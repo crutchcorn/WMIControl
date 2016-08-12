@@ -1,3 +1,4 @@
+pywin32==220
 docopt==0.6.2
 wmi==1.4.9
 requests==2.11.0
