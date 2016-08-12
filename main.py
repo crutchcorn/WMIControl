@@ -1,30 +1,21 @@
+#!/usr/bin/env python3
 """WMIControl.
 
 Usage:
   WMIControl scan
-  WMIControl scan <subnet>
-  WMIControl scan <start> <end>
+  WMIControl scan --subnet=<subnet>
+  WMIControl scan (-r | --range) <start> <end>
 
 Options:
-  -h --help                     Show this screen.
-  --version                     Show version.
-  scan                          Start a scan          ###################### EDIT THIS WHEN YOU'RE NOT A PIECE OF SHIT
-  <start>                       Start of IP Range to scan.
-  <end>                         End of IP Range to scan.
-  --subnet=<ie: 192.168.1>      Scan entire IP subnet.
+  -h --help                  Show this screen.
+  -v --version               Show version.
+  scan                       Start a local or remote scan.       IE: When empty, local
+  <start>                    Start of IP Range to scan.          EG: 192.168.1.1
+  <end>                      End of IP Range to scan.            EG: 192.168.1.255
+  --subnet=<subnet>          Scan entire IP subnet.              EG: 192.168.1
 
 """
 
-'''
-## Database stuff unfinished. Do not uncomment
-from django.core.wsgi import get_wsgi_application
-from django.conf import settings
-settings.configure()
-application = get_wsgi_application()
-
-## Standard Import
-from data.models import *
-'''
 import csv
 import json
 import getopt
@@ -154,16 +145,16 @@ def main():
     ## Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
     if (arguments["scan"]):
-        if (arguments["<subnet>"] or arguments["<start>"]):
-            if (arguments["<subnet>"]):
-                search = arguments["<subnet>"]
+        if (arguments["--subnet"] or arguments["-r"]):
+            if (arguments["--subnet"]):
+                search = arguments["--subnet"]
                 if search[-1] == '.':
                     search = search[:-1]
                 n = search.count('.')
                 for _ in range(n, 2): # xxx.xxx.xxx.xxx
                     search += ".0-255"
                 search += ".1-255"
-            elif (arguments["<start>"]):
+            elif (arguments["-r"] or arguments["--range"]):
                 start = tuple(part for part in arguments["<start>"].split('.'))
                 end = tuple(part for part in arguments["<end>"].split('.'))
                 search = ""
