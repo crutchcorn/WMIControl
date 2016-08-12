@@ -11,3 +11,15 @@ email = "test@example.org"
 password = "password"
 device = "Desktop"
 app_version = "2"
+
+
+[db]
+secret_key = "reallylongstringreallylongstringreallylongstringreallylongstring"
+
+[db.databases]
+engine = 'django.db.backends.postgresql'
+name = 'name'
+user = 'user'
+password = 'password'
+host = '127.0.0.1'
+port = '5432'
