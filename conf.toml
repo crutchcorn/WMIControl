@@ -1,0 +1,13 @@
+[credentials]
+
+[credentials.wmi]
+user = 'username'
+pass = "password"
+
+[credentials.assetpanda]
+client_id = "reallylongstringreallylongstringreallylongstringreallylongstring"
+client_secret = "reallylongstringreallylongstringreallylongstringreallylongstring"
+email = "test@example.org"
+password = "password"
+device = "Desktop"
+app_version = "2"

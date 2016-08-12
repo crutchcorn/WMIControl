@@ -9,17 +9,22 @@ Options:
   -h --help                     Show this screen.
   --version                     Show version.
   scan                          Start a scan          ###################### EDIT THIS WHEN YOU'RE NOT A PIECE OF SHIT
-  <start>             Start of IP Range to scan.
-  <end>                 End of IP Range to scan.
+  <start>                       Start of IP Range to scan.
+  <end>                         End of IP Range to scan.
   --subnet=<ie: 192.168.1>      Scan entire IP subnet.
 
 """
 
-#from django.core.wsgi import get_wsgi_application
-#application = get_wsgi_application()
+'''
+## Database stuff unfinished. Do not uncomment
+from django.core.wsgi import get_wsgi_application
+from django.conf import settings
+settings.configure()
+application = get_wsgi_application()
 
 ## Standard Import
-#from data.models import *
+from data.models import *
+'''
 import csv
 import json
 import getopt
@@ -31,22 +36,30 @@ from docopt import docopt
 import wmi
 import requests
 import nmap
+import toml
 
-'''
+
 ## Asset Panda
-token = requests.post('https://login.assetpanda.com:443/v2/session/token', data = {'client_id':'', 'client_secret': '', 'email': '', 'password': '', 'device': '', 'app_version': ''})
+def assetPanda(config):
+    token = requests.post('https://login.assetpanda.com:443/v2/session/token', data = {
+        'client_id': config['credentials']['assetpanda']['client_id'],
+        'client_secret': config['credentials']['assetpanda']['client_secret'],
+        'email': config['credentials']['assetpanda']['email'],
+        'password': config['credentials']['assetpanda']['password'],
+        'device': config['credentials']['assetpanda']['device'],
+        'app_version': config['credentials']['assetpanda']['app_version']
+    })
 
-key = "Bearer " + token.json()['access_token']
-auth = {'Authorization':key}
-print(key)
+    key = "Bearer " + token.json()['access_token']
+    auth = {'Authorization':key}
+    print(key)
 
-w = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth)
+    w = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth)
 
-print(w.json())
+    print(w.json())
 
-with open('data.json', 'w') as outfile:
-    json.dump(w.json(), outfile)
-'''
+    with open('data.json', 'w') as outfile:
+        json.dump(w.json(), outfile)
 
 ## NMAP Stuff
 def getComputers(search):
@@ -61,13 +74,11 @@ def WMIInfo(c):
     computer = {}
     B2GB = 1024 * 1024 * 1024
 
-    computer['os'] = c.Win32_OperatingSystem()[-1].Caption
-
+    computer['os'] = c.Win32_OperatingSystem()[-1].Caption.strip()
     computer['sticks'] = c.win32_PhysicalMemoryArray()[-1].MemoryDevices
-
-    computer['manufacturer'] = c.Win32_ComputerSystem()[-1].Manufacturer
-    computer['model'] = c.Win32_ComputerSystem()[-1].Model
-    computer['compname'] = c.Win32_ComputerSystem()[-1].Name
+    computer['manufacturer'] = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
+    computer['model'] = c.Win32_ComputerSystem()[-1].Model.strip()
+    computer['compname'] = c.Win32_ComputerSystem()[-1].Name.strip()
     computer['memory'] = round(int(c.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / B2GB)
     computer['cores'] = c.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors
 
@@ -84,20 +95,15 @@ def WMIInfo(c):
     computer['drivesSize'] = drivesSize
     computer['drivesFreeSpace'] = drivesFreeSpace
 
-    '''
-    for drivetype in c.Win32_DiskDrive():
-        print(drivetype)
-    '''
-
     cpusName = []
     for cpu in c.Win32_Processor():
-        cpusName.append(cpu.Name)
+        cpusName.append(cpu.Name.strip())
 
     computer['cpusName'] = cpusName
 
     gpusName = []
     for gpu in c.Win32_VideoController():
-        gpusName.append(gpu.Name)
+        gpusName.append(gpu.Name.strip())
 
     computer['gpusName'] = gpusName
 
@@ -123,13 +129,14 @@ def WMIInfo(c):
                     break
                 else:
                     macs.add(net.MACAddress)
-                    netnames.add(net.Name)
+                    netnames.add(net.Name.strip())
 
     computer['macs'] = macs
     computer['netnames'] = netnames
+    computer['roles'] = []
     try:
         for server in c.Win32_ServerFeature():
-            print(server) # STILL NEED TO TURN THIS INTO ACTUALLY SAVING THE INFORMATION FROM HERE SOMEPLACE. TEST SOON
+            computer['roles'].append(server.Name.strip())
             comptype = "Server"
     except:
         if c.Win32_Battery()[-1].BatteryStatus > 0:
@@ -140,6 +147,11 @@ def WMIInfo(c):
     return computer
 
 def main():
+    ## Get config file ready to roll
+    with open("conf.toml") as conffile:
+        config = toml.loads(conffile.read())
+
+    ## Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
     if (arguments["scan"]):
         if (arguments["<subnet>"] or arguments["<start>"]):
@@ -165,10 +177,10 @@ def main():
             for ip in getComputers(search):
                 print("Trying to connect to", ip)
                 try:
-                    c = wmi.WMI(str(ip), user=r"User", password="Password")
+                    c = wmi.WMI(str(ip), user=config['credentials']['wmi']['user'], password=config['credentials']['wmi']['pass'])
                     WMIInfo(c)
                 except wmi.x_wmi as e:
-                    print("Sorry, was unable to connect.\n\tError: " + str(e))
+                    print("Sorry, was unable to connect.\n\tError: " + str(e.com_error.excepinfo[2]))
         else:
             c = wmi.WMI()
             print(WMIInfo(c))
