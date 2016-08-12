@@ -1,3 +1,6 @@
+# Configuration files: Prevents people from trying to commit their own config (*cough* CORBIN)
+*.toml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
