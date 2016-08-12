@@ -28,7 +28,18 @@ import wmi
 import requests
 import nmap
 import toml
+from django.core.wsgi import get_wsgi_application
+from django.conf import settings
 
+## Database info
+from data import models
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+application = get_wsgi_application()
+
+## Database
+def database():
+    # Code goes here
+    pass
 
 ## Asset Panda
 def assetPanda(config):
