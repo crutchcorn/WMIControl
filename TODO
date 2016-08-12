@@ -7,3 +7,5 @@
 - [ ] Better CLI ARGs
 - [ ] Figure out CSV export
 - [ ] Database (built in options on that, but not anytime soon)
+- [ ] Make data in WMIscan match database data schema
+- [ ] Seperate code into files (WMI.py, scan.py, etc)
