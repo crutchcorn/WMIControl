@@ -28,18 +28,17 @@ import wmi
 import requests
 import nmap
 import toml
-from django.core.wsgi import get_wsgi_application
-from django.conf import settings
+import pywintypes
 
 ## Database info
-from data import models
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+
+from django.core.wsgi import get_wsgi_application
+from django.conf import settings
 application = get_wsgi_application()
 
-## Database
-def database():
-    # Code goes here
-    pass
+## DB models
+from data import models
 
 ## Asset Panda
 def assetPanda(config):
@@ -52,7 +51,7 @@ def assetPanda(config):
         'app_version': config['credentials']['assetpanda']['app_version']
     })
 
-    key = "Bearer " + token.json()['access_token']
+    key = token.json()['token_type'].title() + " " + token.json()['access_token']
     auth = {'Authorization':key}
     print(key)
 
@@ -72,81 +71,65 @@ def getComputers(search):
 
 ## WMI Stuff
 def WMIInfo(c):
-
-    computer = {}
     B2GB = 1024 * 1024 * 1024
 
-    computer['os'] = c.Win32_OperatingSystem()[-1].Caption.strip()
-    computer['sticks'] = c.win32_PhysicalMemoryArray()[-1].MemoryDevices
-    computer['manufacturer'] = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
-    computer['model'] = c.Win32_ComputerSystem()[-1].Model.strip()
-    computer['compname'] = c.Win32_ComputerSystem()[-1].Name.strip()
-    computer['memory'] = round(int(c.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / B2GB)
-    computer['cores'] = c.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors
+    machine = models.Machine()
+    machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
+    machine.compModel = c.Win32_ComputerSystem()[-1].Model.strip()
+    machine.cpu = models.CPU.objects.get_or_create(name = c.Win32_Processor()[0].Name.strip(), cores = c.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors, count = len(c.Win32_Processor()))[0]
+    machine.ram = models.RAM.objects.get_or_create(sticks = c.win32_PhysicalMemoryArray()[-1].MemoryDevices, size = round(int(c.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / B2GB))[0]
 
-    drivesName = []
-    drivesSize = []
-    drivesFreeSpace = []
-    for disk in c.Win32_LogicalDisk ():
-          if disk.DriveType == 3: # Only hard drives
-            drivesName.append(disk.DeviceID)
-            drivesSize.append(round(int(disk.Size) / B2GB))
-            drivesFreeSpace.append(round(int(disk.FreeSpace) / B2GB))
+    # def map(func, iterable):
+    # for i in iterable:
+    #     yield func(i)
+    machine.save()
+    # hdd becomes `i in iterable`
+    machine.hdds = list(map(
+        lambda hdd: models.HDD.objects.get_or_create(
+            name = hdd.DeviceID,
+            size = round(int(hdd.Size) / B2GB),
+            free = round(int(hdd.FreeSpace) / B2GB)
+        )[0],
+        filter(
+            lambda hdd: hdd.DriveType == 3,
+            c.Win32_LogicalDisk()
+        )
+    ))
 
-    computer['drivesName'] = drivesName
-    computer['drivesSize'] = drivesSize
-    computer['drivesFreeSpace'] = drivesFreeSpace
+    machine.gpus = list(map(
+        lambda gpu: models.GPU.objects.get_or_create(
+            name = gpu.Name.strip()
+        )[0],
+        c.Win32_VideoController()
+    ))
 
-    cpusName = []
-    for cpu in c.Win32_Processor():
-        cpusName.append(cpu.Name.strip())
+    # Mac Address & Network Adapter Name
+    machine.network = list(map(
+        lambda net: models.Network.objects.get_or_create(
+            name = net.Name.strip(),
+            mac = net.MACAddress
+        )[0],
+        filter(
+            lambda net: net.PhysicalAdapter and net.Manufacturer != "Microsoft" and net.PNPDeviceID[0:3] != "USB", 
+            c.Win32_NetworkAdapter()
+        )
+    ))
 
-    computer['cpusName'] = cpusName
+    machine.os = c.Win32_OperatingSystem()[-1].Caption.strip()
 
-    gpusName = []
-    for gpu in c.Win32_VideoController():
-        gpusName.append(gpu.Name.strip())
-
-    computer['gpusName'] = gpusName
-
-    # Mac Address
-    macs = set()
-    netnames = set()
-    wifinames = ["USB", "Bluetooth"]
-    brk = False
-    for net in c.Win32_NetworkAdapter():
-        # Widdle it down to Ethernet only
-        if "Ethernet" in str(net.AdapterType):
-            array = [net.Description, net.Name, net.ProductName, net.Caption]
-            for item in array:
-                for wifi in wifinames:
-                    # Remove list wifinames from list
-                    if wifi in item:
-                        brk = True
-                        break
-                    else:
-                        pass
-                if brk == True:
-                    brk = False
-                    break
-                else:
-                    macs.add(net.MACAddress)
-                    netnames.add(net.Name.strip())
-
-    computer['macs'] = macs
-    computer['netnames'] = netnames
-    computer['roles'] = []
     try:
-        for server in c.Win32_ServerFeature():
-            computer['roles'].append(server.Name.strip())
-            comptype = "Server"
+        machine.roles = list(map(
+            lambda server: models.Role.objects.get_or_create(name = server.Name.strip())[0],
+            c.Win32_ServerFeature()
+        ))
+        machine.compType = models.Machine.SERVER
     except:
         if c.Win32_Battery()[-1].BatteryStatus > 0:
-            comptype="Laptop"
-        else:
-            comptype="Desktop"
-    computer['comptype'] = comptype
-    return computer
+            machine.compType = models.Machine.LAPTOP
+
+    ## Still need to do things
+    machine.save()
+    return machine
 
 def main():
     ## Get config file ready to roll
@@ -155,6 +138,8 @@ def main():
 
     ## Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
+
+    ## Let the fun (parsing) begin
     if (arguments["scan"]):
         if (arguments["--subnet"] or arguments["-r"]):
             if (arguments["--subnet"]):

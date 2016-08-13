@@ -4,3 +4,6 @@ wmi==1.4.9
 requests==2.11.0
 python-nmap=0.6.1
 toml==0.9.2
+Django==1.10
+py-moneyed==0.6.0
+django-money==0.9.1

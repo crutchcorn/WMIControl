@@ -14,3 +14,9 @@ pip install requirements.txt
 `python main.py`
 
 Should output generally how to use the program. For more information, you can pass through the `-h` flag to display help. Currently, the CLI arguments are VERY likely to change and will not be stable until otherwise noted.
+
+#### I made a boom. How do I start over?
+```
+DROP DATABASE wmicontrol;
+CREATE DATABASE wmicontrol WITH OWNER wmicontrol;
+```
