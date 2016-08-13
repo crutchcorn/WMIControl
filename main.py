@@ -74,6 +74,7 @@ def WMIInfo(c):
     B2GB = 1024 * 1024 * 1024
 
     machine = models.Machine()
+    machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
     machine.compModel = c.Win32_ComputerSystem()[-1].Model.strip()
     machine.cpu = models.CPU.objects.get_or_create(name = c.Win32_Processor()[0].Name.strip(), cores = c.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors, count = len(c.Win32_Processor()))[0]
