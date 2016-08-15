@@ -37,8 +37,9 @@ from django.core.wsgi import get_wsgi_application
 from django.conf import settings
 application = get_wsgi_application()
 
-## DB models
+## DB models and exceptions
 from data import models
+from django.core.exceptions import ObjectDoesNotExist
 
 ## Asset Panda
 def assetPanda(config):
@@ -74,16 +75,33 @@ def WMIInfo(c):
     B2GB = 1024 * 1024 * 1024
 
     machine = models.Machine()
+
+    # Mac Address & Network Adapter Name
+    # Placed first to check if exists in database
+    netdevices = filter(
+        lambda net: net.PhysicalAdapter and net.Manufacturer != "Microsoft" and net.PNPDeviceID[0:3] != "USB",
+        c.Win32_NetworkAdapter()
+    )
+
+    for macaddr in netdevices:
+        try:
+            get = models.Network.objects.get(mac=macaddr.MACAddress)
+        except ObjectDoesNotExist:
+            print("This item is not in the database")
+        else:
+            print("This item IS in the database")
+            return
+
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
     machine.compModel = c.Win32_ComputerSystem()[-1].Model.strip()
     machine.cpu = models.CPU.objects.get_or_create(name = c.Win32_Processor()[0].Name.strip(), cores = c.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors, count = len(c.Win32_Processor()))[0]
     machine.ram = models.RAM.objects.get_or_create(sticks = c.win32_PhysicalMemoryArray()[-1].MemoryDevices, size = round(int(c.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / B2GB))[0]
+    machine.save()
 
     # def map(func, iterable):
     # for i in iterable:
     #     yield func(i)
-    machine.save()
     # hdd becomes `i in iterable`
     machine.hdds = list(map(
         lambda hdd: models.HDD.objects.get_or_create(
@@ -104,20 +122,9 @@ def WMIInfo(c):
         c.Win32_VideoController()
     ))
 
-    # Mac Address & Network Adapter Name
-    machine.network = list(map(
-        lambda net: models.Network.objects.get_or_create(
-            name = net.Name.strip(),
-            mac = net.MACAddress
-        )[0],
-        filter(
-            lambda net: net.PhysicalAdapter and net.Manufacturer != "Microsoft" and net.PNPDeviceID[0:3] != "USB", 
-            c.Win32_NetworkAdapter()
-        )
-    ))
-
     machine.os = c.Win32_OperatingSystem()[-1].Caption.strip()
 
+    # Get roles and computer type
     try:
         machine.roles = list(map(
             lambda server: models.Role.objects.get_or_create(name = server.Name.strip())[0],
@@ -128,7 +135,19 @@ def WMIInfo(c):
         if c.Win32_Battery()[-1].BatteryStatus > 0:
             machine.compType = models.Machine.LAPTOP
 
-    ## Still need to do things
+    # Push
+    machine.network = list(map(
+        lambda net: models.Network.objects.create(
+            name = net.Name.strip(),
+            mac = net.MACAddress
+        ),
+        filter(
+            lambda net: net.PhysicalAdapter and net.Manufacturer != "Microsoft" and net.PNPDeviceID[0:3] != "USB",
+            c.Win32_NetworkAdapter()
+        )
+    ))
+
+    ## Save machine
     machine.save()
     return machine
 

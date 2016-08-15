@@ -5,6 +5,7 @@
 - [ ] Figure out CSV export
 - [ ] WMI RPC control
 - [ ] Make data in WMIscan match database data schema
+- [ ] Instead of skipping the computer already scanned, update it instead
 
 ### Cleanup
 - [ ] Config files to specify what you want done
