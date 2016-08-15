@@ -14,6 +14,8 @@
 #### Wishlist
 - [ ] Support for SnipeIT (waiting on RESTful API)
 - [ ] NMAP control from program
+- [ ]  Support for many WMI authentication credentials
+- [ ]  Make AssetPanda support a configuration
 
 ##### Long Into The Future
 - [ ] Some type of support for OSX/Linux
