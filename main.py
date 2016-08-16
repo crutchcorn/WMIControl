@@ -25,10 +25,10 @@ import os
 ## Custom Imports
 from docopt import docopt
 import wmi
-import requests
 import nmap
 import toml
 import pywintypes
+#from integrations.assetpanda import assetPanda
 
 ## Database info
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
@@ -41,28 +41,6 @@ application = get_wsgi_application()
 from data import models
 from django.core.exceptions import ObjectDoesNotExist
 
-## Asset Panda
-def assetPanda(config):
-    token = requests.post('https://login.assetpanda.com:443/v2/session/token', data = {
-        'client_id': config['credentials']['assetpanda']['client_id'],
-        'client_secret': config['credentials']['assetpanda']['client_secret'],
-        'email': config['credentials']['assetpanda']['email'],
-        'password': config['credentials']['assetpanda']['password'],
-        'device': config['credentials']['assetpanda']['device'],
-        'app_version': config['credentials']['assetpanda']['app_version']
-    })
-
-    key = token.json()['token_type'].title() + " " + token.json()['access_token']
-    auth = {'Authorization':key}
-    print(key)
-
-    w = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth)
-
-    print(w.json())
-
-    with open('data.json', 'w') as outfile:
-        json.dump(w.json(), outfile)
-
 ## NMAP Stuff
 def getComputers(search):
     nm = nmap.PortScanner()
@@ -74,8 +52,6 @@ def getComputers(search):
 def WMIInfo(c):
     B2GB = 1024 * 1024 * 1024
 
-    machine = models.Machine()
-
     # Mac Address & Network Adapter Name
     # Placed first to check if exists in database
     netdevices = filter(
@@ -85,12 +61,12 @@ def WMIInfo(c):
 
     for macaddr in netdevices:
         try:
-            get = models.Machine.objects.get(network__mac=macaddr.MACAddress)
+            machine = models.Machine.objects.get(network__mac=macaddr.MACAddress)
         except ObjectDoesNotExist:
             print("This item is not in the database")
+            machine = models.Machine()
         else:
             print("This item IS in the database")
-            return
 
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
