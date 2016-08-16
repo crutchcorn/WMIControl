@@ -75,10 +75,13 @@ def WMIInfo(c):
     machine.ram = models.RAM.objects.get_or_create(sticks = c.win32_PhysicalMemoryArray()[-1].MemoryDevices, size = round(int(c.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / B2GB))[0]
     machine.save()
 
-    # def map(func, iterable):
+    # map(func, iterable):
     # for i in iterable:
-    #     yield func(i)
-    # hdd becomes `i in iterable`
+    #     func(i)
+    ### iterate through filter
+    ### and make the iteration `hdd` in the lambda
+    ## lambda x: funct(x), iterable
+    ### funct will iterate through x
     machine.hdds = list(map(
         lambda hdd: models.HDD.objects.get_or_create(
             name = hdd.DeviceID,
