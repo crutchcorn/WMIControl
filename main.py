@@ -85,7 +85,7 @@ def WMIInfo(c):
 
     for macaddr in netdevices:
         try:
-            get = models.Network.objects.get(mac=macaddr.MACAddress)
+            get = models.Machine.objects.get(network__mac=macaddr.MACAddress)
         except ObjectDoesNotExist:
             print("This item is not in the database")
         else:
@@ -137,10 +137,10 @@ def WMIInfo(c):
 
     # Push
     machine.network = list(map(
-        lambda net: models.Network.objects.create(
+        lambda net: models.Network.objects.get_or_create(
             name = net.Name.strip(),
             mac = net.MACAddress
-        ),
+        )[0],
         filter(
             lambda net: net.PhysicalAdapter and net.Manufacturer != "Microsoft" and net.PNPDeviceID[0:3] != "USB",
             c.Win32_NetworkAdapter()
