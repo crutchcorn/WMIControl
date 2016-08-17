@@ -29,7 +29,7 @@ def getToken(config):
 
     # Makes sure there was no error connecting before going forward
     try:
-        token.raise_for_status()
+        token.raise_for_status() # Raises an error if 4xx or 5xx error code. Goes through if 200
     except requests.exceptions.HTTPError:
         print("There was an error")
         return
@@ -39,6 +39,29 @@ def getToken(config):
     auth = {'Authorization':key}
     return auth
 
+## Generates dictionary with IDs matching these names:
+# Assets
+# Campus
+# Room
+# Asset Categories
+# Employees
+# Help Desk Tickets
+# Funding Sources
+def getAssetID(auth): # This will likely be expanded to getting the IDs of all entities and then renamed
+    entitiesjson = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth).json()
+    entitydict = {}
+    for entity in entitiesjson:
+        entitydict[entity['name']] = entity['id']
+    print(entitydict['Assets'])
+    return entitydict
+
+def getAssets(auth, entitydict):
+    array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects', headers=auth).json()
+    for objects in array['objects']:
+        print(objects) # This handles one object at a time
+    with open('data.json', 'w') as outfile:
+        json.dump(array, outfile)
+
 # stuff only to run when not called via 'import' here
 if __name__ == "__main__":
     main()
@@ -46,7 +69,9 @@ if __name__ == "__main__":
         config = toml.loads(conffile.read())
 
     auth = getToken(config)
-    w = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth)
+    getAssets(auth, getAssetID(auth))
+
+    entities = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth)
 
     with open('data.json', 'w') as outfile:
-        json.dump(w.json(), outfile)
+        json.dump(entities.json(), outfile)
