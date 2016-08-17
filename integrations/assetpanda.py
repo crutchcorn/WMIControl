@@ -31,23 +31,19 @@ def getToken(config):
     # Makes sure there was no error connecting before going forward
     try:
         token.raise_for_status() # Raises an error if 4xx or 5xx error code. Goes through if 200
-    except requests.exceptions.HTTPError:
-        print("There was an error")
-        return
+    except requests.exceptions.HTTPError as error:
+        print("There was an error recieving the authorization token:")
+        print(error)
+        # Add more from http://docs.python-requests.org/en/latest/user/quickstart/#errors-and-exceptions
+        raise SystemExit
 
     # Takes token recieved and gives token that's needed
     key = token.json()['token_type'].title() + " " + token.json()['access_token']
     auth = {'Authorization':key}
     return auth
 
-## Generates dictionary with IDs matching these names:
+## Generates dictionary with IDs matching names of entities. IE:
 # Assets
-# Campus
-# Room
-# Asset Categories
-# Employees
-# Help Desk Tickets
-# Funding Sources
 def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of all entities and then renamed
     dictionaries = {}
     entitiesjson = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth).json()

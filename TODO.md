@@ -17,6 +17,7 @@
 - [ ] Seperate code into files (WMI.py, scan.py, etc)
 - [ ] Make imports abundantly clear what they're used for (via comments)
 - [ ] MOAR comments
+- [ ] Improve and handle more exceptions
 
 #### Wishlist
 - [ ] Support for SnipeIT (waiting on RESTful API)
