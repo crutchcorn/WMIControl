@@ -18,6 +18,8 @@
 - [ ] Make imports abundantly clear what they're used for (via comments)
 - [ ] MOAR comments
 - [ ] Improve and handle more exceptions
+- [ ] Make networking exceptions apply every time we reach out
+- [ ] Make networking exceptions a tiny library to call across different integrations
 
 #### Wishlist
 - [ ] Support for SnipeIT (waiting on RESTful API)

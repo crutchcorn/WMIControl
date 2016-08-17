@@ -18,15 +18,20 @@ def getToken(config):
         device = "Desktop"
         app_version = "2"
 
-    # Grab token from a POST (as per API)   
-    token = requests.post('https://login.assetpanda.com:443/v2/session/token', data = {
-        'client_id': config['credentials']['assetpanda']['client_id'],
-        'client_secret': config['credentials']['assetpanda']['client_secret'],
-        'email': config['credentials']['assetpanda']['email'],
-        'password': config['credentials']['assetpanda']['password'],
-        'device': device,
-        'app_version': app_version
-    })
+    # Grab token from a POST (as per API). Ensures request went through and did not time out
+    try:
+        token = requests.post('https://login.assetpanda.com:443/v2/session/token', data = {
+            'client_id': config['credentials']['assetpanda']['client_id'],
+            'client_secret': config['credentials']['assetpanda']['client_secret'],
+            'email': config['credentials']['assetpanda']['email'],
+            'password': config['credentials']['assetpanda']['password'],
+            'device': device,
+            'app_version': app_version
+        })
+    except requests.exceptions.ConnectTimeout as timeout:
+        print(timeout)
+        print("It seems like you've hit a timeout with the server")
+        raise SystemExit
 
     # Makes sure there was no error connecting before going forward
     try:
