@@ -2,6 +2,7 @@ import toml
 import requests
 import os.path
 import json
+from collections import namedtuple
 
 # stuff to run always here such as class/def
 def main():
@@ -47,17 +48,24 @@ def getToken(config):
 # Employees
 # Help Desk Tickets
 # Funding Sources
-def getAssetID(auth): # This will likely be expanded to getting the IDs of all entities and then renamed
+def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of all entities and then renamed
+    dictionaries = {}
     entitiesjson = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth).json()
     entitydict = {}
     for entity in entitiesjson:
         entitydict[entity['name']] = entity['id']
-    print(entitydict['Assets'])
-    return entitydict
+        if (entity['name'] == "Assets"):
+            fieldsdict = {}
+            for field in entity['fields']:
+                fieldsdict[field['name']] = field['id']
+    dictcollection = namedtuple('dictcollection', ['entitydict', 'fieldsdict'])
+    dictionaries = dictcollection(entitydict, fieldsdict)
+    return dictionaries
 
 def getAssets(auth, entitydict):
     array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects', headers=auth).json()
     for objects in array['objects']:
+        pass
         print(objects) # This handles one object at a time
     with open('data.json', 'w') as outfile:
         json.dump(array, outfile)
@@ -69,9 +77,5 @@ if __name__ == "__main__":
         config = toml.loads(conffile.read())
 
     auth = getToken(config)
-    getAssets(auth, getAssetID(auth))
-
-    entities = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth)
-
-    with open('data.json', 'w') as outfile:
-        json.dump(entities.json(), outfile)
+    dictionaries = turnIDsIntoNames(auth)
+    getAssets(auth, dictionaries.entitydict)
