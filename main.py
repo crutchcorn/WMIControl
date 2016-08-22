@@ -18,7 +18,6 @@ Options:
 
 import csv
 import json
-import getopt
 import sys
 import os
 
@@ -28,7 +27,8 @@ import wmi
 import nmap
 import toml
 import pywintypes
-#from integrations.assetpanda import assetPanda
+from integrations import assetpanda
+from collections import namedtuple
 
 ## Database info
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
@@ -39,7 +39,7 @@ application = get_wsgi_application()
 
 ## DB models and exceptions
 from data import models
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 ## NMAP Stuff
 def getComputers(search):
@@ -65,8 +65,12 @@ def WMIInfo(c):
         except ObjectDoesNotExist:
             print("This item is not in the database")
             machine = models.Machine()
+        except MultipleObjectsReturned:
+            print("You have a duplicate machine in your database!")
+            raise SystemExit
         else:
             print("This item IS in the database")
+            raise SystemExit
 
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
@@ -130,7 +134,33 @@ def WMIInfo(c):
     machine.save()
     return machine
 
+## Asset Management Functions: pushToAssetTracker
+# This function will need to be made more generic to handle different AssetTrackers in
+# more of an API implamentation than doing something specific to the DB. 
+# This means that the LIB will be doing a bit more heavy lifting;
+# but that's the goal of setting up an API like interface, isn't it?
+
+def makeAssetFromDB():
+    auth = assetpanda.getToken(config)
+    machine = models.Machine.objects.last()
+    network = machine.network.first()
+    hdd = machine.hdds.first()
+    gpu = machine.gpus.first()
+    ram = machine.ram
+    cpu = machine.cpu
+    concatenatedRoles = ""
+    roles = machine.roles.all()
+    for role in roles:
+        concatenatedRoles += str(role) + '\n'
+
+    # This is where the code will go to read from a database and put assets into ITAM solution
+    namedfields = namedtuple('namedfields', ['ramsize', 'netmodel', 'ramsticks', 'model', 'cpucores', 'mac', 'roles', 'name', 'cpumodel', 'manufacturer', 'hddsize', 'gpus', 'hddfree', 'comptype'])
+    fields = namedfields(ram.size, network.name, ram.sticks, machine.compModel, cpu.cores, network.mac, concatenatedRoles, machine.name, cpu.name, machine.manufacturer, hdd.size, gpu.name, hdd.free, machine.get_compType_display())
+    assetpanda.makeAsset(auth, fields)
+
+
 def main():
+    global config
     ## Get config file ready to roll
     with open("conf.toml") as conffile:
         config = toml.loads(conffile.read())
@@ -167,9 +197,11 @@ def main():
                     WMIInfo(c)
                 except wmi.x_wmi as e:
                     print("Sorry, was unable to connect.\n\tError: " + str(e.com_error.excepinfo[2]))
+                makeAssetFromDB()
         else:
             c = wmi.WMI()
             print(WMIInfo(c))
+            makeAssetFromDB()
 
 if __name__ == "__main__":
     main()

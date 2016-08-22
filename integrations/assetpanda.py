@@ -4,6 +4,8 @@ import os.path
 import json
 from collections import namedtuple
 
+# Fair warning to all, this is HIGHLY configured JUST to match my usecase. I'll likely (if I decide that I want to) go ahead and change this later, but that may be difficult being given these restraints
+
 # stuff to run always here such as class/def
 def main():
     pass
@@ -32,6 +34,10 @@ def getToken(config):
         print(timeout)
         print("It seems like you've hit a timeout with the server")
         raise SystemExit
+    except requests.exceptions.ConnectionError as connectErr:
+        print(connectErr)
+        print("We had a hard time trying to connect to the server")
+        raise SystemExit
 
     # Makes sure there was no error connecting before going forward
     try:
@@ -58,25 +64,61 @@ def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of
         if (entity['name'] == "Assets"):
             fieldsdict = {}
             for field in entity['fields']:
-                fieldsdict[field['name']] = field['id']
+                fieldsdict[field['name']] = field['key']
     dictcollection = namedtuple('dictcollection', ['entitydict', 'fieldsdict'])
     dictionaries = dictcollection(entitydict, fieldsdict)
     return dictionaries
 
-def getAssets(auth, entitydict):
-    array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects', headers=auth).json()
-    for objects in array['objects']:
+def getAssetsID(auth, entitydict, fieldsdict):
+    array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects?sort=-' + fieldsdict['Asset ID'], headers=auth).json()
+    try:
+        return int(array['objects'][0][fieldsdict['Asset ID']])
+    except IndexError: # If entity does not yet have an object in it
+        return 0
+
+def makeAsset(auth, info):
+    dictionaries = turnIDsIntoNames(auth)
+    fieldsdict = dictionaries.fieldsdict
+    entitydict = dictionaries.entitydict
+    body = {}
+    body[fieldsdict['Asset ID']] = getAssetsID(auth, entitydict, fieldsdict) + 1
+    body[fieldsdict['Name']] = info.name
+    body[fieldsdict['RAM Size']] = info.ramsize
+    body[fieldsdict['Network Card Model']] = info.netmodel
+    body[fieldsdict['RAM Sticks']] = info.ramsticks
+    body[fieldsdict['Model']] = info.model
+    body[fieldsdict['CPU Cores']] = info.cpucores
+    body[fieldsdict['MAC Address']] = info.mac
+    body[fieldsdict['Server Roles']] = info.roles
+    body[fieldsdict['CPU Model']] = info.cpumodel
+    body[fieldsdict['Manufacturer']] = info.manufacturer
+    body[fieldsdict['HDD Size ']] = info.hddsize
+    body[fieldsdict['Video Card Model']] = info.gpus
+    body[fieldsdict['Asset Category']] = "Technology"
+    body[fieldsdict['HDD Free']] = info.hddfree
+    body[fieldsdict['Asset Sub-Category']] = info.comptype
+    response = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects', headers=auth, data=body)
+    try:
+        if response.json()['code'] == 2: # From what I can tell, code 2 is an error code for something not being unique. This requires you to set up the database in such a way that things need to be unique.
+            print("You already have this asset in AssetPanda")
+            ### Add a way to update said asset instead of skipping over it. For this, you'd use patch v2/entity_objects/{id} in the AssetPanda API
+            ## The following does not work
+            # body[fieldsdict['Asset ID']] = getAssetsID(auth, entitydict, fieldsdict)
+            # print(body[fieldsdict['Asset ID']])
+            # print(body)
+            # that = requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + entitydict['Assets'], headers=auth, data=body)
+            # print(that.text)
+    except KeyError:
         pass
-        print(objects) # This handles one object at a time
-    with open('data.json', 'w') as outfile:
-        json.dump(array, outfile)
+    return response
 
 # stuff only to run when not called via 'import' here
 if __name__ == "__main__":
     main()
     with open(os.path.join(os.path.dirname(__file__), os.pardir, 'conf.toml')) as conffile:
         config = toml.loads(conffile.read())
-
     auth = getToken(config)
-    dictionaries = turnIDsIntoNames(auth)
-    getAssets(auth, dictionaries.entitydict)
+    
+    namedfields = namedtuple('namedfields', ['ramsize', 'netmodel', 'ramsticks', 'model', 'cpucores', 'mac', 'roles', 'name', 'cpumodel', 'manufacturer', 'hddsize', 'gpus', 'hddfree', 'comptype'])
+    fields = namedfields(10, "HealthNet", 9, "Onemoretime", 8, "4A:B4:LF:231:92", "This is a thing that the server does \n no way, this is also a thing the server does \n wat wat \n all up in da club", "Joe202 Mac", "Intel Lumia One", "Dontstopthedancing CO", 300, "That one thing", 200, "Laptop")
+    makeAsset(auth, fields)
