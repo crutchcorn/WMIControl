@@ -55,7 +55,8 @@ def WMIInfo(c):
     # Mac Address & Network Adapter Name
     # Placed first to check if exists in database
     netdevices = filter(
-        lambda net: net.PhysicalAdapter and net.Manufacturer != "Microsoft" and net.PNPDeviceID[0:3] != "USB",
+        lambda net: net.MACAddress != None,
+        # net.PhysicalAdapter and ... and net.PNPDeviceID[0:3] != "USB"
         c.Win32_NetworkAdapter()
     )
 
@@ -98,12 +99,15 @@ def WMIInfo(c):
         )
     ))
 
-    machine.gpus = list(map(
-        lambda gpu: models.GPU.objects.get_or_create(
-            name = gpu.Name.strip()
-        )[0],
-        c.Win32_VideoController()
-    ))
+    if not c.Win32_VideoController():
+        machine.gpus = [models.GPU.objects.get_or_create(name = 'Unknown')[0]]
+    else:
+        machine.gpus = list(map(
+            lambda gpu: models.GPU.objects.get_or_create(
+                name = gpu.Name.strip()
+            )[0],
+            c.Win32_VideoController()
+        ))
 
     machine.os = c.Win32_OperatingSystem()[-1].Caption.strip()
 
@@ -115,8 +119,11 @@ def WMIInfo(c):
         ))
         machine.compType = models.Machine.SERVER
     except:
-        if c.Win32_Battery()[-1].BatteryStatus > 0:
-            machine.compType = models.Machine.LAPTOP
+        try:
+            if c.Win32_Battery()[-1].BatteryStatus > 0:
+                machine.compType = models.Machine.LAPTOP
+        except IndexError:
+            pass
 
     # Push
     machine.network = list(map(
@@ -125,7 +132,8 @@ def WMIInfo(c):
             mac = net.MACAddress
         )[0],
         filter(
-            lambda net: net.PhysicalAdapter and net.Manufacturer != "Microsoft" and net.PNPDeviceID[0:3] != "USB",
+            lambda net: net.MACAddress != None,
+            # net.PhysicalAdapter and ... and net.PNPDeviceID[0:3] != "USB" 
             c.Win32_NetworkAdapter()
         )
     ))
@@ -144,6 +152,7 @@ def makeAssetFromDB():
     auth = assetpanda.getToken(config)
     machine = models.Machine.objects.last()
     network = machine.network.first()
+    netlist = machine.network.all()
     hdd = machine.hdds.first()
     gpu = machine.gpus.first()
     ram = machine.ram
@@ -197,10 +206,11 @@ def main():
                     WMIInfo(c)
                 except wmi.x_wmi as e:
                     print("Sorry, was unable to connect.\n\tError: " + str(e.com_error.excepinfo[2]))
-                makeAssetFromDB()
+                else:
+                    makeAssetFromDB()
         else:
             c = wmi.WMI()
-            print(WMIInfo(c))
+            WMIInfo(c)
             makeAssetFromDB()
 
 if __name__ == "__main__":

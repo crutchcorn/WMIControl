@@ -5,8 +5,11 @@
 - [ ] Figure out CSV export
 - [ ] WMI RPC control
 - [ ] Make data in WMIscan match database data schema
-- [X] Instead of skipping the computer already scanned, update it instead
+- [ ] Instead of skipping the computer already scanned, update it instead in Asset Panda
+- [ ] Add ability to update computer on database
+- [ ] Rename WMIInfo begining to WMIHandler and have it call WMIAdd or WMIUpdate based on if it is in database
 - [ ] Find out what device and app_version does inside of AssetPanda
+- [ ] Add way to scan only one computer
 
 ### Cleanup
 - [ ] Config files to specify what you want done

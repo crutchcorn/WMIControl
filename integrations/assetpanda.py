@@ -101,6 +101,8 @@ def makeAsset(auth, info):
     try:
         if response.json()['code'] == 2: # From what I can tell, code 2 is an error code for something not being unique. This requires you to set up the database in such a way that things need to be unique.
             print("You already have this asset in AssetPanda")
+            print(response.json())
+            print(info.name)
             ### Add a way to update said asset instead of skipping over it. For this, you'd use patch v2/entity_objects/{id} in the AssetPanda API
             ## The following does not work
             # body[fieldsdict['Asset ID']] = getAssetsID(auth, entitydict, fieldsdict)
