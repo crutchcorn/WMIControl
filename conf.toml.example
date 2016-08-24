@@ -1,25 +1,25 @@
 [credentials]
 
 [credentials.wmi]
-user = 'username'
-pass = "password"
+users     = [ "user1", "user2" ]
+passwords = [ "password1", "password2" ]
 
 [credentials.assetpanda]
-client_id = "reallylongstringreallylongstringreallylongstringreallylongstring"
+client_id     = "reallylongstringreallylongstringreallylongstringreallylongstring"
 client_secret = "reallylongstringreallylongstringreallylongstringreallylongstring"
-email = "test@example.org"
-password = "password"
-device = "Desktop"
-app_version = "2"
+email         = "test@example.org"
+password      = "password"
+device        = "Desktop"
+app_version   = "2"
 
 
 [db]
 secret_key = "reallylongstringreallylongstringreallylongstringreallylongstring"
 
 [db.databases]
-engine = 'django.db.backends.postgresql'
-name = 'name'
-user = 'user'
+engine   = 'django.db.backends.postgresql'
+name     = 'name'
+user     = 'user'
 password = 'password'
-host = '127.0.0.1'
-port = '5432'
+host     = '127.0.0.1'
+port     = '5432'

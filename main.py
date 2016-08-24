@@ -41,6 +41,11 @@ application = get_wsgi_application()
 from data import models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
+## Custom Error Exceptions
+class AlreadyInDB(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
 ## NMAP Stuff
 def getComputers(search):
     nm = nmap.PortScanner()
@@ -70,8 +75,7 @@ def WMIInfo(c):
             print("You have a duplicate machine in your database!")
             raise SystemExit
         else:
-            print("This item IS in the database")
-            raise SystemExit
+            raise AlreadyInDB
 
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
@@ -200,14 +204,22 @@ def main():
                     search += '.'
                 search = search[:-1]
             for ip in getComputers(search):
-                print("Trying to connect to", ip)
-                try:
-                    c = wmi.WMI(str(ip), user=config['credentials']['wmi']['user'], password=config['credentials']['wmi']['pass'])
-                    WMIInfo(c)
-                except wmi.x_wmi as e:
-                    print("Sorry, was unable to connect.\n\tError: " + str(e.com_error.excepinfo[2]))
-                else:
-                    makeAssetFromDB()
+                for i in range(len(config['credentials']['wmi']['users'])):
+                    print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
+                    try:
+                        c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
+                        WMIInfo(c)
+                    except wmi.x_wmi as e:
+                        print(e.com_error.excepinfo[2])
+                    except AlreadyInDB:
+                        print("This item is already in your database")
+                        break
+                    except IndexError:
+                        print("Your configuration file is configured incorrectly")
+                        raise SystemExit
+                    else:
+                        makeAssetFromDB()
+                        break
         else:
             c = wmi.WMI()
             WMIInfo(c)
