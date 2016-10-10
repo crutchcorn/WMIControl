@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""WMIControl.
+"""WMIControl - For those hard to reach servers. UoNC eat your heart out
 
 Usage:
   WMIControl scan
@@ -60,8 +60,7 @@ def WMIInfo(c):
     # Mac Address & Network Adapter Name
     # Placed first to check if exists in database
     netdevices = filter(
-        lambda net: net.MACAddress != None,
-        # net.PhysicalAdapter and ... and net.PNPDeviceID[0:3] != "USB"
+        lambda net: net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\"),
         c.Win32_NetworkAdapter()
     )
 
