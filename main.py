@@ -183,7 +183,7 @@ def main():
 
     ## Let the fun (parsing) begin
     if arguments["scan"]:
-        if arguments["--finish"] or arguments["-r"]:
+        if arguments["--finish"] or arguments["--range"] or arguments["<nmapIP>"]:
             if arguments["--finish"]:
                 search = arguments["--finish"]
                 if search[-1] == '.':
@@ -192,7 +192,7 @@ def main():
                 for _ in range(n, 2): # xxx.xxx.xxx.xxx
                     search += ".0-255"
                 search += ".1-255"
-            elif arguments["-r"] or arguments["--range"]:
+            elif arguments["--range"]:
                 start = tuple(part for part in arguments["<start>"].split('.'))
                 end = tuple(part for part in arguments["<end>"].split('.'))
                 search = ""
