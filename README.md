@@ -67,10 +67,3 @@ django.db.backends.oracle
 	- EG: `wmicontrol --subnet=192.168.1`
 
 Currently, the CLI arguments are VERY likely to change and will not be stable until otherwise noted.
-
-#### I made a boom. How do I start over?
-In order to wipe your database clean, you will need to run the following commends in your database shell:
-```sql
-DROP DATABASE wmicontrol;
-CREATE DATABASE wmicontrol WITH OWNER username;
-```
