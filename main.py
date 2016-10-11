@@ -3,15 +3,17 @@
 
 Usage:
   WMIControl scan
-  WMIControl scan --subnet=<subnet>
+  WMIControl scan <nmapIP>
+  WMIControl scan --finish=<iprange>
   WMIControl scan (-r | --range) <start> <end>
 
 Options:
   -h --help                  Show this screen.
   -v --version               Show version.
   scan                       Start a local or remote scan.       IE: When empty, local
+  <nmapIP>                   A valid nmap IP query to call       EG: 192.168.1.1/24
   -r --range                 Scan a range of IP addresses.       EG: 192.168.1.1
-  --subnet=<subnet>          Scan entire IP subnet.              EG: 192.168.1
+  --finish=<iprange>         Replace empty spaces with [0-255]   EG: 192.168.1
 
 """
 
@@ -48,7 +50,7 @@ class AlreadyInDB(Exception):
 ## NMAP Stuff
 def getComputers(search):
     nm = nmap.PortScanner()
-    nm.scan(hosts=search, arguments='-sn -n')
+    nm.scan(hosts=search, arguments='-sS -p 22 -n -T5')
     computers = nm.all_hosts() # Gives me an array of hosts
     return computers
 
@@ -180,17 +182,17 @@ def main():
     arguments = docopt(__doc__, version='WMIControl 0.1')
 
     ## Let the fun (parsing) begin
-    if (arguments["scan"]):
-        if (arguments["--subnet"] or arguments["-r"]):
-            if (arguments["--subnet"]):
-                search = arguments["--subnet"]
+    if arguments["scan"]:
+        if arguments["--finish"] or arguments["-r"]:
+            if arguments["--finish"]:
+                search = arguments["--finish"]
                 if search[-1] == '.':
                     search = search[:-1]
                 n = search.count('.')
                 for _ in range(n, 2): # xxx.xxx.xxx.xxx
                     search += ".0-255"
                 search += ".1-255"
-            elif (arguments["-r"] or arguments["--range"]):
+            elif arguments["-r"] or arguments["--range"]:
                 start = tuple(part for part in arguments["<start>"].split('.'))
                 end = tuple(part for part in arguments["<end>"].split('.'))
                 search = ""
@@ -201,6 +203,8 @@ def main():
                         search += "{0}-{1}".format(s, e) 
                     search += '.'
                 search = search[:-1]
+            elif arguments["<nmapIP>"]:
+                search = arguments["<nmapIP>"]
             for ip in getComputers(search):
                 for i in range(len(config['credentials']['wmi']['users'])):
                     print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
