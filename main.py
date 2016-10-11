@@ -10,8 +10,7 @@ Options:
   -h --help                  Show this screen.
   -v --version               Show version.
   scan                       Start a local or remote scan.       IE: When empty, local
-  <start>                    Start of IP Range to scan.          EG: 192.168.1.1
-  <end>                      End of IP Range to scan.            EG: 192.168.1.255
+  -r --range                 Scan a range of IP addresses.       EG: 192.168.1.1
   --subnet=<subnet>          Scan entire IP subnet.              EG: 192.168.1
 
 """
