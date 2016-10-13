@@ -14,6 +14,9 @@ There are many kinds of databases, but because we are using Django as the Python
 - Git installed to PATH
 - Have your database server installed with a user and database set up for WMIControl.
 
+### NMAP
+This program requires nmap to be previously installed. Proceed to download from [here](https://nmap.org/download.html). Insure you are downloading and installing the Windows version
+
 ### PyWin32
 WMIControl uses a library called PyWin32. Unfortunately, it is not unable to be packaged within PyPi. You have to install it from their installer [here](https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/). Ensure you have to proper architecture selected for your Windows version. You must also have the same arcitecture of Python installed, otherwise you will recieve errors such as:
 `PermissionError: [Errno 13] Permission denied: 'C:\\Program Files (x86)\\python\\lib\\site-packages\\win32com\\gen_py\\__init__.py'`
