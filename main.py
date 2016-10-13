@@ -4,15 +4,17 @@
 Usage:
   WMIControl scan
   WMIControl scan <nmapIP>
+  WMIControl scan (-s | --subnet)
   WMIControl scan --finish=<iprange>
   WMIControl scan (-r | --range) <start> <end>
 
 Options:
-  -h --help                  Show this screen.
-  -v --version               Show version.
-  scan                       Start a local or remote scan.       IE: When empty, local
+  -h --help                  Show this screen
+  -v --version               Show version
+  scan                       Start a local or remote scan        IE: When empty, local
   <nmapIP>                   A valid nmap IP query to call       EG: 192.168.1.1/24
-  -r --range                 Scan a range of IP addresses.       EG: 192.168.1.1
+  -s --subnet                Scan through the entire subnet
+  -r --range                 Scan a range of IP addresses        EG: 192.168.1.1
   --finish=<iprange>         Replace empty spaces with [0-255]   EG: 192.168.1
 
 """
@@ -30,6 +32,7 @@ import toml
 import pywintypes
 from integrations import assetpanda
 from collections import namedtuple
+from netaddr import IPNetwork
 
 ## Database info
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
@@ -183,7 +186,8 @@ def main():
 
     ## Let the fun (parsing) begin
     if arguments["scan"]:
-        if arguments["--finish"] or arguments["--range"] or arguments["<nmapIP>"]:
+        local = wmi.WMI()
+        if arguments["--finish"] or arguments["--range"] or arguments["<nmapIP>"] or arguments["--subnet"]:
             if arguments["--finish"]:
                 search = arguments["--finish"]
                 if search[-1] == '.':
@@ -205,6 +209,38 @@ def main():
                 search = search[:-1]
             elif arguments["<nmapIP>"]:
                 search = arguments["<nmapIP>"]
+            elif arguments["--subnet"]:
+                validNetworkIDs = list(map(
+                        lambda a: a.Index,
+                        filter(
+                            lambda net: net.NetEnabled == True and net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\"),
+                            local.Win32_NetworkAdapter()
+                        )
+                    ))
+                netDevices = []
+                for netAdapter in [netAdapter for netAdapter in local.Win32_NetworkAdapterConfiguration() if (netAdapter.Index in validNetworkIDs)]:
+                    netDevices.append(netAdapter)
+                if len(netDevices) > 1:
+                    i = 1
+                    print("There are more than one network devices currently active")
+                    print("Please select a device from the list given:")
+                    for possibleNet in netDevices:
+                        print(str(i) + ") " + possibleNet.Description)
+                        i += 1
+                    print("")
+                    while True:
+                        try:
+                            netSelection = int(input('Input: '))
+                            netDevices = [netDevices[netSelection - 1]]
+                        except ValueError:
+                            print("Not a number")
+                        except IndexError:
+                            print("Out of range number, try again")
+                        else:
+                            break
+                ip = netDevices[0].IPAddress[0].split(".")[:-1] + ['0']
+                ip = ip[0]+"."+ip[1]+"."+ip[2]+"."+ip[3]
+                search = str(IPNetwork(ip+"/"+netDevices[0].IPSubnet[0]).cidr)
             for ip in getComputers(search):
                 for i in range(len(config['credentials']['wmi']['users'])):
                     print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
@@ -223,8 +259,7 @@ def main():
                         makeAssetFromDB()
                         break
         else:
-            c = wmi.WMI()
-            WMIInfo(c)
+            WMIInfo(local)
             makeAssetFromDB()
 
 if __name__ == "__main__":
