@@ -53,6 +53,15 @@ def getToken(config):
     auth = {'Authorization':key}
     return auth
 
+def getMachineAssetID(auth, mac, entitydict, fieldsdict):
+    body = {
+        "field_filters": {
+            fieldsdict['Asset ID']: mac
+        }
+    }
+    cloudAsset = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/search_objects', headers=auth, data=body)
+    return cloudAsset['objects'][0][fieldsdict['Asset ID']]
+
 ## Generates dictionary with IDs matching names of entities. IE:
 # Assets
 def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of all entities and then renamed
@@ -69,10 +78,10 @@ def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of
     dictionaries = dictcollection(entitydict, fieldsdict)
     return dictionaries
 
-def getAssetsID(auth, entitydict, fieldsdict):
-    array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects?sort=-' + fieldsdict['Asset ID'], headers=auth).json()
+def getNewAssetID(auth, entitydict, fieldsdict):
+    array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects?fields=' + fieldsdict['Asset ID'], headers=auth).json()
     try:
-        return int(array['objects'][0][fieldsdict['Asset ID']])
+        return max(map(lambda object: int(object[fieldsdict['Asset ID']]), array['objects']))
     except IndexError: # If entity does not yet have an object in it
         return 0
 
@@ -80,36 +89,40 @@ def makeAsset(auth, info):
     dictionaries = turnIDsIntoNames(auth)
     fieldsdict = dictionaries.fieldsdict
     entitydict = dictionaries.entitydict
-    body = {}
-    body[fieldsdict['Asset ID']] = getAssetsID(auth, entitydict, fieldsdict) + 1
-    body[fieldsdict['Name']] = info.name
-    body[fieldsdict['RAM Size']] = info.ramsize
-    body[fieldsdict['Network Card Model']] = info.netmodel
-    body[fieldsdict['RAM Sticks']] = info.ramsticks
-    body[fieldsdict['Model']] = info.model
-    body[fieldsdict['CPU Cores']] = info.cpucores
-    body[fieldsdict['MAC Address']] = info.mac
-    body[fieldsdict['Server Roles']] = info.roles
-    body[fieldsdict['CPU Model']] = info.cpumodel
-    body[fieldsdict['Manufacturer']] = info.manufacturer
-    body[fieldsdict['HDD Size ']] = info.hddsize
-    body[fieldsdict['Video Card Model']] = info.gpus
-    body[fieldsdict['Asset Category']] = "Technology"
-    body[fieldsdict['HDD Free']] = info.hddfree
-    body[fieldsdict['Asset Sub-Category']] = info.comptype
+    body = {
+        fieldsdict['Asset ID']: getNewAssetID(auth, entitydict, fieldsdict) + 1,
+        fieldsdict['Name']: info.name,
+        fieldsdict['RAM Size']: info.ramsize,
+        fieldsdict['Network Card Model']: info.netmodel,
+        fieldsdict['RAM Sticks']: info.ramsticks,
+        fieldsdict['Model']: info.model,
+        fieldsdict['CPU Cores']: info.cpucores,
+        fieldsdict['MAC Address']: info.mac,
+        fieldsdict['Server Roles']: info.roles,
+        fieldsdict['CPU Model']: info.cpumodel,
+        fieldsdict['Manufacturer']: info.manufacturer,
+        fieldsdict['HDD Size ']: info.hddsize,
+        fieldsdict['Video Card Model']: info.gpus,
+        fieldsdict['Asset Category']: "Technology",
+        fieldsdict['HDD Free']: info.hddfree,
+        fieldsdict['Asset Sub-Category']: info.comptype
+    }
     response = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects', headers=auth, data=body)
     try:
         if response.json()['code'] == 2: # From what I can tell, code 2 is an error code for something not being unique. This requires you to set up the database in such a way that things need to be unique.
             print("You already have this asset in AssetPanda")
             print(response.json())
             print(info.name)
+            raise AlreadyInDB
             ### Add a way to update said asset instead of skipping over it. For this, you'd use patch v2/entity_objects/{id} in the AssetPanda API
             ## The following does not work
-            # body[fieldsdict['Asset ID']] = getAssetsID(auth, entitydict, fieldsdict)
+            # body[fieldsdict['Asset ID']] = getNewAssetID(auth, entitydict, fieldsdict)
             # print(body[fieldsdict['Asset ID']])
             # print(body)
             # that = requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + entitydict['Assets'], headers=auth, data=body)
             # print(that.text)
+        else:
+            print("Asset created in AssetPanda")
     except KeyError:
         pass
     return response

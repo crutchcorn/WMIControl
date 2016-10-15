@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """WMIControl - For those hard to reach servers. UoNC eat your heart out
 
 Usage:
@@ -20,7 +19,6 @@ Options:
 """
 
 import csv
-import json
 import sys
 import os
 
@@ -63,16 +61,15 @@ def WMIInfo(c):
 
     # Mac Address & Network Adapter Name
     # Placed first to check if exists in database
-    netdevices = filter(
+    netdevices = list(filter(
         lambda net: net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\"),
         c.Win32_NetworkAdapter()
-    )
+    ))
 
     for macaddr in netdevices:
         try:
             machine = models.Machine.objects.get(network__mac=macaddr.MACAddress)
         except ObjectDoesNotExist:
-            print("This item is not in the database")
             machine = models.Machine()
         except MultipleObjectsReturned:
             print("You have a duplicate machine in your database!")
@@ -80,6 +77,7 @@ def WMIInfo(c):
         else:
             raise AlreadyInDB
 
+    print("This item will be created in the local database")
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
     machine.compModel = c.Win32_ComputerSystem()[-1].Model.strip()
@@ -138,11 +136,7 @@ def WMIInfo(c):
             name = net.Name.strip(),
             mac = net.MACAddress
         )[0],
-        filter(
-            lambda net: net.MACAddress != None,
-            # net.PhysicalAdapter and ... and net.PNPDeviceID[0:3] != "USB" 
-            c.Win32_NetworkAdapter()
-        )
+        netdevices
     ))
 
     ## Save machine
@@ -154,12 +148,10 @@ def WMIInfo(c):
 # more of an API implamentation than doing something specific to the DB. 
 # This means that the LIB will be doing a bit more heavy lifting;
 # but that's the goal of setting up an API like interface, isn't it?
+# This should also not get the last item, but get the item by utilizing the machineID in the localDB
 
-def makeAssetFromDB():
-    auth = assetpanda.getToken(config)
-    machine = models.Machine.objects.last()
+def makeAssetFromDB(machine, auth):
     network = machine.network.first()
-    netlist = machine.network.all()
     hdd = machine.hdds.first()
     gpu = machine.gpus.first()
     ram = machine.ram
@@ -180,6 +172,8 @@ def main():
     ## Get config file ready to roll
     with open("conf.toml") as conffile:
         config = toml.loads(conffile.read())
+
+    auth = assetpanda.getToken(config)
 
     ## Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
@@ -248,19 +242,23 @@ def main():
                         c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
                         WMIInfo(c)
                     except wmi.x_wmi as e:
-                        print(e.com_error.excepinfo[2])
+                        if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '):
+                            print("Computer does not have WMI enabled")
+                            break
+                        else:
+                            print(e.com_error.excepinfo[2])
                     except AlreadyInDB:
-                        print("This item is already in your database")
+                        print("This item is already in your database") # Go ahead and match item to database
                         break
                     except IndexError:
                         print("Your configuration file is configured incorrectly")
                         raise SystemExit
                     else:
-                        makeAssetFromDB()
                         break
         else:
             WMIInfo(local)
-            makeAssetFromDB()
+        for machine in models.Machine.objects.all().filter(cloudID=None):
+            makeAssetFromDB(machine, auth)
 
 if __name__ == "__main__":
     main()
