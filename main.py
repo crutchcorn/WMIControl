@@ -161,104 +161,108 @@ def makeAssetFromDB(machine, auth):
     for role in roles:
         concatenatedRoles += str(role) + '\n'
 
-    # This is where the code will go to read from a database and put assets into ITAM solution
     namedfields = namedtuple('namedfields', ['ramsize', 'netmodel', 'ramsticks', 'model', 'cpucores', 'mac', 'roles', 'name', 'cpumodel', 'manufacturer', 'hddsize', 'gpus', 'hddfree', 'comptype'])
     fields = namedfields(ram.size, network.name, ram.sticks, machine.compModel, cpu.cores, network.mac, concatenatedRoles, machine.name, cpu.name, machine.manufacturer, hdd.size, gpu.name, hdd.free, machine.get_compType_display())
-    assetpanda.makeAsset(auth, fields)
-
+    return assetpanda.makeAsset(auth, fields)
 
 def main():
-    global config
+    ## Grab CLI Arguments
+    arguments = docopt(__doc__, version='WMIControl 0.1')
+
     ## Get config file ready to roll
     with open("conf.toml") as conffile:
         config = toml.loads(conffile.read())
 
-    auth = assetpanda.getToken(config)
+        # Get auth code from AssetPanda. Please move this and shoot me later for ever doing it this way
+        auth = assetpanda.getToken(config)
 
-    ## Grab CLI Arguments
-    arguments = docopt(__doc__, version='WMIControl 0.1')
-
-    ## Let the fun (parsing) begin
-    if arguments["scan"]:
-        local = wmi.WMI()
-        if arguments["--finish"] or arguments["--range"] or arguments["<nmapIP>"] or arguments["--subnet"]:
-            if arguments["--finish"]:
-                search = arguments["--finish"]
-                if search[-1] == '.':
+        ## Let the fun (parsing) begin
+        if arguments["scan"]:
+            local = wmi.WMI()
+            if arguments["--finish"] or arguments["--range"] or arguments["<nmapIP>"] or arguments["--subnet"]:
+                if arguments["--finish"]:
+                    search = arguments["--finish"]
+                    if search[-1] == '.':
+                        search = search[:-1]
+                    n = search.count('.')
+                    for _ in range(n, 2): # xxx.xxx.xxx.xxx
+                        search += ".0-255"
+                    search += ".1-255"
+                elif arguments["--range"]:
+                    start = tuple(part for part in arguments["<start>"].split('.'))
+                    end = tuple(part for part in arguments["<end>"].split('.'))
+                    search = ""
+                    for s,e in zip(start, end):
+                        if (s == e):
+                            search += s
+                        else:
+                            search += "{0}-{1}".format(s, e) 
+                        search += '.'
                     search = search[:-1]
-                n = search.count('.')
-                for _ in range(n, 2): # xxx.xxx.xxx.xxx
-                    search += ".0-255"
-                search += ".1-255"
-            elif arguments["--range"]:
-                start = tuple(part for part in arguments["<start>"].split('.'))
-                end = tuple(part for part in arguments["<end>"].split('.'))
-                search = ""
-                for s,e in zip(start, end):
-                    if (s == e):
-                        search += s
-                    else:
-                        search += "{0}-{1}".format(s, e) 
-                    search += '.'
-                search = search[:-1]
-            elif arguments["<nmapIP>"]:
-                search = arguments["<nmapIP>"]
-            elif arguments["--subnet"]:
-                validNetworkIDs = list(map(
-                        lambda a: a.Index,
-                        filter(
-                            lambda net: net.NetEnabled == True and net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\"),
-                            local.Win32_NetworkAdapter()
-                        )
-                    ))
-                netDevices = []
-                for netAdapter in [netAdapter for netAdapter in local.Win32_NetworkAdapterConfiguration() if (netAdapter.Index in validNetworkIDs)]:
-                    netDevices.append(netAdapter)
-                if len(netDevices) > 1:
-                    i = 1
-                    print("There are more than one network devices currently active")
-                    print("Please select a device from the list given:")
-                    for possibleNet in netDevices:
-                        print(str(i) + ") " + possibleNet.Description)
-                        i += 1
-                    print("")
-                    while True:
+                elif arguments["<nmapIP>"]:
+                    search = arguments["<nmapIP>"]
+                elif arguments["--subnet"]:
+                    validNetworkIDs = list(map(
+                            lambda a: a.Index,
+                            filter(
+                                lambda net: net.NetEnabled == True and net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\"),
+                                local.Win32_NetworkAdapter()
+                            )
+                        ))
+                    netDevices = []
+                    for netAdapter in [netAdapter for netAdapter in local.Win32_NetworkAdapterConfiguration() if (netAdapter.Index in validNetworkIDs)]:
+                        netDevices.append(netAdapter)
+                    if len(netDevices) > 1:
+                        i = 1
+                        print("There are more than one network devices currently active")
+                        print("Please select a device from the list given:")
+                        for possibleNet in netDevices:
+                            print(str(i) + ") " + possibleNet.Description)
+                            i += 1
+                        print("")
+                        while True:
+                            try:
+                                netSelection = int(input('Input: '))
+                                netDevices = [netDevices[netSelection - 1]]
+                            except ValueError:
+                                print("Not a number")
+                            except IndexError:
+                                print("Out of range number, try again")
+                            else:
+                                break
+                    ip = netDevices[0].IPAddress[0].split(".")[:-1] + ['0']
+                    ip = ip[0]+"."+ip[1]+"."+ip[2]+"."+ip[3]
+                    search = str(IPNetwork(ip+"/"+netDevices[0].IPSubnet[0]).cidr)
+                for ip in getComputers(search):
+                    for i in range(len(config['credentials']['wmi']['users'])):
+                        print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
                         try:
-                            netSelection = int(input('Input: '))
-                            netDevices = [netDevices[netSelection - 1]]
-                        except ValueError:
-                            print("Not a number")
+                            c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
+                            WMIInfo(c)
+                        except wmi.x_wmi as e:
+                            if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '):
+                                print("Computer does not have WMI enabled")
+                                break
+                            else:
+                                print(e.com_error.excepinfo[2])
+                        except AlreadyInDB:
+                            print("This item is already in your database")
+                            break
                         except IndexError:
-                            print("Out of range number, try again")
+                            print("Your configuration file is configured incorrectly")
+                            raise SystemExit
                         else:
                             break
-                ip = netDevices[0].IPAddress[0].split(".")[:-1] + ['0']
-                ip = ip[0]+"."+ip[1]+"."+ip[2]+"."+ip[3]
-                search = str(IPNetwork(ip+"/"+netDevices[0].IPSubnet[0]).cidr)
-            for ip in getComputers(search):
-                for i in range(len(config['credentials']['wmi']['users'])):
-                    print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
-                    try:
-                        c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
-                        WMIInfo(c)
-                    except wmi.x_wmi as e:
-                        if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '):
-                            print("Computer does not have WMI enabled")
-                            break
-                        else:
-                            print(e.com_error.excepinfo[2])
-                    except AlreadyInDB:
-                        print("This item is already in your database") # Go ahead and match item to database
-                        break
-                    except IndexError:
-                        print("Your configuration file is configured incorrectly")
-                        raise SystemExit
-                    else:
-                        break
-        else:
-            WMIInfo(local)
-        for machine in models.Machine.objects.all().filter(cloudID=None):
-            makeAssetFromDB(machine, auth)
+            else:
+                try:
+                    WMIInfo(local)
+                except AlreadyInDB:
+                    print("This item is already in your database")
+            for machine in models.Machine.objects.all().filter(cloudID=None):
+                assetReply = makeAssetFromDB(machine, auth)
+                if assetReply:
+                    machine.cloudID = assetReply
+                    machine.save()
 
 if __name__ == "__main__":
     main()

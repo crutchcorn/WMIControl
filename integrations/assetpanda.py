@@ -56,11 +56,11 @@ def getToken(config):
 def getMachineAssetID(auth, mac, entitydict, fieldsdict):
     body = {
         "field_filters": {
-            fieldsdict['Asset ID']: mac
+            fieldsdict['MAC Address']: mac
         }
     }
-    cloudAsset = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/search_objects', headers=auth, data=body)
-    return cloudAsset['objects'][0][fieldsdict['Asset ID']]
+    cloudAsset = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/search_objects', headers=auth, json=body)
+    return cloudAsset.json()['objects'][0][fieldsdict['Asset ID']]
 
 ## Generates dictionary with IDs matching names of entities. IE:
 # Assets
@@ -111,9 +111,7 @@ def makeAsset(auth, info):
     try:
         if response.json()['code'] == 2: # From what I can tell, code 2 is an error code for something not being unique. This requires you to set up the database in such a way that things need to be unique.
             print("You already have this asset in AssetPanda")
-            print(response.json())
-            print(info.name)
-            raise AlreadyInDB
+            return getMachineAssetID(auth, info.mac, entitydict, fieldsdict)
             ### Add a way to update said asset instead of skipping over it. For this, you'd use patch v2/entity_objects/{id} in the AssetPanda API
             ## The following does not work
             # body[fieldsdict['Asset ID']] = getNewAssetID(auth, entitydict, fieldsdict)
@@ -125,7 +123,7 @@ def makeAsset(auth, info):
             print("Asset created in AssetPanda")
     except KeyError:
         pass
-    return response
+    return
 
 # stuff only to run when not called via 'import' here
 if __name__ == "__main__":
