@@ -69,15 +69,16 @@ def WMIInfo(c):
     for macaddr in netdevices:
         try:
             machine = models.Machine.objects.get(network__mac=macaddr.MACAddress)
+            print("This item will be updated in the local database")
         except ObjectDoesNotExist:
             machine = models.Machine()
+            print("This item will be created in the local database")
         except MultipleObjectsReturned:
             print("You have a duplicate machine in your database!")
             raise SystemExit
-        else:
-            raise AlreadyInDB
+        # else: # Add option to skip asset update
+        #     raise AlreadyInDB
 
-    print("This item will be created in the local database")
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
     machine.compModel = c.Win32_ComputerSystem()[-1].Model.strip()

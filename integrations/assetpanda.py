@@ -107,23 +107,18 @@ def makeAsset(auth, info):
         fieldsdict['HDD Free']: info.hddfree,
         fieldsdict['Asset Sub-Category']: info.comptype
     }
-    response = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects', headers=auth, data=body)
+    response = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects', headers=auth, json=body)
     try:
         if response.json()['code'] == 2: # From what I can tell, code 2 is an error code for something not being unique. This requires you to set up the database in such a way that things need to be unique.
             print("You already have this asset in AssetPanda")
-            return getMachineAssetID(auth, info.mac, entitydict, fieldsdict)
-            ### Add a way to update said asset instead of skipping over it. For this, you'd use patch v2/entity_objects/{id} in the AssetPanda API
-            ## The following does not work
-            # body[fieldsdict['Asset ID']] = getNewAssetID(auth, entitydict, fieldsdict)
-            # print(body[fieldsdict['Asset ID']])
-            # print(body)
-            # that = requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + entitydict['Assets'], headers=auth, data=body)
-            # print(that.text)
+            AssetID = getMachineAssetID(auth, info.mac, entitydict, fieldsdict)
+            update = requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + AssetID, headers=auth, json=body)
+            print("Asset updated in AssetPanda")
         else:
             print("Asset created in AssetPanda")
     except KeyError:
         pass
-    return
+    return body[fieldsdict['Asset ID']]
 
 # stuff only to run when not called via 'import' here
 if __name__ == "__main__":
