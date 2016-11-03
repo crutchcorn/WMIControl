@@ -15,17 +15,17 @@ class Machine(models.Model):
         choices=MACHINE_TYPES,
         default=DESKTOP
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     manufacturer = models.CharField(max_length=255, blank=True)
     compModel = models.CharField(max_length=255, blank=True)
     cpu = models.ForeignKey('CPU', null=True, blank=True)
     ram = models.ForeignKey('RAM', null=True, blank=True)
-    hdds = models.ManyToManyField('HDD', null=True, blank=True)
-    gpus = models.ManyToManyField('GPU', null=True, blank=True)
+    hdds = models.ManyToManyField('HDD', blank=True)
+    gpus = models.ManyToManyField('GPU', blank=True)
     network = models.ManyToManyField('Network')
     os = models.CharField(max_length=255, blank=True)
-    roles = models.ManyToManyField('Role', null=True, blank=True)
-    cloudID = models.PositiveSmallIntegerField(null=True, blank=True)
+    roles = models.ManyToManyField('Role', blank=True)
+    cloudID = models.PositiveSmallIntegerField(null=True, blank=True, unique=True)
     def __unicode__(self):
         return self.name
     def __str__(self):
@@ -66,7 +66,7 @@ class GPU(models.Model):
 
 class Network(models.Model):
     name = models.CharField(max_length=255, blank=True)
-    mac = models.CharField(max_length=255)
+    mac = models.CharField(max_length=255, unique=True)
     def __unicode__(self):
         return u"{}, {} Mac Address".format(self.name, self.mac)
     def __str__(self):
