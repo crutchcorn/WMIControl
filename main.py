@@ -6,6 +6,7 @@ Usage:
   WMIControl scan (-s | --subnet)
   WMIControl scan --finish=<iprange>
   WMIControl scan (-r | --range) <start> <end>
+  WMIControl updatedb
 
 Options:
   -h --help                  Show this screen
@@ -15,6 +16,7 @@ Options:
   -s --subnet                Scan through the entire subnet
   -r --range                 Scan a range of IP addresses        EG: 192.168.1.1
   --finish=<iprange>         Replace empty spaces with [0-255]   EG: 192.168.1
+  updatedb                   Update the local DB with cloud IDs
 
 """
 
@@ -69,15 +71,15 @@ def WMIInfo(c):
     for macaddr in netdevices:
         try:
             machine = models.Machine.objects.get(network__mac=macaddr.MACAddress)
-            print("This item will be updated in the local database")
         except ObjectDoesNotExist:
             machine = models.Machine()
             print("This item will be created in the local database")
         except MultipleObjectsReturned:
             print("You have a duplicate machine in your database!")
             raise SystemExit
-        # else: # Add option to skip asset update
-        #     raise AlreadyInDB
+        else: # Add option to skip asset update
+            print("This item will be updated in the local database")
+            break
 
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
@@ -143,28 +145,6 @@ def WMIInfo(c):
     ## Save machine
     machine.save()
     return machine
-
-## Asset Management Functions: pushToAssetTracker
-# This function will need to be made more generic to handle different AssetTrackers in
-# more of an API implamentation than doing something specific to the DB. 
-# This means that the LIB will be doing a bit more heavy lifting;
-# but that's the goal of setting up an API like interface, isn't it?
-# This should also not get the last item, but get the item by utilizing the machineID in the localDB
-
-def makeAssetFromDB(machine, auth):
-    network = machine.network.first()
-    hdd = machine.hdds.first()
-    gpu = machine.gpus.first()
-    ram = machine.ram
-    cpu = machine.cpu
-    concatenatedRoles = ""
-    roles = machine.roles.all()
-    for role in roles:
-        concatenatedRoles += str(role) + '\n'
-
-    namedfields = namedtuple('namedfields', ['ramsize', 'netmodel', 'ramsticks', 'model', 'cpucores', 'mac', 'roles', 'name', 'cpumodel', 'manufacturer', 'hddsize', 'gpus', 'hddfree', 'comptype'])
-    fields = namedfields(ram.size, network.name, ram.sticks, machine.compModel, cpu.cores, network.mac, concatenatedRoles, machine.name, cpu.name, machine.manufacturer, hdd.size, gpu.name, hdd.free, machine.get_compType_display())
-    return assetpanda.makeAsset(auth, fields)
 
 def main():
     ## Grab CLI Arguments
@@ -255,15 +235,17 @@ def main():
                         else:
                             break
             else:
-                try:
-                    WMIInfo(local)
-                except AlreadyInDB:
-                    print("This item is already in your database")
+                WMIInfo(local)
             for machine in models.Machine.objects.all().filter(cloudID=None):
-                assetReply = makeAssetFromDB(machine, auth)
+                print(machine.name + " will now be added to the asset tracker")
+                assetReply = assetpanda.makeAsset(machine, auth)
                 if assetReply:
                     machine.cloudID = assetReply
                     machine.save()
+        elif arguments["updatedb"]:
+            for machine in models.Machine.objects.all():
+                machine.cloudID = assetpanda.getMachineAssetID(machine.network.first().mac, auth)
+                machine.save()
 
 if __name__ == "__main__":
     main()
