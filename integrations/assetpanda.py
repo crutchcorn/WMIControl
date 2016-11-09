@@ -1,8 +1,5 @@
-import toml
 import requests
-import os.path
 import json
-from collections import namedtuple
 
 # Fair warning to all, this is HIGHLY configured JUST to match my usecase. I'll likely (if I decide that I want to) go ahead and change this later, but that may be difficult being given these restraints
 
@@ -123,6 +120,7 @@ def makeAsset(machine, auth):
             else:
                 print("You already have this asset in AssetPanda")
                 AssetID = getMachineAssetID(machine.network.first().mac, auth)
+                body[fieldsdict['Asset ID']] = AssetID
                 update = requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + AssetID, headers=auth, json=body)
                 print("Asset updated in AssetPanda")
         else:

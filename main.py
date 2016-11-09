@@ -44,6 +44,7 @@ application = get_wsgi_application()
 ## DB models and exceptions
 from data import models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.db import IntegrityError
 
 ## Custom Error Exceptions
 class AlreadyInDB(Exception):
