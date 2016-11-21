@@ -6,7 +6,7 @@ Usage:
   WMIControl scan (-s | --subnet)
   WMIControl scan --finish=<iprange>
   WMIControl scan (-r | --range) <start> <end>
-  WMIControl updatedb
+  WMIControl scan updatedb
 
 Options:
   -h --help                  Show this screen
@@ -29,7 +29,6 @@ import wmi
 import nmap
 import toml
 from integrations import assetpanda #! Replace with plugin
-from collections import namedtuple
 from netaddr import IPNetwork
 
 ## Database info
@@ -43,6 +42,9 @@ application = get_wsgi_application()
 from data import models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import IntegrityError
+
+## This is a quick test to be used with filter() to see if a network device is a physical adapter or not
+netDeviceTest = lambda net: net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\")
 
 ## Custom Error Exceptions
 class AlreadyInDB(Exception):
@@ -63,13 +65,15 @@ def WMIInfo(c):
     # Mac Address & Network Adapter Name
     # Placed first to check if exists in database
     netdevices = list(filter(
-        lambda net: net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\"),
+        lambda net: netDeviceTest(net),
         c.Win32_NetworkAdapter()
     ))
 
     if not netdevices:
-        return
-        # raise LookupError(c.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice") # Use this to raise a fuss
+        if config['settings']['silentlyFail']:
+            return
+        else:
+            raise LookupError(c.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice")
 
     for macaddr in netdevices:
         try:
@@ -77,11 +81,18 @@ def WMIInfo(c):
         except ObjectDoesNotExist:
             machine = models.Machine()
         except MultipleObjectsReturned:
-            raise MultipleObjectsReturned("You have a duplicate machine in your database!")
-        else: # Add option to skip asset update
+            if config['settings']['silentlyFail']:
+                print("You have a duplicate machine in your database")
+                return
+            else:
+                raise MultipleObjectsReturned("You have a duplicate machine in your database!")
+        else:
             break
-    if machine.name:
-        print("This item will be updated in the local database")
+    if machine.name: # Add option to skip asset update
+        if config['settings']['skipUpdate']:
+            raise AlreadyInDB(machine.name, "is already in your database. Skipping")
+        else:
+            print("This item will be updated in the local database")
     else:
         print("This item will be created in the local database")
 
@@ -93,9 +104,12 @@ def WMIInfo(c):
     try:
         machine.save() # Only use try if you want to allow script to continue running after import has failed
     except IntegrityError as err:
-        print(machine.name + " failed to import.")
-        print(err)
-        return
+        if config['settings']['silentlyFail']:
+            print(machine.name + " failed to import.")
+            print(err)
+            return
+        else:
+            raise IntegrityError(err)
 
     # map(func, iterable):
     # for i in iterable:
@@ -134,15 +148,16 @@ def WMIInfo(c):
             lambda server: models.Role.objects.get_or_create(name = server.Name.strip())[0],
             c.Win32_ServerFeature()
         ))
-        machine.compType = models.Machine.SERVER
     except:
         try:
             if c.Win32_Battery()[-1].BatteryStatus > 0:
                 machine.compType = models.Machine.LAPTOP
         except IndexError:
-            pass
+            pass # The default for compType is already desktop
+    else:
+        machine.compType = models.Machine.SERVER
 
-    # Push
+    # Push network devices to machine finally
     machine.network = list(map(
         lambda net: models.Network.objects.get_or_create(
             name = net.Name.strip(),
@@ -203,7 +218,7 @@ def main():
                     validNetworkIDs = list(map(
                             lambda a: a.Index,
                             filter(
-                                lambda net: net.NetEnabled == True and net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\"),
+                                lambda net: net.NetEnabled == True and netDeviceTest(net),
                                 local.Win32_NetworkAdapter()
                             )
                         ))
@@ -236,13 +251,13 @@ def main():
                             c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
                             WMIInfo(c)
                         except wmi.x_wmi as e:
-                            if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '):
+                            if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '): # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
                                 print("Computer does not have WMI enabled")
                                 break
                             else:
                                 print(e.com_error.excepinfo[2])
-                        except AlreadyInDB:
-                            print("This item is already in your database")
+                        except AlreadyInDB as inDBErr:
+                            print(inDBErr)
                             break
                         except IndexError:
                             raise IndexError("Your configuration file is configured incorrectly")

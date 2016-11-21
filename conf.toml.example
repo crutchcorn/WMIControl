@@ -1,3 +1,7 @@
+[settings]
+skipUpdate = true
+silentlyFail = false
+
 [credentials]
 
 [credentials.wmi]
@@ -11,7 +15,6 @@ email         = "test@example.org"
 password      = "password"
 device        = "Desktop"
 app_version   = "2"
-
 
 [db]
 secret_key = "reallylongstringreallylongstringreallylongstringreallylongstring"
