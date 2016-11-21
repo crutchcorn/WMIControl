@@ -20,7 +20,6 @@ Options:
 
 """
 
-import csv
 import sys
 import os
 
@@ -29,8 +28,7 @@ from docopt import docopt
 import wmi
 import nmap
 import toml
-import pywintypes
-from integrations import assetpanda
+from integrations import assetpanda #! Replace with plugin
 from collections import namedtuple
 from netaddr import IPNetwork
 
@@ -54,7 +52,7 @@ class AlreadyInDB(Exception):
 ## NMAP Stuff
 def getComputers(search):
     nm = nmap.PortScanner()
-    nm.scan(hosts=search, arguments='-sS -p 22 -n -T5')
+    nm.scan(hosts=search, arguments='-sS -p 22 -n -T5') # Remove -n to get DNS NetBIOS results
     computers = nm.all_hosts() # Gives me an array of hosts
     return computers
 
@@ -69,25 +67,35 @@ def WMIInfo(c):
         c.Win32_NetworkAdapter()
     ))
 
+    if not netdevices:
+        return
+        # raise LookupError(c.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice") # Use this to raise a fuss
+
     for macaddr in netdevices:
         try:
             machine = models.Machine.objects.get(network__mac=macaddr.MACAddress)
         except ObjectDoesNotExist:
             machine = models.Machine()
-            print("This item will be created in the local database")
         except MultipleObjectsReturned:
-            print("You have a duplicate machine in your database!")
-            raise SystemExit
+            raise MultipleObjectsReturned("You have a duplicate machine in your database!")
         else: # Add option to skip asset update
-            print("This item will be updated in the local database")
             break
+    if machine.name:
+        print("This item will be updated in the local database")
+    else:
+        print("This item will be created in the local database")
 
     machine.name = c.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
     machine.compModel = c.Win32_ComputerSystem()[-1].Model.strip()
     machine.cpu = models.CPU.objects.get_or_create(name = c.Win32_Processor()[0].Name.strip(), cores = c.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors, count = len(c.Win32_Processor()))[0]
     machine.ram = models.RAM.objects.get_or_create(sticks = c.win32_PhysicalMemoryArray()[-1].MemoryDevices, size = round(int(c.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / B2GB))[0]
-    machine.save()
+    try:
+        machine.save() # Only use try if you want to allow script to continue running after import has failed
+    except IntegrityError as err:
+        print(machine.name + " failed to import.")
+        print(err)
+        return
 
     # map(func, iterable):
     # for i in iterable:
@@ -147,6 +155,14 @@ def WMIInfo(c):
     machine.save()
     return machine
 
+def makeAllAssets():
+    for machine in models.Machine.objects.all().filter(cloudID=None):
+        print(machine.name + " will now be added to the asset tracker")
+        assetReply = assetpanda.makeAsset(machine, auth) #! Replace with plugin
+        if assetReply:
+            machine.cloudID = assetReply
+            machine.save()
+
 def main():
     ## Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
@@ -155,8 +171,8 @@ def main():
     with open("conf.toml") as conffile:
         config = toml.loads(conffile.read())
 
-        # Get auth code from AssetPanda. Please move this and shoot me later for ever doing it this way
-        auth = assetpanda.getToken(config)
+        # As far as I know, this is the only way to do this because of the way we will be using the plugin system. If anyone has any suggestions, please tell me
+        auth = assetpanda.getToken(config) #! Replace with plugin
 
         ## Let the fun (parsing) begin
         if arguments["scan"]:
@@ -212,9 +228,7 @@ def main():
                                 print("Out of range number, try again")
                             else:
                                 break
-                    ip = netDevices[0].IPAddress[0].split(".")[:-1] + ['0']
-                    ip = ip[0]+"."+ip[1]+"."+ip[2]+"."+ip[3]
-                    search = str(IPNetwork(ip+"/"+netDevices[0].IPSubnet[0]).cidr)
+                    search = str(IPNetwork(netDevices[0].IPAddress[0]+"/"+netDevices[0].IPSubnet[0]).cidr)
                 for ip in getComputers(search):
                     for i in range(len(config['credentials']['wmi']['users'])):
                         print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
@@ -231,21 +245,15 @@ def main():
                             print("This item is already in your database")
                             break
                         except IndexError:
-                            print("Your configuration file is configured incorrectly")
-                            raise SystemExit
+                            raise IndexError("Your configuration file is configured incorrectly")
                         else:
                             break
             else:
                 WMIInfo(local)
-            for machine in models.Machine.objects.all().filter(cloudID=None):
-                print(machine.name + " will now be added to the asset tracker")
-                assetReply = assetpanda.makeAsset(machine, auth)
-                if assetReply:
-                    machine.cloudID = assetReply
-                    machine.save()
+            # makeAllAssets() # Uncomment me
         elif arguments["updatedb"]:
             for machine in models.Machine.objects.all():
-                machine.cloudID = assetpanda.getMachineAssetID(machine.network.first().mac, auth)
+                machine.cloudID = assetpanda.getMachineAssetID(machine.network.first().mac, auth) #! Replace with plugin
                 machine.save()
 
 if __name__ == "__main__":
