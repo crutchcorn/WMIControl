@@ -7,6 +7,7 @@ Usage:
   WMIControl scan --finish=<iprange>
   WMIControl scan (-r | --range) <start> <end>
   WMIControl scan updatedb
+  WMIControl settings (skip | silent)
 
 Options:
   -h --help                  Show this screen
@@ -186,90 +187,101 @@ def main():
     with open("conf.toml") as conffile:
         config = toml.loads(conffile.read())
 
-        # As far as I know, this is the only way to do this because of the way we will be using the plugin system. If anyone has any suggestions, please tell me
-        auth = assetpanda.getToken(config) #! Replace with plugin
+    # As far as I know, this is the only way to do this because of the way we will be using the plugin system. If anyone has any suggestions, please tell me
+    auth = assetpanda.getToken(config) #! Replace with plugin
 
-        ## Let the fun (parsing) begin
-        if arguments["scan"]:
-            local = wmi.WMI()
-            if arguments["--finish"] or arguments["--range"] or arguments["<nmapIP>"] or arguments["--subnet"]:
-                if arguments["--finish"]:
-                    search = arguments["--finish"]
-                    if search[-1] == '.':
-                        search = search[:-1]
-                    n = search.count('.')
-                    for _ in range(n, 2): # xxx.xxx.xxx.xxx
-                        search += ".0-255"
-                    search += ".1-255"
-                elif arguments["--range"]:
-                    start = tuple(part for part in arguments["<start>"].split('.'))
-                    end = tuple(part for part in arguments["<end>"].split('.'))
-                    search = ""
-                    for s,e in zip(start, end):
-                        if (s == e):
-                            search += s
-                        else:
-                            search += "{0}-{1}".format(s, e) 
-                        search += '.'
+    ## Let the fun (parsing) begin
+    if arguments["scan"]:
+        local = wmi.WMI()
+        if arguments["--finish"] or arguments["--range"] or arguments["<nmapIP>"] or arguments["--subnet"]:
+            if arguments["--finish"]:
+                search = arguments["--finish"]
+                if search[-1] == '.':
                     search = search[:-1]
-                elif arguments["<nmapIP>"]:
-                    search = arguments["<nmapIP>"]
-                elif arguments["--subnet"]:
-                    validNetworkIDs = list(map(
-                            lambda a: a.Index,
-                            filter(
-                                lambda net: net.NetEnabled == True and netDeviceTest(net),
-                                local.Win32_NetworkAdapter()
-                            )
-                        ))
-                    netDevices = []
-                    for netAdapter in [netAdapter for netAdapter in local.Win32_NetworkAdapterConfiguration() if (netAdapter.Index in validNetworkIDs)]:
-                        netDevices.append(netAdapter)
-                    if len(netDevices) > 1:
-                        i = 1
-                        print("There are more than one network devices currently active")
-                        print("Please select a device from the list given:")
-                        for possibleNet in netDevices:
-                            print(str(i) + ") " + possibleNet.Description)
-                            i += 1
-                        print("")
-                        while True:
-                            try:
-                                netSelection = int(input('Input: '))
-                                netDevices = [netDevices[netSelection - 1]]
-                            except ValueError:
-                                print("Not a number")
-                            except IndexError:
-                                print("Out of range number, try again")
-                            else:
-                                break
-                    search = str(IPNetwork(netDevices[0].IPAddress[0]+"/"+netDevices[0].IPSubnet[0]).cidr)
-                for ip in getComputers(search):
-                    for i in range(len(config['credentials']['wmi']['users'])):
-                        print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
+                n = search.count('.')
+                for _ in range(n, 2): # xxx.xxx.xxx.xxx
+                    search += ".0-255"
+                search += ".1-255"
+            elif arguments["--range"]:
+                start = tuple(part for part in arguments["<start>"].split('.'))
+                end = tuple(part for part in arguments["<end>"].split('.'))
+                search = ""
+                for s,e in zip(start, end):
+                    if (s == e):
+                        search += s
+                    else:
+                        search += "{0}-{1}".format(s, e) 
+                    search += '.'
+                search = search[:-1]
+            elif arguments["<nmapIP>"]:
+                search = arguments["<nmapIP>"]
+            elif arguments["--subnet"]:
+                validNetworkIDs = list(map(
+                        lambda a: a.Index,
+                        filter(
+                            lambda net: net.NetEnabled == True and netDeviceTest(net),
+                            local.Win32_NetworkAdapter()
+                        )
+                    ))
+                netDevices = []
+                for netAdapter in [netAdapter for netAdapter in local.Win32_NetworkAdapterConfiguration() if (netAdapter.Index in validNetworkIDs)]:
+                    netDevices.append(netAdapter)
+                if len(netDevices) > 1:
+                    i = 1
+                    print("There are more than one network devices currently active")
+                    print("Please select a device from the list given:")
+                    for possibleNet in netDevices:
+                        print(str(i) + ") " + possibleNet.Description)
+                        i += 1
+                    print("")
+                    while True:
                         try:
-                            c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
-                            WMIInfo(c)
-                        except wmi.x_wmi as e:
-                            if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '): # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
-                                print("Computer does not have WMI enabled")
-                                break
-                            else:
-                                print(e.com_error.excepinfo[2])
-                        except AlreadyInDB as inDBErr:
-                            print(inDBErr)
-                            break
+                            netSelection = int(input('Input: '))
+                            netDevices = [netDevices[netSelection - 1]]
+                        except ValueError:
+                            print("Not a number")
                         except IndexError:
-                            raise IndexError("Your configuration file is configured incorrectly")
+                            print("Out of range number, try again")
                         else:
                             break
-            else:
-                WMIInfo(local)
-            # makeAllAssets() # Uncomment me
-        elif arguments["updatedb"]:
-            for machine in models.Machine.objects.all():
-                machine.cloudID = assetpanda.getMachineAssetID(machine.network.first().mac, auth) #! Replace with plugin
-                machine.save()
+                search = str(IPNetwork(netDevices[0].IPAddress[0]+"/"+netDevices[0].IPSubnet[0]).cidr)
+            for ip in getComputers(search):
+                for i in range(len(config['credentials']['wmi']['users'])):
+                    print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
+                    try:
+                        c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
+                        WMIInfo(c)
+                    except wmi.x_wmi as e:
+                        if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '): # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
+                            print("Computer does not have WMI enabled")
+                            break
+                        else:
+                            print(e.com_error.excepinfo[2])
+                    except AlreadyInDB as inDBErr:
+                        print(inDBErr)
+                        break
+                    except IndexError:
+                        raise IndexError("Your configuration file is configured incorrectly")
+                    else:
+                        break
+        else:
+            WMIInfo(local)
+        # makeAllAssets() # Uncomment me
+    elif arguments["updatedb"]:
+        for machine in models.Machine.objects.all():
+            machine.cloudID = assetpanda.getMachineAssetID(machine.network.first().mac, auth) #! Replace with plugin
+            machine.save()
+    elif arguments["settings"]:
+        if arguments["skip"]:
+            config["settings"]["skipUpdate"] = not config["settings"]["skipUpdate"]
+            print("Skipping switch has been toggled.")
+            print("Value is now: " + str(config["settings"]["skipUpdate"]))
+        elif arguments["silent"]:
+            config["settings"]["silentlyFail"] = not config["settings"]["silentlyFail"]
+            print("Silence switch has been toggled.")
+            print("Value is now: " + str(config["settings"]["silentlyFail"]))
+    with open("conf.toml", "w") as updateConfig:
+        updateConfig.write(toml.dumps(config))
 
 if __name__ == "__main__":
     main()
