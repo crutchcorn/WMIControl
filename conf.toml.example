@@ -5,8 +5,10 @@ silentlyFail = false
 [credentials]
 
 [credentials.wmi]
-users     = [ "user1", "user2" ]
-passwords = [ "password1", "password2" ]
+users = [
+            {user = "user1", pass = "pass1"},
+            {user = "user2", pass = "pass2"}
+        ]
 
 [credentials.assetpanda]
 client_id     = "reallylongstringreallylongstringreallylongstringreallylongstring"
