@@ -1,18 +1,14 @@
+# Fair warning to all, this is HIGHLY configured JUST to match my usecase. I'll likely (if I decide that I want to) go ahead and change this later, but that may be difficult being given these restraints
 import requests
 import json
 
-# Fair warning to all, this is HIGHLY configured JUST to match my usecase. I'll likely (if I decide that I want to) go ahead and change this later, but that may be difficult being given these restraints
-
-# stuff to run always here such as class/def
-def main():
-    pass
-
 ## Get Token for Auth
 def getToken(config):
+    """Given dictionary config: Return auth token"""
     # To be candid, I really have to check and find out what these items do in the API
     try:
-        device = config['credentials']['assetpanda']['device']
-        app_version = config['credentials']['assetpanda']['app_version']
+        device = config['device']
+        app_version = config['app_version']
     except KeyError:
         device = "Desktop"
         app_version = "2"
@@ -20,10 +16,10 @@ def getToken(config):
     # Grab token from a POST (as per API). Ensures request went through and did not time out
     try:
         token = requests.post('https://login.assetpanda.com:443/v2/session/token', data = {
-            'client_id': config['credentials']['assetpanda']['client_id'],
-            'client_secret': config['credentials']['assetpanda']['client_secret'],
-            'email': config['credentials']['assetpanda']['email'],
-            'password': config['credentials']['assetpanda']['password'],
+            'client_id': config['client_id'],
+            'client_secret': config['client_secret'],
+            'email': config['email'],
+            'password': config['password'],
             'device': device,
             'app_version': app_version
         })
@@ -51,6 +47,7 @@ def getToken(config):
     return auth
 
 def getMachineAssetID(mac, auth):
+    """Given a mac address and auth key, return an asset ID"""
     entitydict, fieldsdict = turnIDsIntoNames(auth)
     body = {
         "field_filters": {
@@ -66,6 +63,7 @@ def getMachineAssetID(mac, auth):
 ## Generates dictionary with IDs matching names of entities. IE:
 # Assets
 def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of all entities and then renamed
+    """Given auth key, return entitydict and fieldsdict for better readability of code"""
     dictionaries = {}
     entitiesjson = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth).json()
     entitydict = {}
@@ -78,6 +76,7 @@ def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of
     return entitydict, fieldsdict
 
 def getNewAssetID(auth):
+    """Given auth key, return an asset id for a new asset"""
     entitydict, fieldsdict = turnIDsIntoNames(auth)
     array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects?fields=' + fieldsdict['Asset ID'], headers=auth).json()
     try:
@@ -86,6 +85,7 @@ def getNewAssetID(auth):
         return 0
 
 def makeAsset(machine, auth):
+    """Given Machine object and auth key, create new asset. Returns ID of asset"""
     entitydict, fieldsdict = turnIDsIntoNames(auth)
     roles = machine.roles.all()
     concatenatedRoles = ""
@@ -128,7 +128,3 @@ def makeAsset(machine, auth):
     except KeyError:
         pass
     return body[fieldsdict['Asset ID']]
-
-# stuff only to run when not called via 'import' here
-if __name__ == "__main__":
-    main()

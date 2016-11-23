@@ -19,33 +19,14 @@ Options:
 
 """
 
-# Core imports
-import sys
-import os
-
 # Custom Imports
 from docopt import docopt
-import wmi
-import nmap
 import toml
-from integrations import assetpanda #! Replace with plugin
-from netaddr import IPNetwork
 
 # Local imports
 from networkMngr import finishIP, getComputers, netDeviceTest, getDeviceNetwork
-from wmihandler import WMIInfo
-from pluginHelper import makeAllAssets
-
-# Database info
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
-from django.core.wsgi import get_wsgi_application
-from django.conf import settings
-application = get_wsgi_application()
-
-# DB models and exceptions
-from data import models
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import IntegrityError
+from wmihandler import WMIInfo, getWMIObjs
+from pluginHelper import makeAllAssets, updateCloudID, getAuth
 
 # Global definitions
 class AlreadyInDB(Exception):
@@ -57,19 +38,21 @@ with open("conf.toml") as conffile:
     config = toml.loads(conffile.read())
 
 def main():
+    # Get auth key from asset tracker
+    # auth = getAuth(config['credentials']['assetpanda'])
+
     # Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
 
     # Handle CLI Arguments
     if arguments['scan']:
-        local = wmi.WMI()
         if arguments['<nmapIP>'] or arguments['<start>'] or arguments['--subnet']:
             if arguments['<start>']:
                 start = tuple(part for part in finishIP(arguments['<start>'], "0").split('.'))
                 end = tuple(part for part in finishIP(arguments['<end>'], "255").split('.'))
                 search = ""
                 for s,e in zip(start, end):
-                    if (s == e):
+                    if s == e:
                         search += s
                     else:
                         search += "{0}-{1}".format(s, e) 
@@ -78,34 +61,27 @@ def main():
             elif arguments['<nmapIP>']:
                 search = finishIP(arguments['<nmapIP>'], "0-255")
             elif arguments['--subnet']:
-                ip, subnet = getDeviceNetwork(local)
+                ip, subnet = getDeviceNetwork()
                 search = str(IPNetwork(ip+"/"+subnet).cidr)
-            for ip in getComputers(search):
-                for i in range(len(config['credentials']['wmi']['users'])):
-                    print("Trying to connect to", ip, "with user '" + config['credentials']['wmi']['users'][i] + "'")
-                    try:
-                        c = wmi.WMI(str(ip), user=config['credentials']['wmi']['users'][i], password=config['credentials']['wmi']['passwords'][i])
-                        WMIInfo(c, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
-                    except wmi.x_wmi as e:
-                        if(e.com_error.excepinfo[2] == 'The RPC server is unavailable. '):  # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
-                            print("Computer does not have WMI enabled")
-                            break
-                        else:
-                            print(e.com_error.excepinfo[2])
-                    except AlreadyInDB as inDBErr:
-                        print(inDBErr)
-                        break
-                    except IndexError:
-                        raise IndexError("Your configuration file is configured incorrectly")
-                    else:
-                        break
+            for comp in getWMIObjs(search, config['credentials']['wmi']['users']):
+                try:
+                    WMIInfo(config['settings']['silentlyFail'], config['settings']['skipUpdate'], comp)
+                except AlreadyInDB as inDBErr:
+                    print(inDBErr)
+                    break
+                except IndexError:
+                    raise IndexError("Your configuration file is configured incorrectly")
         else:
-            WMIInfo(local, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+            try:
+                WMIInfo(config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+            except AlreadyInDB as inDBErr:
+                print(inDBErr)
+                break
+            except IndexError:
+                raise IndexError("Your configuration file is configured incorrectly")
         # makeAllAssets()  # Uncomment me
     elif arguments['updatedb']:
-        for machine in models.Machine.objects.all():
-            machine.cloudID = assetpanda.getMachineAssetID(machine.network.first().mac, auth)  # Replace with plugin
-            machine.save()
+        updateCloudID()
     elif arguments['settings']:
         if arguments['skip']:
             config['settings']['skipUpdate'] = not config['settings']['skipUpdate']

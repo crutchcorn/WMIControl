@@ -1,19 +1,60 @@
+# Core imports
+import os
+
+# Custom Imports
+import wmi
+from networkMngr import netDeviceTest
+
+# Database info
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+from django.core.wsgi import get_wsgi_application
+from django.conf import settings
+application = get_wsgi_application()
+
+# DB models and exceptions
+from data import models
+from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+
+
 Byte2GB = 1024 * 1024 * 1024
 
-def WMIInfo(c, silentlyFail = False, skipUpdate = False):
-    """Given wmi object c, find information and store it in the database"""
+local = wmi.WMI()
+
+
+def getWMIObjs(search, users):
+    """Given ip range search and list of dictionary users: Returns a list of WMIObjects"""
+    wmiObjs = []
+    for ip, login in [(ip, login) for ip in getComputers(search) for login in users]:
+        print("Trying to connect to", ip, "with user '" + login['user'] + "'")
+        try:
+            wmiObj = wmi.WMI(str(ip), user=login['user'], password=login['pass'])
+        except wmi.x_wmi as e:
+            if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':  # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
+                raise EnvironmentError("Computer does not have WMI enabled")
+            else:
+                raise wmi.x_wmi(e.com_error.excepinfo[2])
+        except IndexError:
+            raise IndexError("Config file has errors. Likely is unmatching user/password combo")
+        else:
+            wmiObjs.append(wmiObj)
+            break
+    return wmiObjs # We may also want to return what credentials logged the computers in. This will be a global ID for the credential that refer to the DB
+
+def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
+    """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database"""
 
     # Grab list of network devices. Tested to see if MAC in DB
     netdevices = list(filter(
         lambda net: netDeviceTest(net),
-        c.Win32_NetworkAdapter()
+        wmiObj.Win32_NetworkAdapter()
     ))
 
     if not netdevices:
         if silentlyFail:
             return
         else:
-            raise LookupError(c.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice")
+            raise LookupError(wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice")
 
     for macaddr in netdevices:
         try:
@@ -34,13 +75,12 @@ def WMIInfo(c, silentlyFail = False, skipUpdate = False):
         else:
             print(machine.name + " will be updated in the local database")
     else:
-        print(c.Win32_ComputerSystem()[-1].Name + " will be created in the local database")
-
-    machine.name = c.Win32_ComputerSystem()[-1].Name
-    machine.manufacturer = c.Win32_ComputerSystem()[-1].Manufacturer.strip()
-    machine.compModel = c.Win32_ComputerSystem()[-1].Model.strip()
-    machine.cpu = models.CPU.objects.get_or_create(name = c.Win32_Processor()[0].Name.strip(), cores = c.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors, count = len(c.Win32_Processor()))[0]
-    machine.ram = models.RAM.objects.get_or_create(sticks = c.win32_PhysicalMemoryArray()[-1].MemoryDevices, size = round(int(c.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / Byte2GB))[0]
+        print(wmiObj.Win32_ComputerSystem()[-1].Name + " will be created in the local database")
+    machine.name = wmiObj.Win32_ComputerSystem()[-1].Name
+    machine.manufacturer = wmiObj.Win32_ComputerSystem()[-1].Manufacturer.strip()
+    machine.compModel = wmiObj.Win32_ComputerSystem()[-1].Model.strip()
+    machine.cpu = models.CPU.objects.get_or_create(name = wmiObj.Win32_Processor()[0].Name.strip(), cores = wmiObj.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors, count = len(wmiObj.Win32_Processor()))[0]
+    machine.ram = models.RAM.objects.get_or_create(sticks = wmiObj.win32_PhysicalMemoryArray()[-1].MemoryDevices, size = round(int(wmiObj.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / Byte2GB))[0]
     try:
         machine.save()
     except IntegrityError as err:
@@ -59,31 +99,31 @@ def WMIInfo(c, silentlyFail = False, skipUpdate = False):
         )[0],
         filter(
             lambda hdd: hdd.DriveType == 3,
-            c.Win32_LogicalDisk()
+            wmiObj.Win32_LogicalDisk()
         )
     ))
 
-    if not c.Win32_VideoController():
+    if not wmiObj.Win32_VideoController():
         machine.gpus = [models.GPU.objects.get_or_create(name = 'Unknown')[0]]
     else:
         machine.gpus = list(map(
             lambda gpu: models.GPU.objects.get_or_create(
                 name = gpu.Name.strip()
             )[0],
-            c.Win32_VideoController()
+            wmiObj.Win32_VideoController()
         ))
 
-    machine.os = c.Win32_OperatingSystem()[-1].Caption.strip()
+    machine.os = wmiObj.Win32_OperatingSystem()[-1].Caption.strip()
 
     # Get roles and computer type
     try:
         machine.roles = list(map(
             lambda server: models.Role.objects.get_or_create(name = server.Name.strip())[0],
-            c.Win32_ServerFeature()
+            wmiObj.Win32_ServerFeature()
         ))
     except:
         try:
-            if c.Win32_Battery()[-1].BatteryStatus > 0:
+            if wmiObj.Win32_Battery()[-1].BatteryStatus > 0:
                 machine.compType = models.Machine.LAPTOP
         except IndexError:
             pass  # The default for compType is already desktop

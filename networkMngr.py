@@ -1,3 +1,9 @@
+import nmap
+from netaddr import IPNetwork
+import wmi
+
+local = wmi.WMI()
+
 def finishIP(ip, range):
     """Given string ip, append input range where blank"""
     """EG: finishIP('192.168.', '0') => '192.168.0.0'"""
@@ -21,7 +27,7 @@ def netDeviceTest(net):
     """Given Win32_NetworkAdapter object, returns if object is valid"""
     return net.MACAddress != None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\")
 
-def getDeviceNetwork(c):
+def getDeviceNetwork(c = local): # Should this be moved to WMIHandler.py? It deals with WMI and it would be nice to have all of that in one place
     """Given WMI object c, returns IPaddress and subnetMask"""
     validNetworkIDs = list(map(
             lambda adapter: adapter.Index,
