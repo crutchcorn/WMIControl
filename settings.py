@@ -1,4 +1,5 @@
 import toml
+
 with open("conf.toml") as conffile:
     config = toml.loads(conffile.read())
 
@@ -15,8 +16,8 @@ DATABASES = {
 
 INSTALLED_APPS = (
     'data',
-    )
+)
 
-DEFAULT_CURRENCY="USD"
+DEFAULT_CURRENCY = "USD"
 
 SECRET_KEY = config['db']['secret_key']

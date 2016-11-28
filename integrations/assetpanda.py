@@ -1,8 +1,9 @@
-# Fair warning to all, this is HIGHLY configured JUST to match my usecase. I'll likely (if I decide that I want to) go ahead and change this later, but that may be difficult being given these restraints
+# Fair warning to all, this is HIGHLY configured JUST to match my usecase.
+# I'll likely (if I decide that I want to) go ahead and change this later, but that may be difficult.
 import requests
-import json
 
-## Get Token for Auth
+
+# Get Token for Auth
 def getToken(config):
     """Given dictionary config: Return auth token"""
     # To be candid, I really have to check and find out what these items do in the API
@@ -15,7 +16,7 @@ def getToken(config):
 
     # Grab token from a POST (as per API). Ensures request went through and did not time out
     try:
-        token = requests.post('https://login.assetpanda.com:443/v2/session/token', data = {
+        token = requests.post('https://login.assetpanda.com:443/v2/session/token', data={
             'client_id': config['client_id'],
             'client_secret': config['client_secret'],
             'email': config['email'],
@@ -34,7 +35,7 @@ def getToken(config):
 
     # Makes sure there was no error connecting before going forward
     try:
-        token.raise_for_status() # Raises an error if 4xx or 5xx error code. Goes through if 200
+        token.raise_for_status()  # Raises an error if 4xx or 5xx error code. Goes through if 200
     except requests.exceptions.HTTPError as error:
         print("There was an error recieving the authorization token:")
         print(error)
@@ -43,8 +44,9 @@ def getToken(config):
 
     # Takes token recieved and gives token that's needed
     key = token.json()['token_type'].title() + " " + token.json()['access_token']
-    auth = {'Authorization':key}
+    auth = {'Authorization': key}
     return auth
+
 
 def getMachineAssetID(mac, auth):
     """Given a mac address and auth key, return an asset ID"""
@@ -54,35 +56,41 @@ def getMachineAssetID(mac, auth):
             fieldsdict['MAC Address']: mac
         }
     }
-    cloudAsset = requests.post('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/search_objects', headers=auth, json=body)
+    cloudAsset = requests.post(
+        'https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/search_objects', headers=auth,
+        json=body)
     if len(cloudAsset.json()['objects']):
         return cloudAsset.json()['objects'][0][fieldsdict['Asset ID']]
     else:
         return
 
-## Generates dictionary with IDs matching names of entities. IE:
+
+# Generates dictionary with IDs matching names of entities. IE:
 # Assets
-def turnIDsIntoNames(auth): # This will likely be expanded to getting the IDs of all entities and then renamed
+def turnIDsIntoNames(auth):  # This will likely be expanded to getting the IDs of all entities and then renamed
     """Given auth key, return entitydict and fieldsdict for better readability of code"""
-    dictionaries = {}
     entitiesjson = requests.get('https://login.assetpanda.com:443/v2/entities', headers=auth).json()
     entitydict = {}
+    fieldsdict = {}
     for entity in entitiesjson:
         entitydict[entity['name']] = entity['id']
-        if (entity['name'] == "Assets"):
-            fieldsdict = {}
+        if entity['name'] == "Assets":
             for field in entity['fields']:
                 fieldsdict[field['name']] = field['key']
     return entitydict, fieldsdict
 
+
 def getNewAssetID(auth):
     """Given auth key, return an asset id for a new asset"""
     entitydict, fieldsdict = turnIDsIntoNames(auth)
-    array = requests.get('https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects?fields=' + fieldsdict['Asset ID'], headers=auth).json()
+    array = requests.get(
+        'https://login.assetpanda.com:443/v2/entities/' + entitydict['Assets'] + '/objects?fields=' + fieldsdict[
+            'Asset ID'], headers=auth).json()
     try:
-        return max(map(lambda object: int(object[fieldsdict['Asset ID']]), array['objects']))
-    except IndexError: # If entity does not yet have an object in it
+        return max(map(lambda obj: int(obj[fieldsdict['Asset ID']]), array['objects']))
+    except IndexError:  # If entity does not yet have an object in it
         return 0
+
 
 def makeAsset(machine, auth):
     """Given Machine object and auth key, create new asset. Returns ID of asset"""
@@ -112,7 +120,8 @@ def makeAsset(machine, auth):
 
     response = requests.post('https://login.assetpanda.com:443/v2/entities/31321/objects', headers=auth, json=body)
     try:
-        if response.json()['code'] == 2: # From what I can tell, code 2 is an error code for something not being unique. This requires you to set up the database in such a way that things need to be unique.
+        # From what I can tell, code 2 is an error code for something not being unique.
+        if response.json()['code'] == 2:
             try:
                 response.json()['errors'][0][fieldsdict['MAC Address']]
             except:
@@ -121,7 +130,8 @@ def makeAsset(machine, auth):
                 print("You already have this asset in AssetPanda")
                 AssetID = getMachineAssetID(machine.network.first().mac, auth)
                 body[fieldsdict['Asset ID']] = AssetID
-                update = requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + AssetID, headers=auth, json=body)
+                requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + AssetID, headers=auth,
+                               json=body)
                 print("Asset updated in AssetPanda")
         else:
             print("Asset created in AssetPanda")

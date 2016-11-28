@@ -3,12 +3,14 @@ import os
 
 # Custom Imports
 import wmi
-from networkMngr import netDeviceTest
+
+# Local imports
+from networkMngr import netDeviceTest, getComputers
 
 # Database info
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 from django.core.wsgi import get_wsgi_application
-from django.conf import settings
+
 application = get_wsgi_application()
 
 # DB models and exceptions
@@ -16,6 +18,7 @@ from data import models
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
+from exceptions import AlreadyInDB
 
 Byte2GB = 1024 * 1024 * 1024
 
@@ -30,7 +33,8 @@ def getWMIObjs(search, users):
         try:
             wmiObj = wmi.WMI(str(ip), user=login['user'], password=login['pass'])
         except wmi.x_wmi as e:
-            if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':  # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
+            # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
+            if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':
                 raise EnvironmentError("Computer does not have WMI enabled")
             else:
                 raise wmi.x_wmi(e.com_error.excepinfo[2])
@@ -39,9 +43,10 @@ def getWMIObjs(search, users):
         else:
             wmiObjs.append(wmiObj)
             break
-    return wmiObjs # We may also want to return what credentials logged the computers in. This will be a global ID for the credential that refer to the DB
+    return wmiObjs  # Return credentials that worked in future. This will be a ID for the credential in DB
 
-def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
+
+def WMIInfo(silentlyFail=False, skipUpdate=False, wmiObj=wmi.WMI()):
     """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database"""
 
     # Grab list of network devices. Tested to see if MAC in DB
@@ -54,13 +59,15 @@ def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
         if silentlyFail:
             return
         else:
-            raise LookupError(wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice")
+            raise LookupError(
+                wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice")
 
+    machine = models.Machine()
     for macaddr in netdevices:
         try:
             machine = models.Machine.objects.get(network__mac=macaddr.MACAddress)
         except ObjectDoesNotExist:
-            machine = models.Machine()
+            pass
         except MultipleObjectsReturned:
             if silentlyFail:
                 print("You have a duplicate machine in your database")
@@ -79,8 +86,17 @@ def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
     machine.name = wmiObj.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = wmiObj.Win32_ComputerSystem()[-1].Manufacturer.strip()
     machine.compModel = wmiObj.Win32_ComputerSystem()[-1].Model.strip()
-    machine.cpu = models.CPU.objects.get_or_create(name = wmiObj.Win32_Processor()[0].Name.strip(), cores = wmiObj.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors, count = len(wmiObj.Win32_Processor()))[0]
-    machine.ram = models.RAM.objects.get_or_create(sticks = wmiObj.win32_PhysicalMemoryArray()[-1].MemoryDevices, size = round(int(wmiObj.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / Byte2GB))[0]
+    machine.cpu = models.CPU.objects.get_or_create(
+                                                   name=wmiObj.Win32_Processor()[0].Name.strip(),
+                                                   cores=wmiObj.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors,
+                                                   count=len(wmiObj.Win32_Processor())
+                                                   )[0]
+    machine.ram = models.RAM.objects.get_or_create(
+                                                   sticks=wmiObj.win32_PhysicalMemoryArray()[-1].MemoryDevices,
+                                                   size=round(int(
+                                                       wmiObj.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / Byte2GB
+                                                              )
+                                                   )[0]
     try:
         machine.save()
     except IntegrityError as err:
@@ -93,9 +109,9 @@ def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
 
     machine.hdds = list(map(
         lambda hdd: models.HDD.objects.get_or_create(
-            name = hdd.DeviceID,
-            size = round(int(hdd.Size) / Byte2GB),
-            free = round(int(hdd.FreeSpace) / Byte2GB)
+            name=hdd.DeviceID,
+            size=round(int(hdd.Size) / Byte2GB),
+            free=round(int(hdd.FreeSpace) / Byte2GB)
         )[0],
         filter(
             lambda hdd: hdd.DriveType == 3,
@@ -104,11 +120,11 @@ def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
     ))
 
     if not wmiObj.Win32_VideoController():
-        machine.gpus = [models.GPU.objects.get_or_create(name = 'Unknown')[0]]
+        machine.gpus = [models.GPU.objects.get_or_create(name='Unknown')[0]]
     else:
         machine.gpus = list(map(
             lambda gpu: models.GPU.objects.get_or_create(
-                name = gpu.Name.strip()
+                name=gpu.Name.strip()
             )[0],
             wmiObj.Win32_VideoController()
         ))
@@ -118,10 +134,10 @@ def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
     # Get roles and computer type
     try:
         machine.roles = list(map(
-            lambda server: models.Role.objects.get_or_create(name = server.Name.strip())[0],
+            lambda server: models.Role.objects.get_or_create(name=server.Name.strip())[0],
             wmiObj.Win32_ServerFeature()
         ))
-    except:
+    except AttributeError:
         try:
             if wmiObj.Win32_Battery()[-1].BatteryStatus > 0:
                 machine.compType = models.Machine.LAPTOP
@@ -133,12 +149,12 @@ def WMIInfo(silentlyFail = False, skipUpdate = False, wmiObj = wmi.WMI()):
     # Push network devices to machine finally
     machine.network = list(map(
         lambda net: models.Network.objects.get_or_create(
-            name = net.Name.strip(),
-            mac = net.MACAddress
+            name=net.Name.strip(),
+            mac=net.MACAddress
         )[0],
         netdevices
     ))
 
-    ## Save machine
+    # Save machine
     machine.save()
     return machine
