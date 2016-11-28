@@ -21,13 +21,12 @@ Options:
 
 # Custom Imports
 from docopt import docopt
-from netaddr import IPNetwork
 import toml
 
 # Local imports
 from networkMngr import finishIP, getDeviceNetwork
-from wmihandler import WMIInfo, getWMIObjs
-from pluginHelper import makeAllAssets, updateCloudID, getAuth
+from wmiScanner import WMIInfo, getWMIObjs
+# from pluginHelper import makeAllAssets, updateCloudID, getAuth
 from exceptions import AlreadyInDB
 
 # Load config file
@@ -50,7 +49,7 @@ def main():
                 start = tuple(part for part in finishIP(arguments['<start>'], "0").split('.'))
                 end = tuple(part for part in finishIP(arguments['<end>'], "255").split('.'))
                 for s, e in zip(start, end):
-                    if s == e:
+                    if s is e:
                         search += s
                     else:
                         search += "{0}-{1}".format(s, e)
@@ -59,11 +58,10 @@ def main():
             elif arguments['<nmapIP>']:
                 search = finishIP(arguments['<nmapIP>'], "0-255")
             elif arguments['--subnet']:
-                ip, subnet = getDeviceNetwork()
-                search = str(IPNetwork(ip + "/" + subnet).cidr)
-            for comp in getWMIObjs(search, config['credentials']['wmi']['users']):
+                _, _, search = getDeviceNetwork()
+            for comp in getWMIObjs(config['credentials']['wmi']['users'], search):
                 try:
-                    WMIInfo(config['settings']['silentlyFail'], config['settings']['skipUpdate'], comp)
+                    WMIInfo(comp, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
                 except AlreadyInDB as inDBErr:
                     print(inDBErr)
                     break
@@ -71,7 +69,7 @@ def main():
                     raise IndexError("Your configuration file is configured incorrectly")
         else:
             try:
-                WMIInfo(config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+                WMIInfo(_, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
             except AlreadyInDB as inDBErr:
                 print(inDBErr)
             except IndexError:

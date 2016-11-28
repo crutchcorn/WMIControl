@@ -5,7 +5,7 @@ import os
 import wmi
 
 # Local imports
-from networkMngr import netDeviceTest, getComputers
+from networkMngr import netDeviceTest, getComputers, getDeviceNetwork
 
 # Database info
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
@@ -25,7 +25,7 @@ Byte2GB = 1024 * 1024 * 1024
 local = wmi.WMI()
 
 
-def getWMIObjs(search, users):
+def getWMIObjs(users, search=getDeviceNetwork()[2]):
     """Given ip range search and list of dictionary users: Returns a list of WMIObjects"""
     wmiObjs = []
     for ip, login in [(ip, login) for ip in getComputers(search) for login in users]:
@@ -33,7 +33,7 @@ def getWMIObjs(search, users):
         try:
             wmiObj = wmi.WMI(str(ip), user=login['user'], password=login['pass'])
         except wmi.x_wmi as e:
-            # This is unfornutately the way this must be done. There is no error codes in wmi library AFAIK
+            # This is unfortunately the way this must be done. There is no error codes in wmi library AFAIK
             if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':
                 raise EnvironmentError("Computer does not have WMI enabled")
             else:
@@ -46,7 +46,7 @@ def getWMIObjs(search, users):
     return wmiObjs  # Return credentials that worked in future. This will be a ID for the credential in DB
 
 
-def WMIInfo(silentlyFail=False, skipUpdate=False, wmiObj=wmi.WMI()):
+def WMIInfo(wmiObj=wmi.WMI(), silentlyFail=False, skipUpdate=False):
     """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database"""
 
     # Grab list of network devices. Tested to see if MAC in DB
@@ -93,9 +93,11 @@ def WMIInfo(silentlyFail=False, skipUpdate=False, wmiObj=wmi.WMI()):
                                                    )[0]
     machine.ram = models.RAM.objects.get_or_create(
                                                    sticks=wmiObj.win32_PhysicalMemoryArray()[-1].MemoryDevices,
-                                                   size=round(int(
-                                                       wmiObj.Win32_ComputerSystem()[-1].TotalPhysicalMemory) / Byte2GB
-                                                              )
+                                                   size=round(
+                                                           int(
+                                                                wmiObj.Win32_ComputerSystem()[-1].TotalPhysicalMemory
+                                                           ) / Byte2GB
+                                                        )
                                                    )[0]
     try:
         machine.save()
