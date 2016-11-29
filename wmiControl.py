@@ -6,8 +6,8 @@ def runFile(comp, file):
     startDir = "C:\\"
     stop = False
     pid = None
-    with open(file, 'r') as file:
-        for line in file:
+    with open(file, 'r') as contents:
+        for line in contents:
             handles = {
                 '#': 'skip',
                 '*': 'dontWait',

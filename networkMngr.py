@@ -1,5 +1,7 @@
 import nmap
 import wmi
+import socket
+import struct
 from netaddr import IPNetwork
 
 
@@ -49,8 +51,9 @@ def getDeviceNetwork(c=local):
 
 
 def finishIP(ip, ipRange):
-    """Given string ip, append input range where blank"""
-    """EG: finishIP('192.168.', '0') => '192.168.0.0'"""
+    """Given string ip, append input range where blank
+    >>> finishIP('192.168.', '0')
+    '192.168.0.0'"""
     if ip[-1] is '.':
         ip = ip[:-1]
     n = ip.count('.')
@@ -74,3 +77,37 @@ def listNetDevices():
     _, a = getComputers(getDeviceNetwork()[2], '-sS -p 22')
     ips = [info['hostnames'][0]['name'] for _, info in a['scan'].items()]
     return list(filter(None, ips))
+
+
+def findBroadcast(ip=None, subnet=None):
+    """Given string ip, subnet: Find WoL broadcast IP.
+    Leave blank to use getDeviceNetwork as ip and subnet retreval"""
+    if not ip:
+        ip, subnet, _ = getDeviceNetwork()
+    return ".".join([str((int(ip.split('.')[i]) | int(subnet.split('.')[i]) ^ 255)) for i in range(0, 4)])
+
+
+def sendWoL(mac, broadcast=findBroadcast()):
+    """Given string mac and broadcast: Turn on computer using WoL
+    This was taken from http://code.activestate.com/recipes/358449-wake-on-lan/. Thanks, Fadly!"""
+    # Checks if mac address has delimiters
+    if len(mac) == 12:
+        pass
+    elif len(mac) == 12 + 5:
+        seperator = mac[2]
+        mac = mac.replace(seperator, '')
+    else:
+        raise ValueError('Incorrect MAC address format')
+
+    # Pad the synchronization stream.
+    data = ''.join(['FFFFFFFFFFFF', mac * 20])
+    send_data = b''
+
+    # Split up the hex values and pack.
+    for i in range(0, len(data), 2):
+        send_data = b''.join([send_data, struct.pack('B', int(data[i: i + 2], 16))])
+
+    # Broadcast it to the LAN.
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    sock.sendto(send_data, (broadcast, 7))
