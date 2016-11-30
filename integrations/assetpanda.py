@@ -103,11 +103,11 @@ def makeAsset(machine, auth):
         fieldsdict['Asset ID']: getNewAssetID(auth) + 1,
         fieldsdict['Name']: machine.name,
         fieldsdict['RAM Size']: machine.ram.size,
-        fieldsdict['Network Card Model']: machine.network.first().name,
+        fieldsdict['Network Card Model']: machine.network_set.first().name,
         fieldsdict['RAM Sticks']: machine.ram.sticks,
         fieldsdict['Model']: machine.compModel,
         fieldsdict['CPU Cores']: machine.cpu.cores,
-        fieldsdict['MAC Address']: machine.network.first().mac,
+        fieldsdict['MAC Address']: machine.network_set.first().mac,
         fieldsdict['Server Roles']: concatenatedRoles,
         fieldsdict['CPU Model']: machine.cpu.name,
         fieldsdict['Manufacturer']: machine.manufacturer,
@@ -128,7 +128,7 @@ def makeAsset(machine, auth):
                 raise NameError("There is already an asset in AssetPanda called " + machine.name)
             else:
                 print("You already have this asset in AssetPanda")
-                AssetID = getMachineAssetID(machine.network.first().mac, auth)
+                AssetID = getMachineAssetID(machine.network_set.first().mac, auth)
                 body[fieldsdict['Asset ID']] = AssetID
                 requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + AssetID, headers=auth,
                                json=body)

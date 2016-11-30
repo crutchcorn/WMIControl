@@ -46,8 +46,10 @@ def getWMIObjs(users, search=getDeviceNetwork()[2]):
     return wmiObjs  # Return credentials that worked in future. This will be a ID for the credential in DB
 
 
-def WMIInfo(wmiObj=wmi.WMI(), silentlyFail=False, skipUpdate=False):
+def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database"""
+    if not wmiObj:
+        wmiObj = wmi.WMI()
 
     # Grab list of network devices. Tested to see if MAC in DB
     netdevices = list(filter(
@@ -148,15 +150,15 @@ def WMIInfo(wmiObj=wmi.WMI(), silentlyFail=False, skipUpdate=False):
     else:
         machine.compType = models.Machine.SERVER
 
+    # Save machine
+    machine.save()
+
     # Push network devices to machine finally
-    machine.network = list(map(
-        lambda net: models.Network.objects.get_or_create(
+    createdNetDevices = list(map(
+        lambda net: machine.network_set.get_or_create(
             name=net.Name.strip(),
             mac=net.MACAddress
         )[0],
         netdevices
     ))
-
-    # Save machine
-    machine.save()
     return machine

@@ -6,3 +6,4 @@ Django==1.10
 psycopg2==2.6.2
 netaddr==0.7.18
 requests==2.11.0
+django-macaddress==1.4.0
