@@ -1,3 +1,15 @@
+"""The following needs to be changed to an extreme amount. The following is how I want the DB set up:
+cpu =many-to-many> uniqueCPUList =many-to-many> nonuniqueCPUModel
+ram =many-to-many> uniqueRAMList =many-to-many> nonuniqueRAMStick
+disk =many-to-many> uniqueDiskList =many-to-many> nonuniqueDiskModel
+gpu =many-to-many> uniqueGPUList =many-to-many> nonuniqueGPUModel
+
+And maybe, just maybe:
+roles =many-to-many> uniqueRoleList =many-to-many> nonuniqueRoles
+
+This will allow you to grab information about that model much easier, as well as have duplicates of that model
+
+"""
 from django.db import models
 
 from macaddress.fields import MACAddressField
@@ -22,7 +34,7 @@ class Machine(models.Model):
     DESKTOP = 1
     LAPTOP = 2
     SERVER = 3
-    MACHINE_TYPES = (
+    MACHINE_TYPES = (  # http://www.b-list.org/weblog/2007/nov/02/handle-choices-right-way/
         (DESKTOP, 'Desktop'),
         (LAPTOP, 'Laptop'),
         (SERVER, 'Server'),
@@ -34,16 +46,16 @@ class Machine(models.Model):
     name = models.CharField(max_length=255, unique=True)
     manufacturer = models.CharField(max_length=255, blank=True)
     compModel = models.CharField(max_length=255, blank=True)
+    os = models.CharField(max_length=255, blank=True)
+    cloudID = models.PositiveSmallIntegerField(null=True, blank=True, unique=True)
+    # THIS NEEDS TO BE CHANGED AS THEY ARE UNIQUE NOW
     cpu = models.ManyToManyField('CPU', blank=True)  # Many to many, as CPUs are not unique.
+    # THIS NEEDS TO BE CHANGED AS THEY ARE UNIQUE NOW
     ram = models.ManyToManyField('RAM', blank=True)  # Many to many, as RAM is not unique.
-    # Should be one to many in the future, HDDs are not unique. However, free space is fairly unique.
-    # This will likely be solved by making free space some type of calculation rather than a field in the DB soon
     hdds = models.ManyToManyField('HDD', blank=True)
     gpus = models.ManyToManyField('GPU', blank=True)
-    os = models.CharField(max_length=255, blank=True)
-    activation = models.OneToOneField('Activation', null=True, blank=True) # Licences have parent-child relationship
+    activation = models.OneToOneField('Activation', null=True, blank=True)  # Licences have parent-child relationship
     roles = models.ManyToManyField('Role', blank=True)  # Roles are not unique
-    cloudID = models.PositiveSmallIntegerField(null=True, blank=True, unique=True)
 
     def __unicode__(self):
         return self.name
@@ -52,10 +64,16 @@ class Machine(models.Model):
         return self.__unicode__()
 
 
-class CPU(models.Model):
+class CPU(models.Model):  # Add choices for Architecture, Family, UpgradeMethod
     name = models.CharField(max_length=255)
-    count = models.PositiveSmallIntegerField()
-    cores = models.PositiveSmallIntegerField()
+    manufacturer = models.CharField(max_length=255)
+    partnum = models.CharField(max_length=255, null=True, blank=True)
+    serial = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+    count = models.PositiveSmallIntegerField(null=True, blank=True)
+    cores = models.PositiveSmallIntegerField(null=True, blank=True)
+    threads = models.PositiveSmallIntegerField(null=True, blank=True)
+    speed = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return u"{}, {} Cores".format(self.name, self.cores)
@@ -64,9 +82,22 @@ class CPU(models.Model):
         return self.__unicode__()
 
 
-class RAM(models.Model):
-    size = models.PositiveSmallIntegerField()
-    sticks = models.PositiveSmallIntegerField(null=True, blank=True)
+class RAM(models.Model):  # Add choices for FormFactor, SMBIOSMemoryType
+    size = models.BigIntegerField()
+    manufacturer = models.CharField(max_length=255)
+    partnum = models.CharField(max_length=255, null=True, blank=True)
+    serial = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+    speed = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    def sizeInGB(self):
+        return int(self.size) / (1024 * 1024 * 1024)
+
+    def sizeInMB(self):
+        return int(self.size) / (1024 * 1024)
+
+    def sizeInKB(self):
+        return int(self.size) / 1024
 
     def __unicode__(self):
         return u"{} GB, {} Number Of Sticks".format(self.size, self.sticks)
@@ -75,10 +106,19 @@ class RAM(models.Model):
         return self.__unicode__()
 
 
-class HDD(models.Model):
+class HDD(models.Model):  # Add/change. Must be renamed to disks
     name = models.CharField(max_length=255, blank=True)
-    size = models.PositiveSmallIntegerField()
+    size = models.BigIntegerField()
     free = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    def sizeInGB(self):
+        return int(self.size)/(1024 * 1024 * 1024)
+
+    def sizeInMB(self):
+        return int(self.size)/(1024 * 1024)
+
+    def sizeInKB(self):
+        return int(self.size)/1024
 
     def __unicode__(self):
         return u"{} Mount, {} GB, {} GB Free".format(self.name, self.size, self.free)
@@ -87,8 +127,20 @@ class HDD(models.Model):
         return self.__unicode__()
 
 
-class GPU(models.Model):
+class GPU(models.Model):  # Add choices for VideoArchitecture, VideoMemoryType
     name = models.CharField(max_length=255)
+    size = models.BigIntegerField()
+    location = models.CharField(max_length=255, null=True, blank=True)
+    refresh = models.PositiveSmallIntegerField(null=True, blank=True)
+
+    def sizeInGB(self):
+        return int(self.size)/(1024 * 1024 * 1024)
+
+    def sizeInMB(self):
+        return int(self.size)/(1024 * 1024)
+
+    def sizeInKB(self):
+        return int(self.size)/1024
 
     def __unicode__(self):
         return self.name
@@ -101,6 +153,8 @@ class Network(models.Model):
     machine = models.ForeignKey('Machine')  # One to many, network cards ARE unique and can be moved (MAC addresses)
     name = models.CharField(max_length=255, blank=True, null=True)
     mac = MACAddressField(unique=True)
+    manufacturer = models.CharField(max_length=255, blank=True, null=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
         return u"{}, {} Mac Address".format(self.name, self.mac)
@@ -122,7 +176,7 @@ class Activation(models.Model):
         return self.__unicode__()
 
 
-class Role(models.Model):
+class Role(models.Model):  # Add/change
     name = models.CharField(max_length=255)
 
     def __unicode__(self):

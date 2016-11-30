@@ -88,19 +88,9 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     machine.name = wmiObj.Win32_ComputerSystem()[-1].Name
     machine.manufacturer = wmiObj.Win32_ComputerSystem()[-1].Manufacturer.strip()
     machine.compModel = wmiObj.Win32_ComputerSystem()[-1].Model.strip()
-    machine.cpu = models.CPU.objects.get_or_create(
-                                                   name=wmiObj.Win32_Processor()[0].Name.strip(),
-                                                   cores=wmiObj.Win32_ComputerSystem()[-1].NumberOfLogicalProcessors,
-                                                   count=len(wmiObj.Win32_Processor())
-                                                   )[0]
-    machine.ram = models.RAM.objects.get_or_create(
-                                                   sticks=wmiObj.win32_PhysicalMemoryArray()[-1].MemoryDevices,
-                                                   size=round(
-                                                           int(
-                                                                wmiObj.Win32_ComputerSystem()[-1].TotalPhysicalMemory
-                                                           ) / Byte2GB
-                                                        )
-                                                   )[0]
+    machine.os = wmiObj.Win32_OperatingSystem()[-1].Caption.strip()
+
+    # Try to save to allow many-to-many relationship to exist
     try:
         machine.save()
     except IntegrityError as err:
@@ -109,7 +99,36 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
             print(err)
             return
         else:
-            raise IntegrityError(err)
+            raise IntegrityError("Failed to import.", err)
+
+    machine.cpu = list(map(
+        lambda cpu: models.CPU.objects.get_or_create(  # This requires heavy modifications "Win32_PhysicalMemory"
+            name=cpu.Name.strip(),
+            manufacturer=cpu.Manufacturer,
+            partnum=cpu.PartNumber.strip(),
+            serial=cpu.SerialNumber.strip(),
+            location=cpu.DeviceID,
+            cores=cpu.NumberOfCores,
+            threads=cpu.ThreadCount,
+            speed=cpu.MaxClockSpeed
+        )[0],
+        filter(
+            lambda processor: processor.ProcessorType == 3,
+            wmiObj.Win32_Processor()
+        )
+    ))
+
+    machine.ram = list(map(
+        lambda stick: models.RAM.objects.get_or_create(  # This requires heavy modifications "Win32_PhysicalMemory"
+            size=int(stick.Capacity),
+            manufacturer=stick.Manufacturer,
+            partnum=stick.PartNumber.strip(),
+            serial=stick.SerialNumber.strip(),
+            location=stick.DeviceLocator,
+            speed=stick.Speed
+        )[0],
+        wmiObj.Win32_PhysicalMemory()
+    ))
 
     machine.hdds = list(map(
         lambda hdd: models.HDD.objects.get_or_create(
@@ -119,21 +138,43 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         )[0],
         filter(
             lambda hdd: hdd.DriveType == 3,
-            wmiObj.Win32_LogicalDisk()
+            wmiObj.Win32_LogicalDisk()  # Change to Win32_DiskDrive
         )
     ))
 
+    """WORKING CODE FOR HDD DISCOVERY
+    Ported from:
+    blogs.technet.microsoft.com/heyscriptingguy/2005/05/23/how-can-i-correlate-logical-drives-and-physical-disks/
+    Thanks ScriptingGuy1"""
+    # def makeQuery(FromWinClass, DeviceID, WhereWinClass):
+    #     return 'ASSOCIATORS OF {' + FromWinClass + '.DeviceID="' + DeviceID + '"} WHERE AssocClass = ' + WhereWinClass
+    #
+    # for diskdrive in wmiObj.Win32_DiskDrive():
+    #     print(diskdrive.Caption, diskdrive.DeviceID)
+    #
+    #     partsOnDrive = makeQuery("Win32_DiskDrive", diskdrive.DeviceID, "Win32_DiskDriveToDiskPartition")
+    #     diskParts = wmiObj.query(driveFromDisk)
+    #
+    #     for diskpart in diskParts:
+    #         wql2 = makeQuery("Win32_DiskPartition", diskpart.DeviceID, "Win32_LogicalDiskToPartition")
+    #         disklogictopart = wmiObj.query(wql2)
+    #         print(disklogictopart)
+    #
+    #         for logicdisk in disklogictopart:
+    #             print(logicdisk.DeviceID)
+
     if not wmiObj.Win32_VideoController():
-        machine.gpus = [models.GPU.objects.get_or_create(name='Unknown')[0]]
+        machine.gpus = [models.GPU.objects.get_or_create(name='Unknown', size=-1)[0]]
     else:
         machine.gpus = list(map(
             lambda gpu: models.GPU.objects.get_or_create(
-                name=gpu.Name.strip()
+                name=gpu.Name.strip(),
+                size=int(gpu.AdapterRAM),
+                location=gpu.DeviceID,
+                refresh=gpu.MaxRefreshRate,
             )[0],
             wmiObj.Win32_VideoController()
         ))
-
-    machine.os = wmiObj.Win32_OperatingSystem()[-1].Caption.strip()
 
     # Get roles and computer type
     try:
@@ -150,14 +191,13 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     else:
         machine.compType = models.Machine.SERVER
 
-    # Save machine
-    machine.save()
-
     # Push network devices to machine finally
     createdNetDevices = list(map(
         lambda net: machine.network_set.get_or_create(
             name=net.Name.strip(),
-            mac=net.MACAddress
+            mac=net.MACAddress,
+            location=net.DeviceID,
+            manufactuer=net.Manufacturer
         )[0],
         netdevices
     ))

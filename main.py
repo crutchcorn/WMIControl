@@ -69,7 +69,7 @@ def main():
                     raise IndexError("Your configuration file is configured incorrectly")
         else:
             try:
-                WMIInfo(_, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+                WMIInfo(None, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
             except AlreadyInDB as inDBErr:
                 print(inDBErr)
             except IndexError:
