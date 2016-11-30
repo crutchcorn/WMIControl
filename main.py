@@ -1,21 +1,22 @@
 """WMIControl - For those hard to reach servers. UoNC eat your heart out
 
 Usage:
-  WMIControl scan
-  WMIControl scan <nmapIP>
-  WMIControl scan <start> <end>
-  WMIControl scan (-s | --subnet)
-  WMIControl scan updatedb
-  WMIControl settings (skip | silent)
+    WMIControl scan
+    WMIControl scan <nmapIP>
+    WMIControl scan <start> <end>
+    WMIControl scan (-s | --subnet)
+    WMIControl scan updatedb
+    WMIControl settings (skip | silent)
+    WMIControl control <file>
 
 Options:
-  -h --help                  Show this screen
-  -v --version               Show version
-  scan                       Start a local or remote scan        IE: When empty, local
-  <nmapIP>                   A valid nmap IP query to call       EG: 192.168.1.1/24
-  <start> <end>              Scan a range of IP addresses        EG: 192.168.1.0 192.168.1.255
-  -s --subnet                Scan through the entire subnet
-  updatedb                   Update the local DB with cloud IDs
+    -h --help                  Show this screen
+    -v --version               Show version
+    scan                       Start a local or remote scan        IE: When empty, local
+    <nmapIP>                   A valid nmap IP query to call       EG: 192.168.1.1/24
+    <start> <end>              Scan a range of IP addresses        EG: 192.168.1.0 192.168.1.255
+    -s --subnet                Scan through the entire subnet
+    updatedb                   Update the local DB with cloud IDs
 
 """
 
@@ -26,8 +27,9 @@ import toml
 # Local imports
 from networkMngr import finishIP, getDeviceNetwork
 from wmiScanner import WMIInfo, getWMIObjs
+from wmiControl import runFile
 # from pluginHelper import makeAllAssets, updateCloudID, getAuth
-from exceptions import AlreadyInDB
+from excepts import AlreadyInDB
 
 # Load config file
 with open("conf.toml") as conffile:
@@ -69,7 +71,7 @@ def main():
                     raise IndexError("Your configuration file is configured incorrectly")
         else:
             try:
-                WMIInfo(_, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+                WMIInfo(None, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
             except AlreadyInDB as inDBErr:
                 print(inDBErr)
             except IndexError:
@@ -88,6 +90,10 @@ def main():
             print("Value is now: " + str(config['settings']['silentlyFail']))
         with open("conf.toml", "w") as updateConfig:
             updateConfig.write(toml.dumps(config))
+    elif arguments['control']:
+        # Select which computers to control
+        if arguments['<file>']:
+            runFile(comp, arguments['<file>'])
 
 
 if __name__ == "__main__":

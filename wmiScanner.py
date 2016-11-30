@@ -18,7 +18,7 @@ from data import models
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
-from exceptions import AlreadyInDB
+from excepts import AlreadyInDB
 
 Byte2GB = 1024 * 1024 * 1024
 
@@ -35,9 +35,9 @@ def getWMIObjs(users, search=getDeviceNetwork()[2]):
         except wmi.x_wmi as e:
             # This is unfortunately the way this must be done. There is no error codes in wmi library AFAIK
             if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':
-                raise EnvironmentError("Computer does not have WMI enabled")
+                return "Computer does not have WMI enabled"
             else:
-                raise wmi.x_wmi(e.com_error.excepinfo[2])
+                return wmi.x_wmi(e.com_error.excepinfo[2])
         except IndexError:
             raise IndexError("Config file has errors. Likely is unmatching user/password combo")
         else:
@@ -46,8 +46,10 @@ def getWMIObjs(users, search=getDeviceNetwork()[2]):
     return wmiObjs  # Return credentials that worked in future. This will be a ID for the credential in DB
 
 
-def WMIInfo(wmiObj=wmi.WMI(), silentlyFail=False, skipUpdate=False):
+def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database"""
+    if not wmiObj:
+        wmiObj = wmi.WMI()
 
     # Grab list of network devices. Tested to see if MAC in DB
     netdevices = list(filter(
