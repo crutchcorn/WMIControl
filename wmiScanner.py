@@ -35,9 +35,11 @@ def getWMIObjs(users, search=getDeviceNetwork()[2]):
         except wmi.x_wmi as e:
             # This is unfortunately the way this must be done. There is no error codes in wmi library AFAIK
             if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':
-                return "Computer does not have WMI enabled"
+                print("Computer does not have WMI enabled")
+                break
             else:
-                return wmi.x_wmi(e.com_error.excepinfo[2])
+                print(wmi.x_wmi(e.com_error.excepinfo[2]))
+                break
         except IndexError:
             raise IndexError("Config file has errors. Likely is unmatching user/password combo")
         else:
