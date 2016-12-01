@@ -1,7 +1,8 @@
 """The following needs to be changed to an extreme amount. The following is how I want the DB set up:
 cpu =many-to-many> uniqueCPUList =many-to-many> nonuniqueCPUModel
 ram =many-to-many> uniqueRAMList =many-to-many> nonuniqueRAMStick
-disk =many-to-many> uniqueDiskList =many-to-many> nonuniqueDiskModel
+disk =many-to-many> uniquePhysicalDiskList =many-to-many> nonuniqueDiskModel
+disk =many-to-many> uniquePhysicalDiskList =many-to-many> uniquePartitionInfo
 gpu =many-to-many> uniqueGPUList =many-to-many> nonuniqueGPUModel
 
 And maybe, just maybe:
@@ -9,13 +10,24 @@ roles =many-to-many> uniqueRoleList =many-to-many> nonuniqueRoles
 
 This will allow you to grab information about that model much easier, as well as have duplicates of that model
 
+You may turn a code into a human readable name as such:
+>>> ComputerType = 0
+>>> models.Machine.MACHINE_TYPES[ComputerType][1]
+'Desktop'
+
+That being said, not all values start at 0. (Thanks, Microsoft)
+Because of this, a new function may be introduced per table, per choice, to retreive the human readable value from code
+
+With the addition of Machine Model, it may be tricky to figure out how the relationship will work between them all.
+The following might represent what you would do:
+CPU.model = Machine.MachineModel.CPUModel
+
+Before I allow things to get too far, I'll need to really think about the datatypes and lengths for each field.
 """
 from django.db import models
-
 from macaddress.fields import MACAddressField
-
-
 # from djmoney.models.fields import MoneyField
+
 
 class Location(models.Model):
     campus = models.CharField(max_length=255, blank=True)
@@ -30,10 +42,10 @@ class Location(models.Model):
         return self.__unicode__()
 
 
-class Machine(models.Model):
-    DESKTOP = 1
-    LAPTOP = 2
-    SERVER = 3
+class MachineModel(models.Model):
+    DESKTOP = 0
+    LAPTOP = 1
+    SERVER = 2
     MACHINE_TYPES = (
         (DESKTOP, 'Desktop'),
         (LAPTOP, 'Laptop'),
@@ -43,20 +55,27 @@ class Machine(models.Model):
         choices=MACHINE_TYPES,
         default=DESKTOP
     )
-    name = models.CharField(max_length=255, unique=True)
     manufacturer = models.CharField(max_length=255, blank=True)
     compModel = models.CharField(max_length=255, blank=True)
+    cpu = models.ForeignKey('CPUModel')
+    ram = models.ForeignKey('RAMModel')
+    disks = models.ForeignKey('PhysicalDiskModel')
+    gpu = models.ForeignKey('GPUModel')
+    network = models.ForeignKey('NetworkModel')
+
+    def __unicode__(self):
+        return self.name
+
+    def __str__(self):
+        return self.__unicode__()
+
+
+class Machine(models.Model):
+    model = models.ForeignKey('MachineModel')
+    name = models.CharField(max_length=255, unique=True)
     os = models.CharField(max_length=255, blank=True)  # Change to a seperate table of some kind
-    cloudID = models.PositiveSmallIntegerField(null=True, blank=True, unique=True)
-    # THIS NEEDS TO BE CHANGED AS THEY ARE UNIQUE NOW
-    cpu = models.ManyToManyField('CPU', blank=True)  # Many to many, as CPUs are not unique.
-    # THIS NEEDS TO BE CHANGED AS THEY ARE UNIQUE NOW
-    ram = models.ManyToManyField('RAM', blank=True)  # Many to many, as RAM is not unique.
-    # THIS NEEDS TO BE CHANGED AS THEY ARE UNIQUE NOW
-    hdds = models.ManyToManyField('HDD', blank=True)
-    # THIS NEEDS TO BE CHANGED AS THEY ARE UNIQUE NOW
-    gpus = models.ManyToManyField('GPU', blank=True)
     activation = models.OneToOneField('Activation', null=True, blank=True)  # Licences have parent-child relationship
+    cloudID = models.PositiveSmallIntegerField(null=True, blank=True, unique=True)
     roles = models.ManyToManyField('Role', blank=True)  # Roles are not unique
 
     def __unicode__(self):
@@ -66,7 +85,7 @@ class Machine(models.Model):
         return self.__unicode__()
 
 
-class CPU(models.Model):
+class CPUModel(models.Model):
     X86 = 0
     MIPS = 1
     ALPHA = 2
@@ -342,12 +361,6 @@ class CPU(models.Model):
     name = models.CharField(max_length=255)
     manufacturer = models.CharField(max_length=255)
     partnum = models.CharField(max_length=255, null=True, blank=True)
-    serial = models.CharField(max_length=255, null=True, blank=True)
-    location = models.CharField(max_length=255, null=True, blank=True)
-    count = models.PositiveSmallIntegerField(null=True, blank=True)
-    cores = models.PositiveSmallIntegerField(null=True, blank=True)
-    threads = models.PositiveSmallIntegerField(null=True, blank=True)
-    speed = models.PositiveSmallIntegerField(null=True, blank=True)
     arch = models.PositiveSmallIntegerField(
         choices=CPU_ARCHS,
         default=X64
@@ -360,15 +373,31 @@ class CPU(models.Model):
         choices=UPGRADE_METHODS,
         default=UNKNOWN
     )
+    cores = models.PositiveSmallIntegerField(null=True, blank=True)
+    threads = models.PositiveSmallIntegerField(null=True, blank=True)
+    speed = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return u"{}, {} Cores".format(self.name, self.cores)
+        return u"{}, {}".format(self.name, self.arch)
 
     def __str__(self):
         return self.__unicode__()
 
 
-class RAM(models.Model):
+class CPU(models.Model):
+    machine = models.ForeignKey('Machine')
+    model = models.ForeignKey('CPUModel')
+    serial = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+
+    def __unicode__(self):
+        return u"CPU {}, {}".format(self.serial, self.location)
+
+    def __str__(self):
+        return self.__unicode__()
+
+
+class RAMModel(models.Model):
     UNKNOWN = 0
     OTHER = 1
     SIP = 2
@@ -472,8 +501,6 @@ class RAM(models.Model):
     size = models.BigIntegerField()
     manufacturer = models.CharField(max_length=255)
     partnum = models.CharField(max_length=255, null=True, blank=True)
-    serial = models.CharField(max_length=255, null=True, blank=True)
-    location = models.CharField(max_length=255, null=True, blank=True)
     speed = models.PositiveSmallIntegerField(null=True, blank=True)
     formFactor = models.PositiveSmallIntegerField(
         choices=FORM_FACTORS,
@@ -494,39 +521,88 @@ class RAM(models.Model):
         return int(self.size) / 1024
 
     def __unicode__(self):
-        return u"{} GB, {} Number Of Sticks".format(self.size, self.sticks)
+        return u"{} GB, {}".format(self.sizeInGB(), self.manufacturer)
+
+    def __str__(self):
+        return self.__unicode__()
+
+
+class RAM(models.Model):
+    machine = models.ForeignKey('Machine')
+    model = models.ForeignKey('RAMModel')
+    serial = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+
+    def __unicode__(self):
+        return u"Serial Number: {}".format(self.serial)
+
+    def __str__(self):
+        return self.__unicode__()
+
+
+class PhysicalDiskModel(models.Model):
+    name = models.CharField(max_length=255, blank=True)
+    size = models.BigIntegerField()
+    interface = models.CharField(max_length=5, blank=True)
+    manufacturer = models.CharField(max_length=255, blank=True)
+
+    def sizeInGB(self):
+        return int(self.size) / (1024 * 1024 * 1024)
+
+    def sizeInMB(self):
+        return int(self.size) / (1024 * 1024)
+
+    def sizeInKB(self):
+        return int(self.size) / 1024
+
+    def __unicode__(self):
+        return u"{} Mount, {} GB".format(self.name, self.sizeInGB())
 
     def __str__(self):
         return self.__unicode__()
 
 
 class PhysicalDisk(models.Model):
+    machine = models.ForeignKey('Machine')
+    model = models.ForeignKey('PhysicalDiskModel')
     name = models.CharField(max_length=255, blank=True)
-    size = models.BigIntegerField()
-    connection = models.CharField(max_length=5, blank=True)
     serial = models.CharField(max_length=255, blank=True)
-    type = models.CharField(max_length=255, blank=True)  # Add choices
-
-    def sizeInGB(self):
-        return int(self.size) / (1024 * 1024 * 1024)
-
-    def sizeInMB(self):
-        return int(self.size) / (1024 * 1024)
-
-    def sizeInKB(self):
-        return int(self.size) / 1024
+    partitions = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"{} Mount, {} GB, {} GB Free".format(self.name, self.size, self.free)
+        return u"{} Mount, {} GB".format(self.name, self.serial)
 
     def __str__(self):
         return self.__unicode__()
 
 
-class HDD(models.Model):  # Add/change. Must be renamed to LogicalDisk
-    name = models.CharField(max_length=255, blank=True)
+class LogicalDisk(models.Model):
+    UNKNOWN = 0
+    NOROOTDIRECTORY = 1
+    REMOVABLEDISK = 2
+    LOCALDISK = 3
+    NETWORKDRIVE = 4
+    COMPACTDISC = 5
+    RAMDISK = 6
+    DRIVE_TYPES = (
+        (UNKNOWN, 'Unknown'),
+        (NOROOTDIRECTORY, 'No Root Directory'),
+        (REMOVABLEDISK, 'Removable Disk'),
+        (LOCALDISK, 'Local Disk'),
+        (NETWORKDRIVE, 'Network Drive'),
+        (COMPACTDISC, 'Compact Disc'),
+        (RAMDISK, 'RAM Disk'),
+    )
+    disk = models.ForeignKey('PhysicalDisk')
+    name = models.CharField(max_length=255)
+    mount = models.CharField(max_length=4, null=True, blank=True)
+    filesystem = models.CharField(max_length=255, null=True, blank=True)
     size = models.BigIntegerField()
-    free = models.PositiveSmallIntegerField(null=True, blank=True)
+    freesize = models.BigIntegerField(null=True, blank=True)
+    type = models.PositiveSmallIntegerField(
+        choices=DRIVE_TYPES,
+        default=UNKNOWN
+    )
 
     def sizeInGB(self):
         return int(self.size) / (1024 * 1024 * 1024)
@@ -537,6 +613,15 @@ class HDD(models.Model):  # Add/change. Must be renamed to LogicalDisk
     def sizeInKB(self):
         return int(self.size) / 1024
 
+    def freesizeInGB(self):
+        return int(self.freesize) / (1024 * 1024 * 1024)
+
+    def freesizeInMB(self):
+        return int(self.freesize) / (1024 * 1024)
+
+    def freesizeInKB(self):
+        return int(self.freesize) / 1024
+
     def __unicode__(self):
         return u"{} Mount, {} GB, {} GB Free".format(self.name, self.size, self.free)
 
@@ -544,7 +629,7 @@ class HDD(models.Model):  # Add/change. Must be renamed to LogicalDisk
         return self.__unicode__()
 
 
-class GPU(models.Model):
+class GPUModel(models.Model):
     OTHER = 1
     UNKNOWN = 2
     CGA = 3
@@ -601,7 +686,6 @@ class GPU(models.Model):
     )
     name = models.CharField(max_length=255)
     size = models.BigIntegerField()
-    location = models.CharField(max_length=255, null=True, blank=True)
     refresh = models.PositiveSmallIntegerField(null=True, blank=True)
     arch = models.PositiveSmallIntegerField(
         choices=VIDEO_ARCHITECTURES,
@@ -628,15 +712,37 @@ class GPU(models.Model):
         return self.__unicode__()
 
 
-class Network(models.Model):
-    machine = models.ForeignKey('Machine')  # One to many, network cards ARE unique and can be moved
-    name = models.CharField(max_length=255, blank=True, null=True)
-    mac = MACAddressField(unique=True)
-    manufacturer = models.CharField(max_length=255, blank=True, null=True)
+class GPU(models.Model):
+    machine = models.ForeignKey('Machine')
+    model = models.ForeignKey('GPUModel')
     location = models.CharField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
-        return u"{}, {} Mac Address".format(self.name, self.mac)
+        return self.location
+
+    def __str__(self):
+        return self.__unicode__()
+
+
+class NetworkModel(models.Model):
+    name = models.CharField(max_length=255)
+    manufacturer = models.CharField(max_length=255, blank=True, null=True)
+
+    def __unicode__(self):
+        return u"{}, {}".format(self.name, self.manufacturer)
+
+    def __str__(self):
+        return self.__unicode__()
+
+
+class Network(models.Model):
+    machine = models.ForeignKey('Machine')  # One to many, network cards ARE unique and can be moved
+    model = models.ForeignKey('NetworkModel')
+    mac = MACAddressField(unique=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.mac
 
     def __str__(self):
         return self.__unicode__()
