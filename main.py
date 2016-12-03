@@ -27,7 +27,7 @@ import toml
 from networkMngr import finishIP, getDeviceNetwork
 from wmiScanner import WMIInfo, getWMIObjs
 # from pluginHelper import makeAllAssets, updateCloudID, getAuth
-from exceptions import AlreadyInDB
+from excepts import AlreadyInDB
 
 # Load config file
 with open("conf.toml") as conffile:

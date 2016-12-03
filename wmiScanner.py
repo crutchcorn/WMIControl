@@ -15,13 +15,10 @@ application = get_wsgi_application()
 
 # DB models and exceptions
 from data import models
-from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-
-from exceptions import AlreadyInDB
+from excepts import AlreadyInDB, SilentFail
 
 Byte2GB = 1024 * 1024 * 1024
-
 local = wmi.WMI()
 
 
@@ -47,136 +44,64 @@ def getWMIObjs(users, search=getDeviceNetwork()[2]):
 
 
 def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
-    """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database"""
+    """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database.
+    wmiObj default is None. If none, the local WMI object will be used"""
     if not wmiObj:
-        wmiObj = wmi.WMI()
+        wmiObj = local
 
-    # Grab list of network devices. Tested to see if MAC in DB
+    """Get a list of valid network devices to use later to find MAC in DB"""
     netdevices = list(filter(
         lambda net: netDeviceTest(net),
         wmiObj.Win32_NetworkAdapter()
     ))
-
     if not netdevices:
         if silentlyFail:
-            return
+            raise SilentFail(
+                wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any valid network devices."
+            )
         else:
             raise LookupError(
-                wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any network devices. Please advice")
+                wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any valid network devices."
+            )
 
-    machine = models.Machine()
+    """Setup machine and compModel to start import data into it"""
+    machine, compModel = None, None
     for macaddr in netdevices:
         try:
-            machine = models.Machine.objects.get(network__mac=macaddr.MACAddress)
+            machine = models.Network.objects.get(mac=macaddr.MACAddress).machine  # Gets machine with mac address
         except ObjectDoesNotExist:
-            pass
+            machine, compModel = models.Machine(), models.MachineModel()
         except MultipleObjectsReturned:
             if silentlyFail:
-                print("You have a duplicate machine in your database")
-                return
+                raise SilentFail("You have a duplicate machine in your database!")
             else:
                 raise MultipleObjectsReturned("You have a duplicate machine in your database!")
         else:
-            break
-    if machine.name:
-        if skipUpdate:
-            raise AlreadyInDB(machine.name, "is already in your database. Skipping")
-        else:
-            print(machine.name + " will be updated in the local database")
-    else:
-        print(wmiObj.Win32_ComputerSystem()[-1].Name + " will be created in the local database")
-    machine.name = wmiObj.Win32_ComputerSystem()[-1].Name
-    machine.manufacturer = wmiObj.Win32_ComputerSystem()[-1].Manufacturer.strip()
-    machine.compModel = wmiObj.Win32_ComputerSystem()[-1].Model.strip()
-    machine.os = wmiObj.Win32_OperatingSystem()[-1].Caption.strip()
-
-    # Try to save to allow many-to-many relationship to exist
-    try:
-        machine.save()
-    except IntegrityError as err:
+            if skipUpdate:
+                raise AlreadyInDB(machine.name, "is already in your database. Skipping")
+            else:
+                print(machine.name + " will be updated in the local database")
+                compModel = machine.model  # Error handling needed if machine has no model
+                break  # Machine has been found and defined. Update the machine
+    # Need to add a way to make sure that a computer isn't going to replace another with matching mac
+    if not machine:
         if silentlyFail:
-            print(machine.name + " failed to import.")
-            print(err)
-            return
+            raise SilentFail("None of the network cards found have a mac address!")
         else:
-            raise IntegrityError("Failed to import.", err)
+            raise LookupError("None of the network cards found have a mac address!")
 
-    machine.cpu = list(map(
-        lambda cpu: models.CPU.objects.get_or_create(  # This requires heavy modifications "Win32_PhysicalMemory"
-            name=cpu.Name.strip(),
-            manufacturer=cpu.Manufacturer,
-            partnum=cpu.PartNumber.strip(),
-            serial=cpu.SerialNumber.strip(),
-            location=cpu.DeviceID,
-            cores=cpu.NumberOfCores,
-            threads=cpu.ThreadCount,
-            speed=cpu.MaxClockSpeed
-        )[0],
-        filter(
-            lambda processor: processor.ProcessorType == 3,
-            wmiObj.Win32_Processor()
-        )
-    ))
-
-    machine.ram = list(map(
-        lambda stick: models.RAM.objects.get_or_create(  # This requires heavy modifications "Win32_PhysicalMemory"
-            size=int(stick.Capacity),
-            manufacturer=stick.Manufacturer,
-            partnum=stick.PartNumber.strip(),
-            serial=stick.SerialNumber.strip(),
-            location=stick.DeviceLocator,
-            speed=stick.Speed
-        )[0],
-        wmiObj.Win32_PhysicalMemory()
-    ))
-
-    machine.hdds = list(map(
-        lambda hdd: models.HDD.objects.get_or_create(
-            name=hdd.DeviceID,
-            size=round(int(hdd.Size) / Byte2GB),
-            free=round(int(hdd.FreeSpace) / Byte2GB)
-        )[0],
-        filter(
-            lambda hdd: hdd.DriveType == 3,
-            wmiObj.Win32_LogicalDisk()  # Change to Win32_DiskDrive
-        )
-    ))
-
-    """WORKING CODE FOR HDD DISCOVERY
-    Ported from:
-    blogs.technet.microsoft.com/heyscriptingguy/2005/05/23/how-can-i-correlate-logical-drives-and-physical-disks/
-    Thanks ScriptingGuy1"""
-    # def makeQuery(FromWinClass, DeviceID, WhereWinClass):
-    #     return 'ASSOCIATORS OF {' + FromWinClass + '.DeviceID="' + DeviceID + '"} WHERE AssocClass = ' + WhereWinClass
-    #
-    # for diskdrive in wmiObj.Win32_DiskDrive():
-    #     print(diskdrive.Caption, diskdrive.DeviceID)
-    #
-    #     partsOnDrive = makeQuery("Win32_DiskDrive", diskdrive.DeviceID, "Win32_DiskDriveToDiskPartition")
-    #     diskParts = wmiObj.query(driveFromDisk)
-    #
-    #     for diskpart in diskParts:
-    #         wql2 = makeQuery("Win32_DiskPartition", diskpart.DeviceID, "Win32_LogicalDiskToPartition")
-    #         disklogictopart = wmiObj.query(wql2)
-    #         print(disklogictopart)
-    #
-    #         for logicdisk in disklogictopart:
-    #             print(logicdisk.DeviceID)
-
-    if not wmiObj.Win32_VideoController():
-        machine.gpus = [models.GPU.objects.get_or_create(name='Unknown', size=-1)[0]]
+    """Begin creation of compModel"""
+    modelName = wmiObj.Win32_ComputerSystem()[-1].Model.strip()
+    modelManufacturer = wmiObj.Win32_ComputerSystem()[-1].Manufacturer.strip()
+    if not machine.name:
+        print(wmiObj.Win32_ComputerSystem()[-1].Name + " will be created in the local database")
+        compModel, _ = models.MachineModel.objects.get_or_create(name=compModel.name,
+                                                                 manufacturer=compModel.manufacturer)
     else:
-        machine.gpus = list(map(
-            lambda gpu: models.GPU.objects.get_or_create(
-                name=gpu.Name.strip(),
-                size=int(gpu.AdapterRAM),
-                location=gpu.DeviceID,
-                refresh=gpu.MaxRefreshRate,
-            )[0],
-            wmiObj.Win32_VideoController()
-        ))
+        compModel.name = modelName
+        compModel.manufacturer = modelManufacturer
 
-    # Get roles and computer type
+    # The following will not only get compType, but also get the roles of the machine
     try:
         machine.roles = list(map(
             lambda server: models.Role.objects.get_or_create(name=server.Name.strip())[0],
@@ -185,20 +110,160 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     except AttributeError:
         try:
             if wmiObj.Win32_Battery()[-1].BatteryStatus > 0:
-                machine.compType = models.Machine.LAPTOP
+                machine.compType = models.MachineModel.LAPTOP
         except IndexError:
-            pass  # The default for compType is already desktop
+            machine.compType = models.MachineModel.DESKTOP
     else:
-        machine.compType = models.Machine.SERVER
+        machine.compType = models.MachineModel.SERVER
+    compModel.save()
 
-    # Push network devices to machine finally
-    createdNetDevices = list(map(
-        lambda net: machine.network_set.get_or_create(
+    """Begin creation of machine"""
+    machine.name = wmiObj.Win32_ComputerSystem()[-1].Name
+    machine.os = wmiObj.Win32_OperatingSystem()[-1].Caption.strip()
+    machine.model = compModel
+    machine.save()
+
+    """Begin creation of CPUModel"""
+    def createCPU(cpu):
+        cpuMod, _ = models.CPUModel.objects.get_or_create(
+            name=cpu.Name.strip(),
+            manufacturer=cpu.Manufacturer,
+            partnum=cpu.PartNumber.strip(),
+            arch=cpu.Architecture,
+            family=cpu.Family,
+            upgradeMethod=cpu.UpgradeMethod,
+            cores=cpu.NumberOfCores,
+            threads=cpu.ThreadCount,
+            speed=cpu.MaxClockSpeed
+        )
+        cpuMod.save()
+
+        processor = models.CPU(
+            machine=machine,
+            model=cpuMod,
+            serial=cpu.SerialNumber.strip(),
+            location=cpu.DeviceID
+        )
+        processor.save()
+
+    list(map(
+        lambda cpu: createCPU(cpu),
+        filter(
+            lambda processor: processor.ProcessorType == 3,
+            wmiObj.Win32_Processor()
+        )
+    ))
+
+    """Begin creation of RAM"""
+    def createRAM(ram):
+        ramMod, _ = models.RAMModel.objects.get_or_create(
+            size=int(ram.Capacity),
+            manufacturer=ram.Manufacturer,
+            partnum=ram.PartNumber.strip(),
+            speed=ram.Speed,
+            formFactor=ram.FormFactor,
+            memoryType=ram.MemoryType
+        )
+        ramMod.save()
+
+        ramStick = models.RAM(
+            machine=machine,
+            model=ramMod,
+            serial=ram.SerialNumber.strip(),
+            location=ram.DeviceLocator
+        )
+        ramStick.save()
+
+    list(map(
+        lambda ram: createRAM(ram),
+        wmiObj.Win32_PhysicalMemory()
+    ))
+
+    """Begin creation of Physical and Logical Disks
+    Matching of Physical and Logical disks ported from:
+    blogs.technet.microsoft.com/heyscriptingguy/2005/05/23/how-can-i-correlate-logical-drives-and-physical-disks/
+    Thanks, ScriptingGuy1"""
+    def makeQuery(FromWinClass, DeviceID, WhereWinClass):
+        return 'ASSOCIATORS OF {' + FromWinClass + '.DeviceID="' + DeviceID + '"} WHERE AssocClass = ' + WhereWinClass
+
+    def createDrive(PhysDrive):
+        pdMod, _ = models.PhysicalDiskModel.objects.get_or_create(
+            name=PhysDrive.Model,
+            size=PhysDrive.Size,
+            interface=PhysDrive.InterfaceType,
+            manufacturer=PhysDrive.Manufacturer
+        )
+        pdMod.save()
+
+        pd = models.PhysicalDisk(
+            machine=machine,
+            model=pdMod,
+            serial=PhysDrive.SerialNumber,
+            partitions=PhysDrive.Partitions,
+        )
+        pd.save()
+        return pd
+
+    for diskdrive in wmiObj.Win32_DiskDrive():
+        """Get info from Win32_LogicalDisk"""
+        physDisk = createDrive(diskdrive)
+        partsOnDrive = makeQuery("Win32_DiskDrive", diskdrive.DeviceID, "Win32_DiskDriveToDiskPartition")
+        for diskpart in wmiObj.query(partsOnDrive):
+            diskPartToLogic = makeQuery("Win32_DiskPartition", diskpart.DeviceID, "Win32_LogicalDiskToPartition")
+            for logicdisk in wmiObj.query(diskPartToLogic):
+                """Get info from Win32_LogicalDisk"""
+                logicDisk = models.LogicalDisk(
+                    disk=physDisk,
+                    name=logicdisk.Name,
+                    mount=logicdisk.DeviceID,
+                    filesystem=logicdisk.FileSystem,
+                    size=logicdisk.Size,
+                    freesize=logicdisk.FreeSpace,
+                    type=logicdisk.DriveType
+                )
+                logicDisk.save()
+
+    """Begin creation of GPU"""
+    def createGPU(gpu):
+        gpuMod, _ = models.GPUModel.objects.get_or_create(
+            name=gpu.Name.strip(),
+            size=int(gpu.AdapterRAM),
+            refresh=gpu.MaxRefreshRate,
+            arch=gpu.VideoArchitecture,
+            memoryType=gpu.VideoMemoryType
+        )
+        gpuMod.save()
+
+        gpuCard = models.GPU(
+            machine=machine,
+            model=gpuMod,
+            location=gpu.DeviceID,
+        )
+        gpuCard.save()
+
+    list(map(
+        lambda gpu: createGPU(gpu),
+        wmiObj.Win32_VideoController()
+    ))
+
+    """Begin creation of Network"""
+    def createNetwork(net):
+        netMod, _ = models.NetworkModel.objects.get_or_create(
             name=net.Name.strip(),
+            manufacturer=net.Manufacturer
+        )
+        netMod.save()
+
+        netCard = models.Network(
+            machine=machine,
+            model=netMod,
             mac=net.MACAddress,
             location=net.DeviceID,
-            manufactuer=net.Manufacturer
-        )[0],
+        )
+        netCard.save()
+
+    list(map(
+        lambda net: createNetwork(net),
         netdevices
     ))
     return machine

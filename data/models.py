@@ -43,25 +43,32 @@ class Location(models.Model):
 
 
 class MachineModel(models.Model):
-    DESKTOP = 0
-    LAPTOP = 1
-    SERVER = 2
+    UNKNOWN = 0
+    OTHER = 1
+    DESKTOP = 2
+    LAPTOP = 3
+    SERVER = 4
     MACHINE_TYPES = (
+        (UNKNOWN, 'Unknown'),
+        (OTHER, 'Other'),
         (DESKTOP, 'Desktop'),
         (LAPTOP, 'Laptop'),
         (SERVER, 'Server'),
     )
     compType = models.PositiveSmallIntegerField(
         choices=MACHINE_TYPES,
-        default=DESKTOP
+        default=UNKNOWN
     )
     manufacturer = models.CharField(max_length=255, blank=True)
-    compModel = models.CharField(max_length=255, blank=True)
-    cpu = models.ForeignKey('CPUModel')
-    ram = models.ForeignKey('RAMModel')
-    disks = models.ForeignKey('PhysicalDiskModel')
-    gpu = models.ForeignKey('GPUModel')
-    network = models.ForeignKey('NetworkModel')
+    name = models.CharField(max_length=255, blank=True)
+
+    # def getCPUs(self):
+    #     return list(set([machine.cpu_set.model for machine in Machine.objects.filter(model__name=self.name)]))
+
+    # ram = models.ForeignKey('RAMModel')
+    # disks = models.ForeignKey('PhysicalDiskModel')
+    # gpu = models.ForeignKey('GPUModel')
+    # network = models.ForeignKey('NetworkModel')
 
     def __unicode__(self):
         return self.name
@@ -71,7 +78,7 @@ class MachineModel(models.Model):
 
 
 class Machine(models.Model):
-    model = models.ForeignKey('MachineModel')
+    model = models.ForeignKey('MachineModel', blank=True, null=True)
     name = models.CharField(max_length=255, unique=True)
     os = models.CharField(max_length=255, blank=True)  # Change to a seperate table of some kind
     activation = models.OneToOneField('Activation', null=True, blank=True)  # Licences have parent-child relationship
@@ -359,11 +366,12 @@ class CPUModel(models.Model):
         (SOCKET939, 'Socket 939'),
     )
     name = models.CharField(max_length=255)
-    manufacturer = models.CharField(max_length=255)
+    manufacturer = models.CharField(max_length=255, blank=True, null=True)
     partnum = models.CharField(max_length=255, null=True, blank=True)
     arch = models.PositiveSmallIntegerField(
         choices=CPU_ARCHS,
-        default=X64
+        default=None,
+        null=True
     )
     family = models.PositiveSmallIntegerField(
         choices=CPU_FAMILIES,
@@ -499,7 +507,7 @@ class RAMModel(models.Model):
         (FBD2, 'FBD2'),
     )
     size = models.BigIntegerField()
-    manufacturer = models.CharField(max_length=255)
+    manufacturer = models.CharField(max_length=255, blank=True, null=True)
     partnum = models.CharField(max_length=255, null=True, blank=True)
     speed = models.PositiveSmallIntegerField(null=True, blank=True)
     formFactor = models.PositiveSmallIntegerField(
@@ -565,9 +573,8 @@ class PhysicalDiskModel(models.Model):
 class PhysicalDisk(models.Model):
     machine = models.ForeignKey('Machine')
     model = models.ForeignKey('PhysicalDiskModel')
-    name = models.CharField(max_length=255, blank=True)
     serial = models.CharField(max_length=255, blank=True)
-    partitions = models.CharField(max_length=255, blank=True)
+    partitions = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return u"{} Mount, {} GB".format(self.name, self.serial)
