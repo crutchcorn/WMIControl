@@ -23,7 +23,12 @@ The following might represent what you would do:
 CPU.model = Machine.MachineModel.CPUModel
 
 Before I allow things to get too far, I'll need to really think about the datatypes and lengths for each field.
+
+Replace all constants refering to responce types with a table for responces.
+For a guide on how to fill the model with initial data:
+https://docs.djangoproject.com/en/1.10/howto/initial-data/
 """
+
 from django.db import models
 from macaddress.fields import MACAddressField
 # from djmoney.models.fields import MoneyField

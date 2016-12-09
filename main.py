@@ -59,7 +59,7 @@ def main():
                 search = finishIP(arguments['<nmapIP>'], "0-255")
             elif arguments['--subnet']:
                 _, _, search = getDeviceNetwork()
-            for comp in getWMIObjs(config['credentials']['wmi']['users'], search):
+            for comp in getWMIObjs(config['credentials']['wmi']['users'], search, True):
                 try:
                     WMIInfo(comp, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
                 except AlreadyInDB as inDBErr:

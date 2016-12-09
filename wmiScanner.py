@@ -16,25 +16,41 @@ application = get_wsgi_application()
 # DB models and exceptions
 from data import models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from excepts import AlreadyInDB, SilentFail
+from excepts import AlreadyInDB, SilentFail, AccessDenied
 
 Byte2GB = 1024 * 1024 * 1024
 local = wmi.WMI()
 
 
-def getWMIObjs(users, search=getDeviceNetwork()[2]):
-    """Given ip range search and list of dictionary users: Returns a list of WMIObjects"""
+def testCredentials(computer, userLogin):
+    print("Trying to connect to", computer, "with user '" + userLogin['user'] + "'")
+    try:
+        wmiObj = wmi.WMI(str(computer), user=userLogin['user'], password=userLogin['pass'])
+    except wmi.x_wmi as e:
+        # This is unfortunately the way this must be done. There is no error codes in wmi library AFAIK
+        if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':
+            raise EnvironmentError("Computer does not have WMI enabled")
+        elif e.com_error.excepinfo[2] == 'Access is denied. ':
+            raise AccessDenied("Incorrect credentials")
+        else:
+            raise wmi.x_wmi(e.com_error.excepinfo[2])
+    else:
+        return wmiObj
+
+
+def getWMIObjs(users, search=getDeviceNetwork()[2], silentlyFail=False):
+    """Given ip range search and list of dictionary users: Returns a list of WMIObjects
+
+    TODO: Split off into two functions - One that tests credentials with computer, one that handles the looping"""
     wmiObjs = []
-    for ip, login in [(ip, login) for ip in getComputers(search) for login in users]:
-        print("Trying to connect to", ip, "with user '" + login['user'] + "'")
+    for ip, login in [(ip, login) for ip in getComputers(search)[0] for login in users]:
         try:
-            wmiObj = wmi.WMI(str(ip), user=login['user'], password=login['pass'])
-        except wmi.x_wmi as e:
-            # This is unfortunately the way this must be done. There is no error codes in wmi library AFAIK
-            if e.com_error.excepinfo[2] == 'The RPC server is unavailable. ':
-                raise EnvironmentError("Computer does not have WMI enabled")
+            wmiObj = testCredentials(ip, login)
+        except (EnvironmentError, AccessDenied) as err:
+            if silentlyFail:
+                print(err)
             else:
-                raise wmi.x_wmi(e.com_error.excepinfo[2])
+                raise err
         except IndexError:
             raise IndexError("Config file has errors. Likely is unmatching user/password combo")
         else:
@@ -95,8 +111,8 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     modelManufacturer = wmiObj.Win32_ComputerSystem()[-1].Manufacturer.strip()
     if not machine.name:
         print(wmiObj.Win32_ComputerSystem()[-1].Name + " will be created in the local database")
-        compModel, _ = models.MachineModel.objects.get_or_create(name=compModel.name,
-                                                                 manufacturer=compModel.manufacturer)
+        compModel, _ = models.MachineModel.objects.get_or_create(name=modelName,
+                                                                 manufacturer=modelManufacturer)
     else:
         compModel.name = modelName
         compModel.manufacturer = modelManufacturer
@@ -125,10 +141,15 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
 
     """Begin creation of CPUModel"""
     def createCPU(cpu):
+        try:
+            PartNumber = cpu.PartNumber.strip()
+        except AttributeError:
+            PartNumber = None
+
         cpuMod, _ = models.CPUModel.objects.get_or_create(
             name=cpu.Name.strip(),
             manufacturer=cpu.Manufacturer,
-            partnum=cpu.PartNumber.strip(),
+            partnum=PartNumber,
             arch=cpu.Architecture,
             family=cpu.Family,
             upgradeMethod=cpu.UpgradeMethod,
@@ -138,45 +159,63 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         )
         cpuMod.save()
 
-        processor = models.CPU(
+        try:
+            SerialNumber = cpu.SerialNumber.strip()
+        except AttributeError:
+            SerialNumber = None
+
+        processor, _ = models.CPU.objects.get_or_create(
             machine=machine,
             model=cpuMod,
-            serial=cpu.SerialNumber.strip(),
+            serial=SerialNumber,
             location=cpu.DeviceID
         )
         processor.save()
 
     list(map(
         lambda cpu: createCPU(cpu),
-        filter(
+        list(filter(
             lambda processor: processor.ProcessorType == 3,
             wmiObj.Win32_Processor()
-        )
+        ))
     ))
 
     """Begin creation of RAM"""
     def createRAM(ram):
+        try:
+            PartNumber = ram.PartNumber.strip()
+        except AttributeError:
+            PartNumber = None
+
         ramMod, _ = models.RAMModel.objects.get_or_create(
             size=int(ram.Capacity),
             manufacturer=ram.Manufacturer,
-            partnum=ram.PartNumber.strip(),
+            partnum=PartNumber,
             speed=ram.Speed,
             formFactor=ram.FormFactor,
             memoryType=ram.MemoryType
         )
         ramMod.save()
 
-        ramStick = models.RAM(
+        try:
+            SerialNumber = ram.SerialNumber.strip()
+        except AttributeError:
+            SerialNumber = None
+
+        ramStick, _ = models.RAM.objects.get_or_create(
             machine=machine,
             model=ramMod,
-            serial=ram.SerialNumber.strip(),
+            serial=SerialNumber,
             location=ram.DeviceLocator
         )
         ramStick.save()
 
     list(map(
         lambda ram: createRAM(ram),
-        wmiObj.Win32_PhysicalMemory()
+        filter(
+            lambda mem: mem.TypeDetail != 4096,
+            wmiObj.Win32_PhysicalMemory()
+        )
     ))
 
     """Begin creation of Physical and Logical Disks
@@ -195,7 +234,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         )
         pdMod.save()
 
-        pd = models.PhysicalDisk(
+        pd, _ = models.PhysicalDisk.objects.get_or_create(
             machine=machine,
             model=pdMod,
             serial=PhysDrive.SerialNumber,
@@ -212,7 +251,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
             diskPartToLogic = makeQuery("Win32_DiskPartition", diskpart.DeviceID, "Win32_LogicalDiskToPartition")
             for logicdisk in wmiObj.query(diskPartToLogic):
                 """Get info from Win32_LogicalDisk"""
-                logicDisk = models.LogicalDisk(
+                logicDisk, _ = models.LogicalDisk.objects.get_or_create(
                     disk=physDisk,
                     name=logicdisk.Name,
                     mount=logicdisk.DeviceID,
@@ -234,7 +273,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         )
         gpuMod.save()
 
-        gpuCard = models.GPU(
+        gpuCard, _ = models.GPU.objects.get_or_create(
             machine=machine,
             model=gpuMod,
             location=gpu.DeviceID,
@@ -243,7 +282,10 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
 
     list(map(
         lambda gpu: createGPU(gpu),
-        wmiObj.Win32_VideoController()
+        filter(
+            lambda vidCont: vidCont.AdapterRAM,
+            wmiObj.Win32_VideoController()
+        )
     ))
 
     """Begin creation of Network"""
@@ -254,7 +296,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         )
         netMod.save()
 
-        netCard = models.Network(
+        netCard, _ = models.Network.objects.get_or_create(
             machine=machine,
             model=netMod,
             mac=net.MACAddress,
