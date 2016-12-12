@@ -21,3 +21,5 @@ INSTALLED_APPS = (
 DEFAULT_CURRENCY = "USD"
 
 SECRET_KEY = config['db']['secret_key']
+
+FIXTURE_DIRS = ["fixtures"]

@@ -40,7 +40,7 @@ def getDeviceNetwork(c=local):
                 netSelection = int(input('Input: '))
                 netDevices = [netDevices[netSelection - 1]]
             except ValueError:
-                print("Not a number")
+                print("Not a number, try again")
             except IndexError:
                 print("Out of range number, try again")
             else:

@@ -146,13 +146,20 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         except AttributeError:
             PartNumber = None
 
+        archName = models.WMICodes.objects.get(code=cpu.Architecture, identifier="Architecture",
+                                               wmiObject="Win32_Processor")
+        familyName = models.WMICodes.objects.get(code=cpu.Family, identifier="Family",
+                                                 wmiObject="Win32_Processor")
+        upgradeName = models.WMICodes.objects.get(code=cpu.UpgradeMethod, identifier="UpgradeMethod",
+                                                  wmiObject="Win32_Processor")
+
         cpuMod, _ = models.CPUModel.objects.get_or_create(
             name=cpu.Name.strip(),
             manufacturer=cpu.Manufacturer,
             partnum=PartNumber,
-            arch=cpu.Architecture,
-            family=cpu.Family,
-            upgradeMethod=cpu.UpgradeMethod,
+            arch=archName.name,
+            family=familyName.name,
+            upgradeMethod=upgradeName.name,
             cores=cpu.NumberOfCores,
             threads=cpu.ThreadCount,
             speed=cpu.MaxClockSpeed
@@ -187,13 +194,18 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         except AttributeError:
             PartNumber = None
 
+        formName = models.WMICodes.objects.get(code=ram.FormFactor, identifier="FormFactor",
+                                               wmiObject="Win32_PhysicalMemory")
+        memTypeName = models.WMICodes.objects.get(code=ram.MemoryType, identifier="MemoryType",
+                                                  wmiObject="Win32_PhysicalMemory")
+
         ramMod, _ = models.RAMModel.objects.get_or_create(
             size=int(ram.Capacity),
             manufacturer=ram.Manufacturer,
             partnum=PartNumber,
             speed=ram.Speed,
-            formFactor=ram.FormFactor,
-            memoryType=ram.MemoryType
+            formFactor=formName.name,
+            memoryType=memTypeName.name
         )
         ramMod.save()
 
@@ -251,6 +263,9 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
             diskPartToLogic = makeQuery("Win32_DiskPartition", diskpart.DeviceID, "Win32_LogicalDiskToPartition")
             for logicdisk in wmiObj.query(diskPartToLogic):
                 """Get info from Win32_LogicalDisk"""
+                driveTypeName = models.WMICodes.objects.get(code=logicdisk.DriveType, identifier="DriveType",
+                                                            wmiObject="Win32_LogicalDisk")
+
                 logicDisk, _ = models.LogicalDisk.objects.get_or_create(
                     disk=physDisk,
                     name=logicdisk.Name,
@@ -258,18 +273,23 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
                     filesystem=logicdisk.FileSystem,
                     size=logicdisk.Size,
                     freesize=logicdisk.FreeSpace,
-                    type=logicdisk.DriveType
+                    type=driveTypeName.name
                 )
                 logicDisk.save()
 
     """Begin creation of GPU"""
     def createGPU(gpu):
+        vidArchName = models.WMICodes.objects.get(code=gpu.VideoArchitecture, identifier="VideoArchitecture",
+                                                  wmiObject="Win32_VideoController")
+        memTypeName = models.WMICodes.objects.get(code=gpu.VideoMemoryType, identifier="VideoMemoryType",
+                                                  wmiObject="Win32_VideoController")
+
         gpuMod, _ = models.GPUModel.objects.get_or_create(
             name=gpu.Name.strip(),
             size=int(gpu.AdapterRAM),
             refresh=gpu.MaxRefreshRate,
-            arch=gpu.VideoArchitecture,
-            memoryType=gpu.VideoMemoryType
+            arch=vidArchName.name,
+            memoryType=memTypeName.name
         )
         gpuMod.save()
 
