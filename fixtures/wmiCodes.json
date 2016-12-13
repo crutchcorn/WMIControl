@@ -1,0 +1,2162 @@
+[
+  {
+    "model": "data.wmicodes",
+    "pk": 1,
+    "fields": {
+      "code": 0,
+      "name": "x86",
+      "identifier": "Architecture",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 2,
+    "fields": {
+      "code": 1,
+      "name": "MIPS",
+      "identifier": "Architecture",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 3,
+    "fields": {
+      "code": 2,
+      "name": "Alpha",
+      "identifier": "Architecture",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 4,
+    "fields": {
+      "code": 3,
+      "name": "PowerPC",
+      "identifier": "Architecture",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 5,
+    "fields": {
+      "code": 5,
+      "name": "ARM",
+      "identifier": "Architecture",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 6,
+    "fields": {
+      "code": 6,
+      "name": "ia64",
+      "identifier": "Architecture",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 7,
+    "fields": {
+      "code": 9,
+      "name": "x64",
+      "identifier": "Architecture",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 8,
+    "fields": {
+      "code": 1,
+      "name": "Other",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 9,
+    "fields": {
+      "code": 2,
+      "name": "Unknown",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 10,
+    "fields": {
+      "code": 3,
+      "name": "8086",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 11,
+    "fields": {
+      "code": 4,
+      "name": "80286",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 12,
+    "fields": {
+      "code": 5,
+      "name": "80386",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 13,
+    "fields": {
+      "code": 6,
+      "name": "80486",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 14,
+    "fields": {
+      "code": 7,
+      "name": "8087",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 15,
+    "fields": {
+      "code": 8,
+      "name": "80287",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 16,
+    "fields": {
+      "code": 9,
+      "name": "80387",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 17,
+    "fields": {
+      "code": 10,
+      "name": "80487",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 18,
+    "fields": {
+      "code": 11,
+      "name": "Pentium brand",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 19,
+    "fields": {
+      "code": 12,
+      "name": "Pentium Pro",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 20,
+    "fields": {
+      "code": 13,
+      "name": "Pentium II",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 21,
+    "fields": {
+      "code": 14,
+      "name": "Pentium processor with MMX technology",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 22,
+    "fields": {
+      "code": 15,
+      "name": "Celeron",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 23,
+    "fields": {
+      "code": 16,
+      "name": "Pentium II Xeon",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 24,
+    "fields": {
+      "code": 17,
+      "name": "Pentium III",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 25,
+    "fields": {
+      "code": 18,
+      "name": "M1 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 26,
+    "fields": {
+      "code": 19,
+      "name": "M2 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 27,
+    "fields": {
+      "code": 24,
+      "name": "K5 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 28,
+    "fields": {
+      "code": 25,
+      "name": "K6 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 29,
+    "fields": {
+      "code": 26,
+      "name": "K6-2",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 30,
+    "fields": {
+      "code": 27,
+      "name": "K6-3",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 31,
+    "fields": {
+      "code": 28,
+      "name": "AMD Athlon Processor Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 32,
+    "fields": {
+      "code": 29,
+      "name": "AMD Duron Processor",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 33,
+    "fields": {
+      "code": 30,
+      "name": "AMD29000 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 34,
+    "fields": {
+      "code": 31,
+      "name": "K6-2+",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 35,
+    "fields": {
+      "code": 32,
+      "name": "Power PC Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 36,
+    "fields": {
+      "code": 33,
+      "name": "Power PC 601",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 37,
+    "fields": {
+      "code": 34,
+      "name": "Power PC 603",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 38,
+    "fields": {
+      "code": 35,
+      "name": "Power PC 603+",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 39,
+    "fields": {
+      "code": 36,
+      "name": "Power PC 604",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 40,
+    "fields": {
+      "code": 37,
+      "name": "Power PC 620",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 41,
+    "fields": {
+      "code": 38,
+      "name": "Power PC X704",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 42,
+    "fields": {
+      "code": 39,
+      "name": "Power PC 750",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 43,
+    "fields": {
+      "code": 48,
+      "name": "Alpha Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 44,
+    "fields": {
+      "code": 49,
+      "name": "Alpha 21064",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 45,
+    "fields": {
+      "code": 50,
+      "name": "Alpha 21066",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 46,
+    "fields": {
+      "code": 51,
+      "name": "Alpha 21164",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 47,
+    "fields": {
+      "code": 52,
+      "name": "Alpha 21164PC",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 48,
+    "fields": {
+      "code": 53,
+      "name": "Alpha 21164a",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 49,
+    "fields": {
+      "code": 54,
+      "name": "Alpha 21264",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 50,
+    "fields": {
+      "code": 55,
+      "name": "Alpha 21364",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 51,
+    "fields": {
+      "code": 64,
+      "name": "MIPS Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 52,
+    "fields": {
+      "code": 65,
+      "name": "MIPS R4000",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 53,
+    "fields": {
+      "code": 66,
+      "name": "MIPS R4200",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 54,
+    "fields": {
+      "code": 67,
+      "name": "MIPS R4400",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 55,
+    "fields": {
+      "code": 68,
+      "name": "MIPS R4600",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 56,
+    "fields": {
+      "code": 69,
+      "name": "MIPS R10000",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 57,
+    "fields": {
+      "code": 80,
+      "name": "SPARC Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 58,
+    "fields": {
+      "code": 81,
+      "name": "SuperSPARC",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 59,
+    "fields": {
+      "code": 82,
+      "name": "microSPARC II",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 60,
+    "fields": {
+      "code": 83,
+      "name": "microSPARC IIep",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 61,
+    "fields": {
+      "code": 84,
+      "name": "UltraSPARC",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 62,
+    "fields": {
+      "code": 85,
+      "name": "UltraSPARC II",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 63,
+    "fields": {
+      "code": 86,
+      "name": "UltraSPARC IIi",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 64,
+    "fields": {
+      "code": 87,
+      "name": "UltraSPARC III",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 65,
+    "fields": {
+      "code": 88,
+      "name": "UltraSPARC IIIi",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 66,
+    "fields": {
+      "code": 96,
+      "name": "68040",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 67,
+    "fields": {
+      "code": 97,
+      "name": "68xxx Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 68,
+    "fields": {
+      "code": 98,
+      "name": "68000",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 69,
+    "fields": {
+      "code": 99,
+      "name": "68010",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 70,
+    "fields": {
+      "code": 100,
+      "name": "68020",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 71,
+    "fields": {
+      "code": 101,
+      "name": "68030",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 72,
+    "fields": {
+      "code": 112,
+      "name": "Hobbit Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 73,
+    "fields": {
+      "code": 120,
+      "name": "Crusoe TM5000 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 74,
+    "fields": {
+      "code": 121,
+      "name": "Crusoe TM3000 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 75,
+    "fields": {
+      "code": 122,
+      "name": "Efficeon TM8000 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 76,
+    "fields": {
+      "code": 128,
+      "name": "Weitek",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 77,
+    "fields": {
+      "code": 130,
+      "name": "Itanium Processor",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 78,
+    "fields": {
+      "code": 131,
+      "name": "AMD Athlon 64 Processor Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 79,
+    "fields": {
+      "code": 132,
+      "name": "AMD Opteron Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 80,
+    "fields": {
+      "code": 144,
+      "name": "PA-RISC Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 81,
+    "fields": {
+      "code": 145,
+      "name": "PA-RISC 8500",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 82,
+    "fields": {
+      "code": 146,
+      "name": "PA-RISC 8000",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 83,
+    "fields": {
+      "code": 147,
+      "name": "PA-RISC 7300LC",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 84,
+    "fields": {
+      "code": 148,
+      "name": "PA-RISC 7200",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 85,
+    "fields": {
+      "code": 149,
+      "name": "PA-RISC 7100LC",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 86,
+    "fields": {
+      "code": 150,
+      "name": "PA-RISC 7100",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 87,
+    "fields": {
+      "code": 160,
+      "name": "V30 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 88,
+    "fields": {
+      "code": 176,
+      "name": "Pentium III Xeon",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 89,
+    "fields": {
+      "code": 177,
+      "name": "Pentium III Processor with Intel SpeedStep Technology",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 90,
+    "fields": {
+      "code": 178,
+      "name": "Pentium 4",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 91,
+    "fields": {
+      "code": 179,
+      "name": "Intel Xeon",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 92,
+    "fields": {
+      "code": 180,
+      "name": "AS400 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 93,
+    "fields": {
+      "code": 181,
+      "name": "Intel Xeon processor MP",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 94,
+    "fields": {
+      "code": 182,
+      "name": "AMD AthlonXP Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 95,
+    "fields": {
+      "code": 183,
+      "name": "AMD AthlonMP Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 96,
+    "fields": {
+      "code": 184,
+      "name": "Intel Itanium 2",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 97,
+    "fields": {
+      "code": 185,
+      "name": "Intel Pentium M Processor",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 98,
+    "fields": {
+      "code": 190,
+      "name": "K7",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 99,
+    "fields": {
+      "code": 198,
+      "name": "Intel Core i7-2760QM",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 100,
+    "fields": {
+      "code": 200,
+      "name": "IBM390 Family",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 101,
+    "fields": {
+      "code": 201,
+      "name": "G4",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 102,
+    "fields": {
+      "code": 202,
+      "name": "G5",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 103,
+    "fields": {
+      "code": 203,
+      "name": "G6",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 104,
+    "fields": {
+      "code": 204,
+      "name": "z/Architecture base",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 105,
+    "fields": {
+      "code": 250,
+      "name": "i860",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 106,
+    "fields": {
+      "code": 251,
+      "name": "i960",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 107,
+    "fields": {
+      "code": 260,
+      "name": "SH-3",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 108,
+    "fields": {
+      "code": 261,
+      "name": "SH-4",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 109,
+    "fields": {
+      "code": 280,
+      "name": "ARM",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 110,
+    "fields": {
+      "code": 281,
+      "name": "StrongARM",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 111,
+    "fields": {
+      "code": 300,
+      "name": "6x86",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 112,
+    "fields": {
+      "code": 301,
+      "name": "MediaGX",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 113,
+    "fields": {
+      "code": 302,
+      "name": "MII",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 114,
+    "fields": {
+      "code": 320,
+      "name": "WinChip",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 115,
+    "fields": {
+      "code": 350,
+      "name": "DSP",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 116,
+    "fields": {
+      "code": 500,
+      "name": "Video Processor",
+      "identifier": "Family",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 117,
+    "fields": {
+      "code": 1,
+      "name": "Other",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 118,
+    "fields": {
+      "code": 2,
+      "name": "Unknown",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 119,
+    "fields": {
+      "code": 3,
+      "name": "Daughter Board",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 120,
+    "fields": {
+      "code": 4,
+      "name": "ZIF Socket",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 121,
+    "fields": {
+      "code": 5,
+      "name": "Replacement/Piggy Back",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 122,
+    "fields": {
+      "code": 6,
+      "name": "None",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 123,
+    "fields": {
+      "code": 7,
+      "name": "LIF Socket",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 124,
+    "fields": {
+      "code": 8,
+      "name": "Slot 1",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 125,
+    "fields": {
+      "code": 9,
+      "name": "Slot 2",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 126,
+    "fields": {
+      "code": 10,
+      "name": "370 Pin Socket",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 127,
+    "fields": {
+      "code": 11,
+      "name": "Slot A",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 128,
+    "fields": {
+      "code": 12,
+      "name": "Slot M",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 129,
+    "fields": {
+      "code": 13,
+      "name": "Socket 423",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 130,
+    "fields": {
+      "code": 14,
+      "name": "Socket A (Socket 462)",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 131,
+    "fields": {
+      "code": 15,
+      "name": "Socket 478",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 132,
+    "fields": {
+      "code": 16,
+      "name": "Socket 754",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 133,
+    "fields": {
+      "code": 17,
+      "name": "Socket 940",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 134,
+    "fields": {
+      "code": 18,
+      "name": "Socket 939",
+      "identifier": "UpgradeMethod",
+      "wmiObject": "Win32_Processor"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 135,
+    "fields": {
+      "code": 0,
+      "name": "Unknown",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 136,
+    "fields": {
+      "code": 1,
+      "name": "Other",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 137,
+    "fields": {
+      "code": 2,
+      "name": "SIP",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 138,
+    "fields": {
+      "code": 3,
+      "name": "DIP",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 139,
+    "fields": {
+      "code": 4,
+      "name": "ZIP",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 140,
+    "fields": {
+      "code": 5,
+      "name": "SOJ",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 141,
+    "fields": {
+      "code": 6,
+      "name": "Proprietary",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 142,
+    "fields": {
+      "code": 7,
+      "name": "SIMM",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 143,
+    "fields": {
+      "code": 8,
+      "name": "DIMM",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 144,
+    "fields": {
+      "code": 9,
+      "name": "TSOP",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 145,
+    "fields": {
+      "code": 10,
+      "name": "PGA",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 146,
+    "fields": {
+      "code": 11,
+      "name": "RIMM",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 147,
+    "fields": {
+      "code": 12,
+      "name": "SODIMM",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 148,
+    "fields": {
+      "code": 13,
+      "name": "SRIMM",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 149,
+    "fields": {
+      "code": 14,
+      "name": "SMD",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 150,
+    "fields": {
+      "code": 15,
+      "name": "SSMP",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 151,
+    "fields": {
+      "code": 16,
+      "name": "QFP",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 152,
+    "fields": {
+      "code": 17,
+      "name": "TQFP",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 153,
+    "fields": {
+      "code": 18,
+      "name": "SOIC",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 154,
+    "fields": {
+      "code": 19,
+      "name": "LCC",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 155,
+    "fields": {
+      "code": 20,
+      "name": "PLCC",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 156,
+    "fields": {
+      "code": 21,
+      "name": "BGA",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 157,
+    "fields": {
+      "code": 22,
+      "name": "FPBGA",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 158,
+    "fields": {
+      "code": 23,
+      "name": "LGA",
+      "identifier": "FormFactor",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 159,
+    "fields": {
+      "code": 0,
+      "name": "Unknown",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 160,
+    "fields": {
+      "code": 1,
+      "name": "Other",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 161,
+    "fields": {
+      "code": 2,
+      "name": "DRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 162,
+    "fields": {
+      "code": 3,
+      "name": "Synchronous DRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 163,
+    "fields": {
+      "code": 4,
+      "name": "Cache DRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 164,
+    "fields": {
+      "code": 5,
+      "name": "EDO",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 165,
+    "fields": {
+      "code": 6,
+      "name": "EDRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 166,
+    "fields": {
+      "code": 7,
+      "name": "VRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 167,
+    "fields": {
+      "code": 8,
+      "name": "SRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 168,
+    "fields": {
+      "code": 9,
+      "name": "RAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 169,
+    "fields": {
+      "code": 10,
+      "name": "ROM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 170,
+    "fields": {
+      "code": 11,
+      "name": "Flash",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 171,
+    "fields": {
+      "code": 12,
+      "name": "EEPROM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 172,
+    "fields": {
+      "code": 13,
+      "name": "FEPROM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 173,
+    "fields": {
+      "code": 14,
+      "name": "EPROM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 174,
+    "fields": {
+      "code": 15,
+      "name": "CDRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 175,
+    "fields": {
+      "code": 16,
+      "name": "3DRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 176,
+    "fields": {
+      "code": 17,
+      "name": "SDRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 177,
+    "fields": {
+      "code": 18,
+      "name": "SGRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 178,
+    "fields": {
+      "code": 19,
+      "name": "RDRAM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 179,
+    "fields": {
+      "code": 20,
+      "name": "DDR",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 180,
+    "fields": {
+      "code": 21,
+      "name": "DDR2",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 181,
+    "fields": {
+      "code": 22,
+      "name": "DDR2 FB-DIMM",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 182,
+    "fields": {
+      "code": 24,
+      "name": "DDR3",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 183,
+    "fields": {
+      "code": 25,
+      "name": "FBD2",
+      "identifier": "MemoryType",
+      "wmiObject": "Win32_PhysicalMemory"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 184,
+    "fields": {
+      "code": 0,
+      "name": "Unknown",
+      "identifier": "DriveType",
+      "wmiObject": "Win32_LogicalDisk"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 185,
+    "fields": {
+      "code": 1,
+      "name": "No Root Directory",
+      "identifier": "DriveType",
+      "wmiObject": "Win32_LogicalDisk"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 186,
+    "fields": {
+      "code": 2,
+      "name": "Removable Disk",
+      "identifier": "DriveType",
+      "wmiObject": "Win32_LogicalDisk"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 187,
+    "fields": {
+      "code": 3,
+      "name": "Local Disk",
+      "identifier": "DriveType",
+      "wmiObject": "Win32_LogicalDisk"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 188,
+    "fields": {
+      "code": 4,
+      "name": "Network Drive",
+      "identifier": "DriveType",
+      "wmiObject": "Win32_LogicalDisk"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 189,
+    "fields": {
+      "code": 5,
+      "name": "Compact Disc",
+      "identifier": "DriveType",
+      "wmiObject": "Win32_LogicalDisk"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 190,
+    "fields": {
+      "code": 6,
+      "name": "RAM Disk",
+      "identifier": "DriveType",
+      "wmiObject": "Win32_LogicalDisk"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 191,
+    "fields": {
+      "code": 1,
+      "name": "Other",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 192,
+    "fields": {
+      "code": 2,
+      "name": "Unknown",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 193,
+    "fields": {
+      "code": 3,
+      "name": "CGA",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 194,
+    "fields": {
+      "code": 4,
+      "name": "EGA",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 195,
+    "fields": {
+      "code": 5,
+      "name": "VGA",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 196,
+    "fields": {
+      "code": 6,
+      "name": "SVGA",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 197,
+    "fields": {
+      "code": 7,
+      "name": "MDA",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 198,
+    "fields": {
+      "code": 8,
+      "name": "HGC",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 199,
+    "fields": {
+      "code": 9,
+      "name": "MCGA",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 200,
+    "fields": {
+      "code": 10,
+      "name": "8514A",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 201,
+    "fields": {
+      "code": 11,
+      "name": "XGA",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 202,
+    "fields": {
+      "code": 12,
+      "name": "Linear Frame Buffer",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 203,
+    "fields": {
+      "code": 160,
+      "name": "PC-98",
+      "identifier": "VideoArchitecture",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 204,
+    "fields": {
+      "code": 1,
+      "name": "Other",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 205,
+    "fields": {
+      "code": 2,
+      "name": "Unknown",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 206,
+    "fields": {
+      "code": 3,
+      "name": "VRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 207,
+    "fields": {
+      "code": 4,
+      "name": "DRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 208,
+    "fields": {
+      "code": 5,
+      "name": "SRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 209,
+    "fields": {
+      "code": 6,
+      "name": "WRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 210,
+    "fields": {
+      "code": 7,
+      "name": "EDORAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 211,
+    "fields": {
+      "code": 8,
+      "name": "Burst Synchronous DRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 212,
+    "fields": {
+      "code": 9,
+      "name": "Pipelined Burst SRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 213,
+    "fields": {
+      "code": 10,
+      "name": "CDRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 214,
+    "fields": {
+      "code": 11,
+      "name": "3DRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 215,
+    "fields": {
+      "code": 12,
+      "name": "SDRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  },
+  {
+    "model": "data.wmicodes",
+    "pk": 216,
+    "fields": {
+      "code": 13,
+      "name": "SGRAM",
+      "identifier": "VideoMemoryType",
+      "wmiObject": "Win32_VideoController"
+    }
+  }
+]

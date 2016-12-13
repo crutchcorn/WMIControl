@@ -15,7 +15,9 @@ def netDeviceTest(net):
 
 
 def getDeviceNetwork(c=local):
-    """Given WMI object c, returns IPaddress and subnetMask"""
+    """Given WMI object c, returns IPaddress, subnetMask, and cidr
+
+    While inconvinient, I am having cidrNet as the third item as you can simply call it in functions"""
     validNetworkIDs = list(map(
         lambda adapter: adapter.Index,
         filter(
@@ -40,14 +42,15 @@ def getDeviceNetwork(c=local):
                 netSelection = int(input('Input: '))
                 netDevices = [netDevices[netSelection - 1]]
             except ValueError:
-                print("Not a number")
+                print("Not a number, try again")
             except IndexError:
                 print("Out of range number, try again")
             else:
                 break
     ip = netDevices[0].IPAddress[0]
     subnet = netDevices[0].IPSubnet[0]
-    return ip, subnet, str(IPNetwork(ip + "/" + subnet).cidr)
+    cidr = str(IPNetwork(ip + "/" + subnet).cidr)
+    return ip, subnet, cidr
 
 
 def finishIP(ip, ipRange):
@@ -64,8 +67,12 @@ def finishIP(ip, ipRange):
     return ip
 
 
-def getComputers(search=getDeviceNetwork()[2], args='-sS -p 22 -n -T5'):
-    """Given string search: Return list of hosts on network"""
+def getComputers(search=None, args='-sS -p 22 -n -T5'):
+    """Given string search: Return list of hosts on network
+
+    'search' defaults to current network subnet"""
+    if not search:
+        _, _, search = getDeviceNetwork()
     nm = nmap.PortScanner()
     scanInfo = nm.scan(hosts=search, arguments=args)  # Remove -n to get DNS NetBIOS results
     IPs = nm.all_hosts()  # Gives me an host of hosts

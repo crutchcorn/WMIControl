@@ -102,20 +102,20 @@ def makeAsset(machine, auth):
     body = {
         fieldsdict['Asset ID']: getNewAssetID(auth) + 1,
         fieldsdict['Name']: machine.name,
-        fieldsdict['RAM Size']: machine.ram.size,
-        fieldsdict['Network Card Model']: machine.network.first().name,
-        fieldsdict['RAM Sticks']: machine.ram.sticks,
-        fieldsdict['Model']: machine.compModel,
-        fieldsdict['CPU Cores']: machine.cpu.cores,
-        fieldsdict['MAC Address']: machine.network.first().mac,
+        fieldsdict['RAM Size']: machine.ram_set.first().model.size,
+        fieldsdict['Network Card Model']: machine.network_set.first().name,
+        fieldsdict['RAM Sticks']: len(machine.ram_set.all()),
+        fieldsdict['Model']: machine.model.name,
+        fieldsdict['CPU Cores']: machine.cpu_set.first().model.cores,
+        fieldsdict['MAC Address']: str(machine.network_set.first().mac),
         fieldsdict['Server Roles']: concatenatedRoles,
-        fieldsdict['CPU Model']: machine.cpu.name,
-        fieldsdict['Manufacturer']: machine.manufacturer,
-        fieldsdict['HDD Size ']: machine.hdds.first().size,
-        fieldsdict['Video Card Model']: machine.gpus.first().name,
+        fieldsdict['CPU Model']: machine.cpu_set.first().model.name,
+        fieldsdict['Manufacturer']: machine.model.manufacturer,
+        fieldsdict['HDD Size ']: machine.physicaldisk_set.first().model.size,
+        fieldsdict['Video Card Model']: machine.gpu_set.first().model.name,
         fieldsdict['Asset Category']: "Technology",
-        fieldsdict['HDD Free']: machine.hdds.first().free,
-        fieldsdict['Asset Sub-Category']: machine.get_compType_display()
+        fieldsdict['HDD Free']: machine.physicaldisk_set.first().logicaldisk_set.first().freesize,
+        fieldsdict['Asset Sub-Category']: machine.model.get_compType_display()
     }
 
     response = requests.post('https://login.assetpanda.com:443/v2/entities/31321/objects', headers=auth, json=body)
@@ -128,7 +128,7 @@ def makeAsset(machine, auth):
                 raise NameError("There is already an asset in AssetPanda called " + machine.name)
             else:
                 print("You already have this asset in AssetPanda")
-                AssetID = getMachineAssetID(machine.network.first().mac, auth)
+                AssetID = getMachineAssetID(machine.network_set.first().mac, auth)
                 body[fieldsdict['Asset ID']] = AssetID
                 requests.patch('https://login.assetpanda.com:443/v2/entity_objects/' + AssetID, headers=auth,
                                json=body)
