@@ -1,21 +1,21 @@
 """WMIControl - For those hard to reach servers. UoNC eat your heart out
 
 Usage:
-  WMIControl scan
-  WMIControl scan <nmapIP>
-  WMIControl scan <start> <end>
-  WMIControl scan (-s | --subnet)
-  WMIControl scan updatedb
-  WMIControl settings (skip | silent)
+    WMIControl scan
+    WMIControl scan <nmapIP>
+    WMIControl scan <start> <end>
+    WMIControl scan (-s | --subnet)
+    WMIControl scan updatedb
+    WMIControl settings (skip | silent)
 
 Options:
-  -h --help                  Show this screen
-  -v --version               Show version
-  scan                       Start a local or remote scan        IE: When empty, local
-  <nmapIP>                   A valid nmap IP query to call       EG: 192.168.1.1/24
-  <start> <end>              Scan a range of IP addresses        EG: 192.168.1.0 192.168.1.255
-  -s --subnet                Scan through the entire subnet
-  updatedb                   Update the local DB with cloud IDs
+    -h --help                  Show this screen
+    -v --version               Show version
+    scan                       Start a local or remote scan        IE: When empty, local
+    <nmapIP>                   A valid nmap IP query to call       EG: 192.168.1.1/24
+    <start> <end>              Scan a range of IP addresses        EG: 192.168.1.0 192.168.1.255
+    -s --subnet                Scan through the entire subnet
+    updatedb                   Update the local DB with cloud IDs
 
 """
 
@@ -88,7 +88,10 @@ def main():
             print("Value is now: " + str(config['settings']['silentlyFail']))
         with open("conf.toml", "w") as updateConfig:
             updateConfig.write(toml.dumps(config))
-
+    elif arguments['control']:
+        # Select which computers to control
+        if arguments['<file>']:
+            runFile(comp, arguments['<file>'])
 
 if __name__ == "__main__":
     main()
