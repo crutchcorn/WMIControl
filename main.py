@@ -4,18 +4,45 @@ Usage:
     WMIControl scan [<nmapIP> <args>]
     WMIControl scan (-r | --range) <start> <end>
     WMIControl scan (-s | --subnet)
-    WMIControl scan updatedb
+    WMIControl control [<file> [<nmapIP>]]
     WMIControl settings (skip | silent)
-    WMIControl control <file>
 
 Options:
-    -h --help                  Show this screen
-    -v --version               Show version
-    scan                       Start a local or remote scan        IE: When empty, local
-    <nmapIP>                   A valid nmap IP query to call       EG: 192.168.1.1/24
-    <start> <end>              Scan a range of IP addresses        EG: 192.168.1.0 192.168.1.255
-    -s --subnet                Scan through the entire subnet
-    updatedb                   Update the local DB with cloud IDs
+    -h --help           ~ Show this screen
+    -v --version        ~ Show version
+
+    scan                ~ Start a scan to import assets into DB.
+        ----------------------------------------------------------------
+        When no parameters passed, it scans the local machine into the DB
+
+    <nmapIP> <args>     ~ Valid nmap IP and arguments                              EG: 192.168.1.1/24 ["-p 22 -n -T2"]
+        ----------------------------------------------------------------
+        If <nmapIP> ip is left incomplete, it will finish it with '0-255'.         EG: 192.168.1 becomes 192.168.1.0-255
+        <args> must be passed in by a list containing a string
+
+    <start> <end>       ~ Scan a range of IP addresses                             EG: 192.168.1.0 192.168.1.255
+        ----------------------------------------------------------------
+        If <start>  ip is left incomplete, it will finish it with 0s.              EG: 192.168.1 becomes 192.168.1.0
+        If <end>    ip is left incomplete, it will finish it with 255s.            EG: 192.168.1 becomes 192.168.1.255
+
+    -s --subnet         ~ Scan through the entire subnet currently being used
+        ----------------------------------------------------------------
+        If machine has more than one network device in use, it will prompt you which to use
+
+    control             ~ Take control of assets already scanned into local DB.
+        ----------------------------------------------------------------
+        When no parameters passed, it starts a command line type session to interactively control assets.
+
+    <file>              ~ Run a file on assets. Accepts range <nmapIP>             EG: file.txt 192.168.1.100
+        ----------------------------------------------------------------
+        If <nmapIP> is left blank, <file> will run on every asset on the subnet
+        If <nmapIP> ip is left incomplete, it will finish it with '0-255'.         EG: 192.168.1 becomes 192.168.1.0-255
+        (More ways to select assets to run will come soon)
+
+    settings            ~ Modify settings for WMIControl
+        ----------------------------------------------------------------
+        skip            ~ A toggle to skip updating assets that have already been added to your database.
+        silent          ~ A toggle to silence any non-max-level-crutial errors while scanning.
 
 """
 
@@ -77,9 +104,20 @@ def main():
                 print(inDBErr)
             except IndexError:
                 raise IndexError("Your configuration file is configured incorrectly")
-        # makeAllAssets(auth)  # Uncomment me
+        # makeAllAssets(auth)  # Uncomment me to have assets be created on the remote asset tracker
+
     # elif arguments['updatedb']:
     #     updateCloudID(auth)
+
+    #     """
+    #     Usage:
+    #     WMIControl scan updatedb
+    #
+    #     Options:
+    #     updatedb - Update the local DB assets with cloud IDs
+    #
+    #     """
+
     elif arguments['settings']:
         if arguments['skip']:
             config['settings']['skipUpdate'] = not config['settings']['skipUpdate']
@@ -91,10 +129,20 @@ def main():
             print("Value is now: " + str(config['settings']['silentlyFail']))
         with open("conf.toml", "w") as updateConfig:
             updateConfig.write(toml.dumps(config))
+
     elif arguments['control']:
         # Select which computers to control
         if arguments['<file>']:
-            runFile(comp, arguments['<file>'])
+            if arguments['<nmapIP>']:
+                search = finishIP(arguments['<nmapIP>'], "0-255")
+            else:
+                _, _, search = getDeviceNetwork()
+
+            for comp in getWMIObjs(config['credentials']['wmi']['users'], search, arguments['<args>']):
+                runFile(comp, arguments['<file>'])
+        else:
+            # cmd.py will go here. Unfortunately cmd.py is not done (or hardly started, even)
+            print("Sorry, this feature is still in development. Please use <file> to run commands")
 
 if __name__ == "__main__":
     main()
