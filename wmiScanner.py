@@ -43,7 +43,13 @@ def getWMIObjs(users, search=getDeviceNetwork()[2], silentlyFail=False):
 
     TODO: Split off into two functions - One that tests credentials with computer, one that handles the looping"""
     wmiObjs = []
-    for ip, login in [(ip, login) for ip in getComputers(search)[0] for login in users]:
+
+    if isinstance(search, list):
+        computers = getComputers(*search)[0]
+    else:
+        computers = getComputers(search)[0]
+
+    for ip, login in [(ip, login) for ip in computers for login in users]:
         try:
             wmiObj = testCredentials(ip, login)
         except (EnvironmentError, AccessDenied) as err:
@@ -65,21 +71,17 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     if not wmiObj:
         wmiObj = local
 
-
     """Get a list of valid network devices to use later to find MAC in DB"""
     netdevices = list(filter(
         lambda net: netDeviceTest(net),
         wmiObj.Win32_NetworkAdapter()
     ))
     if not netdevices:
+        errString = wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any valid network devices."
         if silentlyFail:
-            raise SilentFail(
-                wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any valid network devices."
-            )
+            raise SilentFail(errString)
         else:
-            raise LookupError(
-                wmiObj.Win32_ComputerSystem()[-1].Name + " does not have any valid network devices."
-            )
+            raise LookupError(errString)
 
     """Setup machine and compModel to start import data into it"""
     machine, compModel = None, None
@@ -89,10 +91,11 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         except ObjectDoesNotExist:
             machine, compModel = models.Machine(), models.MachineModel()
         except MultipleObjectsReturned:
+            errString = "You have a duplicate machine in your database!"
             if silentlyFail:
-                raise SilentFail("You have a duplicate machine in your database!")
+                raise SilentFail(errString)
             else:
-                raise MultipleObjectsReturned("You have a duplicate machine in your database!")
+                raise MultipleObjectsReturned(errString)
         else:
             if skipUpdate:
                 raise AlreadyInDB(machine.name, "is already in your database. Skipping")
@@ -102,10 +105,11 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
                 break  # Machine has been found and defined. Update the machine
     # Need to add a way to make sure that a computer isn't going to replace another with matching mac
     if not machine:
+        errString = "None of the network cards found have a mac address!"
         if silentlyFail:
-            raise SilentFail("None of the network cards found have a mac address!")
+            raise SilentFail(errString)
         else:
-            raise LookupError("None of the network cards found have a mac address!")
+            raise LookupError(errString)
 
     """Begin creation of compModel"""
     modelName = wmiObj.Win32_ComputerSystem()[-1].Model.strip()

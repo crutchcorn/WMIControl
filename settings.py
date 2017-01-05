@@ -1,7 +1,12 @@
 import toml
+from sys import exit
 
-with open("conf.toml") as conffile:
-    config = toml.loads(conffile.read())
+try:
+    with open("conf.toml") as conffile:
+        config = toml.loads(conffile.read())
+except FileNotFoundError:
+    print("conf.toml does not exist. Please use the template in conf.toml.example to create one.")
+    exit()
 
 DATABASES = {
     'default': {

@@ -316,7 +316,7 @@ class NetworkModel(models.Model):
 
 
 class Network(models.Model):
-    machine = models.ForeignKey('Machine')  # One to many, network cards ARE unique and can be moved
+    machine = models.ForeignKey('Machine')
     model = models.ForeignKey('NetworkModel', null=True, blank=True)
     mac = MACAddressField(unique=True)
     location = models.CharField(max_length=255, null=True, blank=True)
@@ -335,7 +335,7 @@ class Activation(models.Model):
     windowsVer = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return self.windowsVer, "Licence"
+        return u"{} Licence".format(self.windowsVer)
 
     def __str__(self):
         return self.__unicode__()

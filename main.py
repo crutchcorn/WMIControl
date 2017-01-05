@@ -1,9 +1,8 @@
 """WMIControl - For those hard to reach servers. UoNC eat your heart out
 
 Usage:
-    WMIControl scan
-    WMIControl scan <nmapIP>
-    WMIControl scan <start> <end>
+    WMIControl scan [<nmapIP> <args>]
+    WMIControl scan (-r | --range) <start> <end>
     WMIControl scan (-s | --subnet)
     WMIControl scan updatedb
     WMIControl settings (skip | silent)
@@ -46,8 +45,8 @@ def main():
     # Handle CLI Arguments
     if arguments['scan']:
         search = ""
-        if arguments['<nmapIP>'] or arguments['<start>'] or arguments['--subnet']:
-            if arguments['<start>']:
+        if arguments['<nmapIP>'] or arguments['--range'] or arguments['--subnet']:
+            if arguments['--range']:
                 start = tuple(part for part in finishIP(arguments['<start>'], "0").split('.'))
                 end = tuple(part for part in finishIP(arguments['<end>'], "255").split('.'))
                 for s, e in zip(start, end):
@@ -59,9 +58,11 @@ def main():
                 search = search[:-1]
             elif arguments['<nmapIP>']:
                 search = finishIP(arguments['<nmapIP>'], "0-255")
+                if arguments['<args>']:
+                    search = [search, arguments['<args>']]
             elif arguments['--subnet']:
                 _, _, search = getDeviceNetwork()
-            for comp in getWMIObjs(config['credentials']['wmi']['users'], search, True):
+            for comp in getWMIObjs(config['credentials']['wmi']['users'], search, arguments['<args>']):
                 try:
                     WMIInfo(comp, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
                 except AlreadyInDB as inDBErr:

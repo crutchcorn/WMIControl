@@ -14,10 +14,17 @@ def netDeviceTest(net):
         net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\")
 
 
-def getDeviceNetwork(c=local):
+def getDeviceNetwork(c=None):
     """Given WMI object c, returns IPaddress, subnetMask, and cidr
 
-    While inconvinient, I am having cidrNet as the third item as you can simply call it in functions"""
+    While inconvinient, I am having cidrNet as the third item as you can simply call it in functions
+
+    This function has a bug that when imported, it will run. Though I know the root cause I don't know the solution
+    The root cause is that Python precompiles default calls"""
+
+    if not c:
+        c = local
+
     validNetworkIDs = list(map(
         lambda adapter: adapter.Index,
         filter(
@@ -67,12 +74,16 @@ def finishIP(ip, ipRange):
     return ip
 
 
-def getComputers(search=None, args='-sS -p 22 -n -T5'):
-    """Given string search: Return list of hosts on network
+def getComputers(search=None, args=None):
+    """Given string search and string args: Return list of hosts on network
+    'args' being nmap arguments to be passed to nmap for optimized searching on networks
 
-    'search' defaults to current network subnet"""
+    'search' defaults to current network subnet
+    'args' defaults to '-sS -p 22 -n -T5'"""
     if not search:
         _, _, search = getDeviceNetwork()
+    if not args:
+        args = '-sS -p 22 -n -T5'
     nm = nmap.PortScanner()
     scanInfo = nm.scan(hosts=search, arguments=args)  # Remove -n to get DNS NetBIOS results
     IPs = nm.all_hosts()  # Gives me an host of hosts
