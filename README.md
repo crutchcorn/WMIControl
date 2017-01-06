@@ -3,9 +3,6 @@
 This project's goals are to create a sort of "control center".
 This would include WMI scanner, asset management medium, and management software, and more.
 
-### Databases
-
-
 ## Installation
 ### Prereqs:
 - A database installed with login credentials setup, etc
@@ -30,8 +27,6 @@ WMIControl uses a library called PyWin32. Unfortunately, it is not unable to be 
 
 `PermissionError: [Errno 13] Permission denied: 'C:\\Program Files (x86)\\python\\lib\\site-packages\\win32com\\gen_py\\__init__.py'`
 
-___
-
 ### Install Commands
 ```
 git clone https://github.com/crutchcorn/WMIControl.git
@@ -45,10 +40,9 @@ python manage.py migrate
 manage.py loaddata wmiCodes.json
 ```
 
-- - -
-
 ## Configuration
 **The example configuration file is under `conf.toml.example`. You'll need to copy or rename that file to `conf.toml` and edit it to reflect your settings.**
+
 In order to use WMIControl, you'll need to modify the configuration file to match your settings. The settings are as follows:
 
 **`[settings]`**
@@ -80,6 +74,7 @@ Where all of the Django and database related settings will stay
 **Keep this value secret.**
 
 A secure cryptographic key used for signing and other things within Django.
+
 [Running Django with a known secret key defeats many of Django’s security protections, and can lead to privilege escalation and remote code execution vulnerabilities.](https://docs.djangoproject.com/en/1.10/ref/settings/#secret-key)
 
 
@@ -102,9 +97,6 @@ django.db.backends.oracle
 
 While the TOML standard does not require you to define the head of the category if there are no variables in the root, it is best for organizational reasons. Please follow the suggested styling for contributions.
 
-- - -
-
-
 ## Usage
 While the help page for the program is more than enough to see program usage, here are a few commands to note.
 
@@ -113,14 +105,6 @@ While the help page for the program is more than enough to see program usage, he
 
 Please note; currently, the CLI arguments are VERY likely to change and will not be stable until otherwise noted.
 
-- - -
-
-#### I made a boom. How do I start over?
-In order to wipe your database clean, you will need to run the following commends in your database shell:
-```sql
-DROP DATABASE dbname;
-CREATE DATABASE dbname WITH OWNER ownername;
-```
 
 # Developer Notes
 ## Remote CMD
