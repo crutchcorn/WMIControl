@@ -40,8 +40,10 @@ def testCredentials(computer, userLogin):
 
 def getWMIObjs(users, search=getDeviceNetwork()[2], silentlyFail=False):
     """Given ip range search and list of dictionary users: Returns a list of WMIObjects
-
-    TODO: Split off into two functions - One that tests credentials with computer, one that handles the looping"""
+    If search is a list containing arguments for getComputers, it will pass them off properly using a splat operator
+    As the splat operator is a bit of a more obscure usage in Python, I'll link the documentation for it
+    https://docs.python.org/3/tutorial/controlflow.html#unpacking-argument-lists
+    """
     wmiObjs = []
 
     if isinstance(search, list):
@@ -62,12 +64,13 @@ def getWMIObjs(users, search=getDeviceNetwork()[2], silentlyFail=False):
         else:
             wmiObjs.append(wmiObj)
             break
-    return wmiObjs  # Return credentials that worked in future. This will be a ID for the credential in DB
+    return wmiObjs  # Return which credentials it was that worked in future. This will be a ID for the credential in DB
 
 
 def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     """Given wmiObj and bool settings silentlyFail and skipUpdate find information and store it in the database.
-    wmiObj default is None. If none, the local WMI object will be used"""
+    wmiObj default is None. If none, the local WMI object will be used
+    """
     if not wmiObj:
         wmiObj = local
 
@@ -238,7 +241,8 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     """Begin creation of Physical and Logical Disks
     Matching of Physical and Logical disks ported from:
     blogs.technet.microsoft.com/heyscriptingguy/2005/05/23/how-can-i-correlate-logical-drives-and-physical-disks/
-    Thanks, ScriptingGuy1"""
+    Thanks, ScriptingGuy1
+    """
     def makeQuery(FromWinClass, DeviceID, WhereWinClass):
         return 'ASSOCIATORS OF {' + FromWinClass + '.DeviceID="' + DeviceID + '"} WHERE AssocClass = ' + WhereWinClass
 

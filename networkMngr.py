@@ -2,8 +2,8 @@ import nmap
 import wmi
 import socket
 from struct import pack
-from netaddr import IPNetwork
-
+from netaddr import IPNetwork, EUI, mac_bare, AddrFormatError
+from macaddress import format_mac
 
 local = wmi.WMI()
 
@@ -20,8 +20,8 @@ def getDeviceNetwork(c=None):
     While inconvinient, I am having cidrNet as the third item as you can simply call it in functions
 
     This function has a bug that when imported, it will run. Though I know the root cause I don't know the solution
-    The root cause is that Python precompiles default calls"""
-
+    The root cause is that Python precompiles default calls
+    """
     if not c:
         c = local
 
@@ -63,7 +63,8 @@ def getDeviceNetwork(c=None):
 def finishIP(ip, ipRange):
     """Given string ip, append input range where blank
     >>> finishIP('192.168.', '0')
-    '192.168.0.0'"""
+    >>> '192.168.0.0'
+    """
     if ip[-1] is '.':
         ip = ip[:-1]
     n = ip.count('.')
@@ -79,7 +80,14 @@ def getComputers(search=None, args=None):
     'args' being nmap arguments to be passed to nmap for optimized searching on networks
 
     'search' defaults to current network subnet
-    'args' defaults to '-sS -p 22 -n -T5'"""
+    'args' defaults to '-sS -p 22 -n -T5'
+    To break down these NMAP arguments:
+        -sS  : TCP SYN scan. A fast unobtrusive stealthy scan that shouldn't raise any flags while remaining quick
+        -p 22: Only scan port 22. This should speed things up while remaining fairly reliable
+        -n   : No DNS resolution. Since we don't need the host names, we can go ahead and skip that
+        -T5  : Insane timing template. This is the most unreliable, but also the quickest. If you have issues with
+               assets being found, I'd suggest to start change with this option.
+    """
     if not search:
         _, _, search = getDeviceNetwork()
     if not args:
@@ -99,7 +107,8 @@ def listNetDevices():
 
 def findBroadcast(ip=None, subnet=None):
     """Given string ip, subnet: Find WoL broadcast IP.
-    Leave blank to use getDeviceNetwork as ip and subnet retreval"""
+    Leave blank to use getDeviceNetwork as ip and subnet retreval
+    """
     if not ip:
         ip, subnet, _ = getDeviceNetwork()
     return ".".join([str((int(ip.split('.')[i]) | int(subnet.split('.')[i]) ^ 255)) for i in range(0, 4)])
@@ -107,14 +116,12 @@ def findBroadcast(ip=None, subnet=None):
 
 def sendWoL(mac, broadcast=findBroadcast()):
     """Given string mac and broadcast: Turn on computer using WoL
-    This was taken from http://code.activestate.com/recipes/358449-wake-on-lan/. Thanks, Fadly!"""
-    # Checks if mac address has delimiters
-    if len(mac) == 12:
-        pass
-    elif len(mac) == 12 + 5:
-        seperator = mac[2]
-        mac = mac.replace(seperator, '')
-    else:
+    This was taken from http://code.activestate.com/recipes/358449-wake-on-lan/. Thanks, Fadly!
+    """
+    # Cleans and removes delimiters from MAC
+    try:
+        mac = format_mac(EUI(mac), mac_bare)
+    except AddrFormatError:
         raise ValueError('Incorrect MAC address format')
 
     # Pad the synchronization stream.
