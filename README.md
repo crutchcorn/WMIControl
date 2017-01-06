@@ -15,10 +15,10 @@ This would include WMI scanner, asset management medium, and management software
 
 #### Database:
 We are using Django ORM to convert models into objects. Django supports the following databases:
-**PostgreSQL**
-**MySQL**
-**Oracle**
-**SQLite**
+- **PostgreSQL**
+- **MySQL**
+- **Oracle**
+- **SQLite**
 
 We personally use PostgreSQL for testing, but it should work the same no matter which one of them you use. Please defer to [Django's documentation](https://docs.djangoproject.com/) for installation and setup.
 
@@ -27,6 +27,7 @@ This program requires nmap to be previously installed. Proceed to download from 
 
 #### PyWin32
 WMIControl uses a library called PyWin32. Unfortunately, it is not unable to be packaged within PyPi. You have to install it from their installer [here](https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/). Ensure you have to proper architecture selected for your Windows version. You must also have the same arcitecture of Python installed, otherwise you will recieve errors such as:
+
 `PermissionError: [Errno 13] Permission denied: 'C:\\Program Files (x86)\\python\\lib\\site-packages\\win32com\\gen_py\\__init__.py'`
 
 ___
@@ -47,7 +48,7 @@ manage.py loaddata wmiCodes.json
 - - -
 
 ## Configuration
-**The example configuration file is under ==`conf.toml.example`==. You'll need to copy or rename that file to ==`conf.toml`== and edit it to reflect your settings.**
+**The example configuration file is under `conf.toml.example`. You'll need to copy or rename that file to `conf.toml` and edit it to reflect your settings.**
 In order to use WMIControl, you'll need to modify the configuration file to match your settings. The settings are as follows:
 
 **`[settings]`**
@@ -75,14 +76,20 @@ ___
 Where all of the Django and database related settings will stay
 
 `secret_key`
-==**Keep this value secret.**==
+
+**Keep this value secret.**
+
 A secure cryptographic key used for signing and other things within Django.
 [Running Django with a known secret key defeats many of Django’s security protections, and can lead to privilege escalation and remote code execution vulnerabilities.](https://docs.djangoproject.com/en/1.10/ref/settings/#secret-key)
 
+
 `[db.databases]`
+
 Covers the main settings for your database that will be connected to Django, while the rest is fairly straightforard, I will cover what the supported values of `engine`.
 
+
 `engine`
+
 Covers the backend database system that Django will use.
 Supported[~1~](https://docs.djangoproject.com/en/1.10/ref/settings/#engine) values are:
 ```
@@ -111,8 +118,8 @@ Please note; currently, the CLI arguments are VERY likely to change and will not
 #### I made a boom. How do I start over?
 In order to wipe your database clean, you will need to run the following commends in your database shell:
 ```sql
-DROP DATABASE wmicontrol;
-CREATE DATABASE wmicontrol WITH OWNER wmicontrol;
+DROP DATABASE dbname;
+CREATE DATABASE dbname WITH OWNER ownername;
 ```
 
 # Developer Notes
