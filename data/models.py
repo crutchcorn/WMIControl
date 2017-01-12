@@ -82,6 +82,11 @@ class Location(models.Model):
 
 
 class MachineModel(models.Model):
+    """compyType remains a Django choice simply because there tends to be little variation in the types of computers
+    you can save. Because of this, I decided to make it a choice and not a code because:
+    1. It's not part of WMI, portability is key to growth.
+    2. It's better for clean data; disallowing choices that could be inconsistent with others
+    """
     UNKNOWN = 0
     OTHER = 1
     DESKTOP = 2
@@ -235,22 +240,6 @@ class PhysicalDisk(models.Model):
 
 
 class LogicalDisk(models.Model):
-    UNKNOWN = 0
-    NOROOTDIRECTORY = 1
-    REMOVABLEDISK = 2
-    LOCALDISK = 3
-    NETWORKDRIVE = 4
-    COMPACTDISC = 5
-    RAMDISK = 6
-    DRIVE_TYPES = (
-        (UNKNOWN, 'Unknown'),
-        (NOROOTDIRECTORY, 'No Root Directory'),
-        (REMOVABLEDISK, 'Removable Disk'),
-        (LOCALDISK, 'Local Disk'),
-        (NETWORKDRIVE, 'Network Drive'),
-        (COMPACTDISC, 'Compact Disc'),
-        (RAMDISK, 'RAM Disk'),
-    )
     disk = models.ForeignKey('PhysicalDisk')
     name = models.CharField(max_length=255)
     mount = models.CharField(max_length=4, null=True, blank=True)

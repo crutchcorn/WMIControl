@@ -48,4 +48,4 @@ def runFile(comp, file):
                             time.sleep(0.5)
                         else:
                             break
-            return pid
+        return pid
