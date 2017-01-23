@@ -69,9 +69,10 @@ def finishIP(ip, ipRange):
         ip = ip[:-1]
     n = ip.count('.')
     if n < 3:
-        for _ in ipRange(n, 2):  # Range goes from 0-2, there are three dots in IPv4 address.
-            ip += "range"
-        ip += "range"
+        ip += "."
+        for _ in range(n, 2):  # Range goes from 0-2, there are three dots in IPv4 address.
+            ip += str(ipRange) + "."
+        ip += ipRange
     return ip
 
 

@@ -61,6 +61,14 @@ from excepts import AlreadyInDB
 with open("conf.toml") as conffile:
     config = toml.loads(conffile.read())
 
+def switchSettings(config, value):
+        config['settings'][value] = not config['settings'][value]
+        print(value.title() + "switch has been toggled.")
+        print("Value is now: " + str(config['settings'][value]))
+        return config
+
+silentAndSkipDefaults = (config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+
 
 def main():
     # Get auth key from asset tracker
@@ -68,14 +76,16 @@ def main():
 
     # Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
+    finishIt = lambda startOrEnd, number: tuple(part for part in finishIP(arguments['<' + startOrEnd + '>'], str(number)).split('.'))
+    WMIObjDefaults = lambda search: (config['credentials']['wmi']['users'], search, arguments['<args>'])
 
     # Handle CLI Arguments
     if arguments['scan']:
         search = ""
         if arguments['<nmapIP>'] or arguments['--range'] or arguments['--subnet']:
             if arguments['--range']:
-                start = tuple(part for part in finishIP(arguments['<start>'], "0").split('.'))
-                end = tuple(part for part in finishIP(arguments['<end>'], "255").split('.'))
+                start = finishIt("start", 0)
+                end = finishIt("end", 255)
                 for s, e in zip(start, end):
                     if s is e:
                         search += s
@@ -89,9 +99,9 @@ def main():
                     search = [search, arguments['<args>']]
             elif arguments['--subnet']:
                 _, _, search = getDeviceNetwork()
-            for comp in getWMIObjs(config['credentials']['wmi']['users'], search, arguments['<args>']):
+            for comp in getWMIObjs(*WMIObjDefaults(search)):
                 try:
-                    WMIInfo(comp, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+                    WMIInfo(comp, *silentAndSkipDefaults)
                 except AlreadyInDB as inDBErr:
                     print(inDBErr)
                     break
@@ -99,7 +109,7 @@ def main():
                     raise IndexError("Your configuration file is configured incorrectly")
         else:
             try:
-                WMIInfo(None, config['settings']['silentlyFail'], config['settings']['skipUpdate'])
+                WMIInfo(None, *silentAndSkipDefaults)
             except AlreadyInDB as inDBErr:
                 print(inDBErr)
             except IndexError:
@@ -120,13 +130,9 @@ def main():
 
     elif arguments['settings']:
         if arguments['skip']:
-            config['settings']['skipUpdate'] = not config['settings']['skipUpdate']
-            print("Skipping switch has been toggled.")
-            print("Value is now: " + str(config['settings']['skipUpdate']))
+            config = switchSettings(config, "skip")
         elif arguments['silent']:
-            config['settings']['silentlyFail'] = not config['settings']['silentlyFail']
-            print("Silence switch has been toggled.")
-            print("Value is now: " + str(config['settings']['silentlyFail']))
+            config = switchSettings(config, "silent")
         with open("conf.toml", "w") as updateConfig:
             updateConfig.write(toml.dumps(config))
 
@@ -138,7 +144,7 @@ def main():
             else:
                 _, _, search = getDeviceNetwork()
 
-            for comp in getWMIObjs(config['credentials']['wmi']['users'], search, arguments['<args>']):
+            for comp in getWMIObjs(*WMIObjDefaults(search)):
                 runFile(comp, arguments['<file>'])
         else:
             # cmd.py will go here. Unfortunately cmd.py is not done (or hardly started, even)
