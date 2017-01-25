@@ -22,6 +22,193 @@ Byte2GB = 1024 * 1024 * 1024
 local = wmi.WMI()
 
 
+############################
+"""
+This needs to become class based ASAP
+"""
+
+
+def createCPU(name, machine, manufacturer, arch, partnum=None, family=None, upgradeMethod=None, cores=None,
+              threads=None, speed=None, serial=None, location=None):
+    cpuMod, _ = models.CPUModel.objects.get_or_create(
+        name=name,
+        manufacturer=manufacturer,
+        partnum=partnum,
+        arch=arch,
+        family=family,
+        upgradeMethod=upgradeMethod,
+        cores=cores,
+        threads=threads,
+        speed=speed
+
+    )
+    cpuMod.save()
+
+    processor, _ = models.CPU.objects.get_or_create(
+        machine=machine,
+        model=cpuMod,
+        serial=serial,
+        location=location
+    )
+    processor.save()
+
+
+def lookupWMICPU(cpu):
+    archName = models.WMICodes.objects.get(code=cpu.Architecture, identifier="Architecture",
+                                           wmiObject="Win32_Processor")
+    familyName = models.WMICodes.objects.get(code=cpu.Family, identifier="Family",
+                                             wmiObject="Win32_Processor")
+    upgradeName = models.WMICodes.objects.get(code=cpu.UpgradeMethod, identifier="UpgradeMethod",
+                                              wmiObject="Win32_Processor")
+    try:
+        PartNumber = cpu.PartNumber.strip()
+    except AttributeError:
+        PartNumber = None
+    try:
+        SerialNumber = cpu.SerialNumber.strip()
+    except AttributeError:
+        SerialNumber = None
+    return archName, familyName, upgradeName, PartNumber, SerialNumber
+
+
+def createWMICPU(cpu, machine):
+    archName, familyName, upgradeName, PartNumber, SerialNumber = lookupWMICPU(cpu)
+    createCPU(
+        name=cpu.Name.strip(),
+        machine=machine,
+        manufacturer=cpu.Manufacturer,
+        partnum=PartNumber,
+        arch=archName.name,
+        family=familyName.name,
+        upgradeMethod=upgradeName.name,
+        cores=cpu.NumberOfCores,
+        threads=cpu.ThreadCount,
+        speed=cpu.MaxClockSpeed,
+        serial=SerialNumber,
+        location=cpu.DeviceID
+    )
+
+
+def createRAM(size, machine, manufacturer=None, partnum=None, speed=None, formFactor=None, memoryType=None,
+              serial=None, location=None):
+    ramMod, _ = models.RAMModel.objects.get_or_create(
+        size=size,
+        machine=machine,
+        manufacturer=manufacturer,
+        partnum=partnum,
+        speed=speed,
+        formFactor=formFactor,
+        memoryType=memoryType
+    )
+    ramMod.save()
+
+    ramStick, _ = models.RAM.objects.get_or_create(
+        machine=machine,
+        model=ramMod,
+        serial=serial,
+        location=location
+    )
+    ramStick.save()
+
+
+def lookupWMIRAM(ram):
+    formName = models.WMICodes.objects.get(code=ram.FormFactor, identifier="FormFactor",
+                                           wmiObject="Win32_PhysicalMemory")
+    memTypeName = models.WMICodes.objects.get(code=ram.MemoryType, identifier="MemoryType",
+                                              wmiObject="Win32_PhysicalMemory")
+    try:
+        PartNumber = ram.PartNumber.strip()
+    except AttributeError:
+        PartNumber = None
+    try:
+        SerialNumber = ram.SerialNumber.strip()
+    except AttributeError:
+        SerialNumber = None
+    return formName, memTypeName, PartNumber, SerialNumber
+
+
+def createWMIRAM(ram, machine):
+    formName, memTypeName, PartNumber, SerialNumber = lookupWMIRAM(ram)
+    createRAM(
+        size=int(ram.Capacity),
+        manufacturer=ram.Manufacturer,
+        partnum=PartNumber,
+        speed=ram.Speed,
+        formFactor=formName.name,
+        memoryType=memTypeName.name,
+        machine=machine,
+        serial=SerialNumber,
+        location=ram.DeviceLocator
+    )
+
+
+def createGPU(name, machine, size=None, refresh=None, arch=None, memoryType=None, location=None):
+    gpuMod, _ = models.GPUModel.objects.get_or_create(
+        name=name,
+        size=size,
+        refresh=refresh,
+        arch=arch,
+        memoryType=memoryType
+    )
+    gpuMod.save()
+
+    gpuCard, _ = models.GPU.objects.get_or_create(
+        machine=machine,
+        model=gpuMod,
+        location=location,
+    )
+    gpuCard.save()
+
+
+def lookupWMIGPU(gpu):
+    vidArchName = models.WMICodes.objects.get(code=gpu.VideoArchitecture, identifier="VideoArchitecture",
+                                              wmiObject="Win32_VideoController")
+    memTypeName = models.WMICodes.objects.get(code=gpu.VideoMemoryType, identifier="VideoMemoryType",
+                                              wmiObject="Win32_VideoController")
+    return vidArchName.name, memTypeName.name
+
+
+def createWMIGPU(gpu, machine):
+    vidArchName, memTypeName = lookupWMIGPU(gpu)
+    createGPU(
+        name=gpu.Name.strip(),
+        size=int(gpu.AdapterRAM),
+        refresh=gpu.MaxRefreshRate,
+        arch=vidArchName,
+        memoryType=memTypeName,
+        machine=machine,
+        location=gpu.DeviceID
+    )
+
+
+def createLAN(name, machine, mac, manufacturer=None, location=None):
+    netMod, _ = models.NetworkModel.objects.get_or_create(
+        name=name,
+        manufacturer=manufacturer
+    )
+    netMod.save()
+
+    netCard, _ = models.Network.objects.get_or_create(
+        machine=machine,
+        model=netMod,
+        mac=mac,
+        location=location,
+    )
+    netCard.save()
+
+
+def createWMILAN(net, machine):
+    createLAN(
+        name=net.Name.strip(),
+        manufacturer=net.Manufacturer,
+        machine=machine,
+        mac=net.MACAddress,
+        location=net.DeviceID
+    )
+
+##############################
+
+
 def testCredentials(computer, userLogin):
     print("Trying to connect to", computer, "with user '" + userLogin['user'] + "'")
     try:
@@ -148,47 +335,9 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     machine.save()
 
     """Begin creation of CPUModel"""
-    def createCPU(cpu):
-        try:
-            PartNumber = cpu.PartNumber.strip()
-        except AttributeError:
-            PartNumber = None
-
-        archName = models.WMICodes.objects.get(code=cpu.Architecture, identifier="Architecture",
-                                               wmiObject="Win32_Processor")
-        familyName = models.WMICodes.objects.get(code=cpu.Family, identifier="Family",
-                                                 wmiObject="Win32_Processor")
-        upgradeName = models.WMICodes.objects.get(code=cpu.UpgradeMethod, identifier="UpgradeMethod",
-                                                  wmiObject="Win32_Processor")
-
-        cpuMod, _ = models.CPUModel.objects.get_or_create(
-            name=cpu.Name.strip(),
-            manufacturer=cpu.Manufacturer,
-            partnum=PartNumber,
-            arch=archName.name,
-            family=familyName.name,
-            upgradeMethod=upgradeName.name,
-            cores=cpu.NumberOfCores,
-            threads=cpu.ThreadCount,
-            speed=cpu.MaxClockSpeed
-        )
-        cpuMod.save()
-
-        try:
-            SerialNumber = cpu.SerialNumber.strip()
-        except AttributeError:
-            SerialNumber = None
-
-        processor, _ = models.CPU.objects.get_or_create(
-            machine=machine,
-            model=cpuMod,
-            serial=SerialNumber,
-            location=cpu.DeviceID
-        )
-        processor.save()
 
     list(map(
-        lambda cpu: createCPU(cpu),
+        lambda cpu: createWMICPU(cpu, machine),
         list(filter(
             lambda processor: processor.ProcessorType == 3,
             wmiObj.Win32_Processor()
@@ -196,42 +345,8 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     ))
 
     """Begin creation of RAM"""
-    def createRAM(ram):
-        try:
-            PartNumber = ram.PartNumber.strip()
-        except AttributeError:
-            PartNumber = None
-
-        formName = models.WMICodes.objects.get(code=ram.FormFactor, identifier="FormFactor",
-                                               wmiObject="Win32_PhysicalMemory")
-        memTypeName = models.WMICodes.objects.get(code=ram.MemoryType, identifier="MemoryType",
-                                                  wmiObject="Win32_PhysicalMemory")
-
-        ramMod, _ = models.RAMModel.objects.get_or_create(
-            size=int(ram.Capacity),
-            manufacturer=ram.Manufacturer,
-            partnum=PartNumber,
-            speed=ram.Speed,
-            formFactor=formName.name,
-            memoryType=memTypeName.name
-        )
-        ramMod.save()
-
-        try:
-            SerialNumber = ram.SerialNumber.strip()
-        except AttributeError:
-            SerialNumber = None
-
-        ramStick, _ = models.RAM.objects.get_or_create(
-            machine=machine,
-            model=ramMod,
-            serial=SerialNumber,
-            location=ram.DeviceLocator
-        )
-        ramStick.save()
-
     list(map(
-        lambda ram: createRAM(ram),
+        lambda ram: createWMIRAM(ram, machine),
         filter(
             lambda mem: mem.TypeDetail != 4096,
             wmiObj.Win32_PhysicalMemory()
@@ -287,30 +402,8 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
                 logicDisk.save()
 
     """Begin creation of GPU"""
-    def createGPU(gpu):
-        vidArchName = models.WMICodes.objects.get(code=gpu.VideoArchitecture, identifier="VideoArchitecture",
-                                                  wmiObject="Win32_VideoController")
-        memTypeName = models.WMICodes.objects.get(code=gpu.VideoMemoryType, identifier="VideoMemoryType",
-                                                  wmiObject="Win32_VideoController")
-
-        gpuMod, _ = models.GPUModel.objects.get_or_create(
-            name=gpu.Name.strip(),
-            size=int(gpu.AdapterRAM),
-            refresh=gpu.MaxRefreshRate,
-            arch=vidArchName.name,
-            memoryType=memTypeName.name
-        )
-        gpuMod.save()
-
-        gpuCard, _ = models.GPU.objects.get_or_create(
-            machine=machine,
-            model=gpuMod,
-            location=gpu.DeviceID,
-        )
-        gpuCard.save()
-
     list(map(
-        lambda gpu: createGPU(gpu),
+        lambda gpu: createWMIGPU(gpu, machine),
         filter(
             lambda vidCont: vidCont.AdapterRAM,
             wmiObj.Win32_VideoController()
@@ -318,23 +411,8 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     ))
 
     """Begin creation of Network"""
-    def createNetwork(net):
-        netMod, _ = models.NetworkModel.objects.get_or_create(
-            name=net.Name.strip(),
-            manufacturer=net.Manufacturer
-        )
-        netMod.save()
-
-        netCard, _ = models.Network.objects.get_or_create(
-            machine=machine,
-            model=netMod,
-            mac=net.MACAddress,
-            location=net.DeviceID,
-        )
-        netCard.save()
-
     list(map(
-        lambda net: createNetwork(net),
+        lambda net: createWMILAN(net),
         netdevices
     ))
     return machine

@@ -55,6 +55,40 @@ from macaddress.fields import MACAddressField
 # from djmoney.models.fields import MoneyField
 
 
+def toGB(size):
+    return int(size) / (1024 * 1024 * 1024)
+
+
+def toMB(size):
+    return int(size) / (1024 * 1024)
+
+
+def toKB(size):
+    return int(size) / 1024
+
+
+class calcFreeSize:
+    def freeSizeInGB(self):
+        return toGB(self.freesize)
+
+    def freeSizeInMB(self):
+        return toMB(self.freesize)
+
+    def freeSizeInKB(self):
+        return toKB(self.freesize)
+
+
+class calcSize:
+    def sizeInGB(self):
+        return toGB(self.size)
+
+    def sizeInMB(self):
+        return toMB(self.size)
+
+    def sizeInKB(self):
+        return toKB(self.size)
+
+
 class WMICodes(models.Model):
     name = models.CharField(max_length=255)
     code = models.PositiveSmallIntegerField()
@@ -138,9 +172,9 @@ class Machine(models.Model):
 
 class CPUModel(models.Model):
     name = models.CharField(max_length=255)
-    manufacturer = models.CharField(max_length=255, blank=True, null=True)
+    manufacturer = models.CharField(max_length=255)
+    arch = models.CharField(max_length=255)
     partnum = models.CharField(max_length=255, null=True, blank=True)
-    arch = models.CharField(max_length=255, null=True, blank=True)
     family = models.CharField(max_length=255, null=True, blank=True)
     upgradeMethod = models.CharField(max_length=255, null=True, blank=True)
     cores = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -167,22 +201,13 @@ class CPU(models.Model):
         return self.__unicode__()
 
 
-class RAMModel(models.Model):
+class RAMModel(models.Model, calcSize):
     size = models.BigIntegerField()
     manufacturer = models.CharField(max_length=255, blank=True, null=True)
     partnum = models.CharField(max_length=255, null=True, blank=True)
     speed = models.PositiveSmallIntegerField(null=True, blank=True)
     formFactor = models.CharField(max_length=255, null=True, blank=True)
     memoryType = models.CharField(max_length=255, null=True, blank=True)
-
-    def sizeInGB(self):
-        return int(self.size) / (1024 * 1024 * 1024)
-
-    def sizeInMB(self):
-        return int(self.size) / (1024 * 1024)
-
-    def sizeInKB(self):
-        return int(self.size) / 1024
 
     def __unicode__(self):
         return u"{} GB, {}".format(self.sizeInGB(), self.manufacturer)
@@ -204,20 +229,11 @@ class RAM(models.Model):
         return self.__unicode__()
 
 
-class PhysicalDiskModel(models.Model):
+class PhysicalDiskModel(models.Model, calcSize):
     name = models.CharField(max_length=255, blank=True)
     size = models.BigIntegerField()
     interface = models.CharField(max_length=5, blank=True)
     manufacturer = models.CharField(max_length=255, blank=True)
-
-    def sizeInGB(self):
-        return int(self.size) / (1024 * 1024 * 1024)
-
-    def sizeInMB(self):
-        return int(self.size) / (1024 * 1024)
-
-    def sizeInKB(self):
-        return int(self.size) / 1024
 
     def __unicode__(self):
         return u"{} Mount, {} GB".format(self.name, self.sizeInGB())
@@ -239,7 +255,7 @@ class PhysicalDisk(models.Model):
         return self.__unicode__()
 
 
-class LogicalDisk(models.Model):
+class LogicalDisk(models.Model, calcSize, calcFreeSize):
     disk = models.ForeignKey('PhysicalDisk')
     name = models.CharField(max_length=255)
     mount = models.CharField(max_length=4, null=True, blank=True)
@@ -248,24 +264,6 @@ class LogicalDisk(models.Model):
     freesize = models.BigIntegerField(null=True, blank=True)
     type = models.CharField(max_length=255, null=True, blank=True)
 
-    def sizeInGB(self):
-        return int(self.size) / (1024 * 1024 * 1024)
-
-    def sizeInMB(self):
-        return int(self.size) / (1024 * 1024)
-
-    def sizeInKB(self):
-        return int(self.size) / 1024
-
-    def freesizeInGB(self):
-        return int(self.freesize) / (1024 * 1024 * 1024)
-
-    def freesizeInMB(self):
-        return int(self.freesize) / (1024 * 1024)
-
-    def freesizeInKB(self):
-        return int(self.freesize) / 1024
-
     def __unicode__(self):
         return u"{} Mount, {} GB, {} GB Free".format(self.name, self.size, self.free)
 
@@ -273,21 +271,12 @@ class LogicalDisk(models.Model):
         return self.__unicode__()
 
 
-class GPUModel(models.Model):
+class GPUModel(models.Model, calcSize):
     name = models.CharField(max_length=255)
-    size = models.BigIntegerField()
+    size = models.BigIntegerField(null=True, blank=True)
     refresh = models.PositiveSmallIntegerField(null=True, blank=True)
-    arch = models.CharField(max_length=255)
-    memoryType = models.CharField(max_length=255)
-
-    def sizeInGB(self):
-        return int(self.size) / (1024 * 1024 * 1024)
-
-    def sizeInMB(self):
-        return int(self.size) / (1024 * 1024)
-
-    def sizeInKB(self):
-        return int(self.size) / 1024
+    arch = models.CharField(max_length=255, null=True, blank=True)
+    memoryType = models.CharField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
         return self.name
