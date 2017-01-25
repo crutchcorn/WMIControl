@@ -76,6 +76,7 @@ def main():
 
     # Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
+    # This will finish (see finishIP) and split up an IP address into a list
     finishIt = lambda startOrEnd, number: tuple(part for part in finishIP(arguments['<' + startOrEnd + '>'], str(number)).split('.'))
     WMIObjDefaults = lambda search: (config['credentials']['wmi']['users'], search, arguments['<args>'])
 

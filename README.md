@@ -1,4 +1,5 @@
 # WMIControl
+[![Code Climate](https://codeclimate.com/github/crutchcorn/WMIControl/badges/gpa.svg)](https://codeclimate.com/github/crutchcorn/WMIControl)
 ## Preface
 This project's goals are to create a sort of "control center".
 This would include WMI scanner, asset management medium, and management software, and more.
