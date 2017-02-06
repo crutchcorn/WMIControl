@@ -67,18 +67,10 @@ def toKB(size):
     return int(size) / 1024
 
 
-class calcFreeSize:
-    def freeSizeInGB(self):
-        return toGB(self.freesize)
-
-    def freeSizeInMB(self):
-        return toMB(self.freesize)
-
-    def freeSizeInKB(self):
-        return toKB(self.freesize)
-
-
 class calcSize:
+    """While this may seem redundant to have calcSize and the functions above, I have done so to ensure that converting
+    both of them is as simple and readable as possible without importing much else. It is likely that this doesn't
+    matter and they would suffice perfectly well as they do the same; however they require an import."""
     def sizeInGB(self):
         return toGB(self.size)
 
@@ -87,6 +79,21 @@ class calcSize:
 
     def sizeInKB(self):
         return toKB(self.size)
+
+
+class calcFreeSize:
+    """While this function may only be used in one class for now, that may likely change in the future and modularity is
+    easier to add earlier. If there are alternative suggestions, I'd recommend bringing them up! As this and calcSize
+    are so similar, it may be possible to make a main class and dynamically generate function name to reduce code even
+    further. EG: .__init__ would set `freeSize` in this instance and `size` would be in `calcSize`."""
+    def freeSizeInGB(self):
+        return toGB(self.freesize)
+
+    def freeSizeInMB(self):
+        return toMB(self.freesize)
+
+    def freeSizeInKB(self):
+        return toKB(self.freesize)
 
 
 class WMICodes(models.Model):

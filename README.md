@@ -28,6 +28,9 @@ WMIControl uses a library called PyWin32. Unfortunately, it is not unable to be 
 
 `PermissionError: [Errno 13] Permission denied: 'C:\\Program Files (x86)\\python\\lib\\site-packages\\win32com\\gen_py\\__init__.py'`
 
+> User's note:
+> PyWin32 seems to always have problems with discovering Python versions. If it complains that Python is not found, go into regestry, export `HKEY_LOCAL_MACHINE\SOFTWARE\Python`, and import it again with the prefix of the version it expects (IE: `3.6` to `3.6-32`)
+
 ### Install Commands
 ```
 git clone https://github.com/crutchcorn/WMIControl.git

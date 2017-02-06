@@ -51,7 +51,7 @@ def createCPU(name, machine, manufacturer, arch, partnum=None, family=None, upgr
         location=location
     )
     processor.save()
-
+    return processor
 
 def lookupWMICPU(cpu):
     archName = models.WMICodes.objects.get(code=cpu.Architecture, identifier="Architecture",
@@ -73,7 +73,7 @@ def lookupWMICPU(cpu):
 
 def createWMICPU(cpu, machine):
     archName, familyName, upgradeName, PartNumber, SerialNumber = lookupWMICPU(cpu)
-    createCPU(
+    return createCPU(
         name=cpu.Name.strip(),
         machine=machine,
         manufacturer=cpu.Manufacturer,
@@ -109,6 +109,7 @@ def createRAM(size, machine, manufacturer=None, partnum=None, speed=None, formFa
         location=location
     )
     ramStick.save()
+    return ramStick
 
 
 def lookupWMIRAM(ram):
@@ -129,7 +130,7 @@ def lookupWMIRAM(ram):
 
 def createWMIRAM(ram, machine):
     formName, memTypeName, PartNumber, SerialNumber = lookupWMIRAM(ram)
-    createRAM(
+    return createRAM(
         size=int(ram.Capacity),
         manufacturer=ram.Manufacturer,
         partnum=PartNumber,
@@ -158,6 +159,7 @@ def createGPU(name, machine, size=None, refresh=None, arch=None, memoryType=None
         location=location,
     )
     gpuCard.save()
+    return gpuCard
 
 
 def lookupWMIGPU(gpu):
@@ -170,7 +172,7 @@ def lookupWMIGPU(gpu):
 
 def createWMIGPU(gpu, machine):
     vidArchName, memTypeName = lookupWMIGPU(gpu)
-    createGPU(
+    return createGPU(
         name=gpu.Name.strip(),
         size=int(gpu.AdapterRAM),
         refresh=gpu.MaxRefreshRate,
@@ -195,10 +197,11 @@ def createLAN(name, machine, mac, manufacturer=None, location=None):
         location=location,
     )
     netCard.save()
+    return netCard
 
 
 def createWMILAN(net, machine):
-    createLAN(
+    return createLAN(
         name=net.Name.strip(),
         manufacturer=net.Manufacturer,
         machine=machine,
@@ -273,12 +276,14 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         else:
             raise LookupError(errString)
 
-    """Setup machine and compModel to start import data into it"""
+    """Attempt to find machine and compModel"""
     machine, compModel = None, None
     for macaddr in netdevices:
         try:
-            machine = models.Network.objects.get(mac=macaddr.MACAddress).machine  # Gets machine with mac address
+            # To get a machine in the database with a matching MAC
+            machine = models.Network.objects.get(mac=macaddr.MACAddress).machine
         except ObjectDoesNotExist:
+            # If nothing, create a new machine
             machine, compModel = models.Machine(), models.MachineModel()
         except MultipleObjectsReturned:
             errString = "You have a duplicate machine in your database!"
@@ -291,8 +296,12 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
                 raise AlreadyInDB(machine.name, "is already in your database. Skipping")
             else:
                 print(machine.name + " will be updated in the local database")
-                compModel = machine.model  # Error handling needed if machine has no model
+                compModel = machine.model
+
+                # Error handling needed if machine has no model
                 break  # Machine has been found and defined. Update the machine
+
+
     # Need to add a way to make sure that a computer isn't going to replace another with matching mac
     if not machine:
         errString = "None of the network cards found have a mac address!"
