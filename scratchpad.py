@@ -21,17 +21,20 @@ from excepts import AlreadyInDB, SilentFail, AccessDenied
 
 class Machine:
     # Constructor
-    def __init__(self, machine, model):
+    def __init__(self, machine=models.Machine(), model=models.MachineModel(), cpu_model=models.CPUModel(),
+                 processor=models.CPU(), ram_model=models.RAMModel(), ram_stick=models.RAM(),
+                 gpu_model=models.GPUModel(), gpu_card=models.GPU(),
+                 network_model=models.NetworkModel(), network_card=models.Network()):
         self.machine = machine
         self.model = model
-        self.cpu_model = None
-        self.processor = None
-        self.ram_model = None
-        self.ram_stick = None
-        self.gpu_model = None
-        self.gpu_card = None
-        self.network_model = None
-        self.network_card = None
+        self.cpu_model = cpu_model
+        self.processor = processor
+        self.ram_model = ram_model
+        self.ram_stick = ram_stick
+        self.gpu_model = gpu_model
+        self.gpu_card = gpu_card
+        self.network_model = network_model
+        self.network_card = network_card
 
     def save(self):
         self.model.save()
