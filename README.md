@@ -39,9 +39,9 @@ pip install requirements.txt
 ```
 Then, copy config.toml.example to config.toml and modify it to match your settings. See below for more
 ```
-python manage.py makemigrations
+python manage.py makemigrations data
 python manage.py migrate
-manage.py loaddata wmiCodes.json
+python manage.py loaddata wmiCodes.json
 ```
 
 ## Configuration
