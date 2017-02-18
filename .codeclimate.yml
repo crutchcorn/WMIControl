@@ -27,3 +27,4 @@ ratings:
   - "**.py"
   - "**.rb"
 exclude_paths: []
+- "scratchpad.py"
