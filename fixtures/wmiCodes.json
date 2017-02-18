@@ -6,7 +6,8 @@
       "code": 0,
       "name": "x86",
       "identifier": "Architecture",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -16,7 +17,8 @@
       "code": 1,
       "name": "MIPS",
       "identifier": "Architecture",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -26,7 +28,8 @@
       "code": 2,
       "name": "Alpha",
       "identifier": "Architecture",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -36,7 +39,8 @@
       "code": 3,
       "name": "PowerPC",
       "identifier": "Architecture",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -46,7 +50,8 @@
       "code": 5,
       "name": "ARM",
       "identifier": "Architecture",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -56,7 +61,8 @@
       "code": 6,
       "name": "ia64",
       "identifier": "Architecture",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -66,7 +72,8 @@
       "code": 9,
       "name": "x64",
       "identifier": "Architecture",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -76,7 +83,8 @@
       "code": 1,
       "name": "Other",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -86,7 +94,8 @@
       "code": 2,
       "name": "Unknown",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -96,7 +105,8 @@
       "code": 3,
       "name": "8086",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -106,7 +116,8 @@
       "code": 4,
       "name": "80286",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -116,7 +127,8 @@
       "code": 5,
       "name": "80386",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -126,7 +138,8 @@
       "code": 6,
       "name": "80486",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -136,7 +149,8 @@
       "code": 7,
       "name": "8087",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -146,7 +160,8 @@
       "code": 8,
       "name": "80287",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -156,7 +171,8 @@
       "code": 9,
       "name": "80387",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -166,7 +182,8 @@
       "code": 10,
       "name": "80487",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -176,7 +193,8 @@
       "code": 11,
       "name": "Pentium brand",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -186,7 +204,8 @@
       "code": 12,
       "name": "Pentium Pro",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -196,7 +215,8 @@
       "code": 13,
       "name": "Pentium II",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -206,7 +226,8 @@
       "code": 14,
       "name": "Pentium processor with MMX technology",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -216,7 +237,8 @@
       "code": 15,
       "name": "Celeron",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -226,7 +248,8 @@
       "code": 16,
       "name": "Pentium II Xeon",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -236,7 +259,8 @@
       "code": 17,
       "name": "Pentium III",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -246,7 +270,8 @@
       "code": 18,
       "name": "M1 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -256,7 +281,8 @@
       "code": 19,
       "name": "M2 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -266,7 +292,8 @@
       "code": 24,
       "name": "K5 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -276,7 +303,8 @@
       "code": 25,
       "name": "K6 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -286,7 +314,8 @@
       "code": 26,
       "name": "K6-2",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -296,7 +325,8 @@
       "code": 27,
       "name": "K6-3",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -306,7 +336,8 @@
       "code": 28,
       "name": "AMD Athlon Processor Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -316,7 +347,8 @@
       "code": 29,
       "name": "AMD Duron Processor",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -326,7 +358,8 @@
       "code": 30,
       "name": "AMD29000 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -336,7 +369,8 @@
       "code": 31,
       "name": "K6-2+",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -346,7 +380,8 @@
       "code": 32,
       "name": "Power PC Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -356,7 +391,8 @@
       "code": 33,
       "name": "Power PC 601",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -366,7 +402,8 @@
       "code": 34,
       "name": "Power PC 603",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -376,7 +413,8 @@
       "code": 35,
       "name": "Power PC 603+",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -386,7 +424,8 @@
       "code": 36,
       "name": "Power PC 604",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -396,7 +435,8 @@
       "code": 37,
       "name": "Power PC 620",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -406,7 +446,8 @@
       "code": 38,
       "name": "Power PC X704",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -416,7 +457,8 @@
       "code": 39,
       "name": "Power PC 750",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -426,7 +468,8 @@
       "code": 48,
       "name": "Alpha Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -436,7 +479,8 @@
       "code": 49,
       "name": "Alpha 21064",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -446,7 +490,8 @@
       "code": 50,
       "name": "Alpha 21066",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -456,7 +501,8 @@
       "code": 51,
       "name": "Alpha 21164",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -466,7 +512,8 @@
       "code": 52,
       "name": "Alpha 21164PC",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -476,7 +523,8 @@
       "code": 53,
       "name": "Alpha 21164a",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -486,7 +534,8 @@
       "code": 54,
       "name": "Alpha 21264",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -496,7 +545,8 @@
       "code": 55,
       "name": "Alpha 21364",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -506,7 +556,8 @@
       "code": 64,
       "name": "MIPS Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -516,7 +567,8 @@
       "code": 65,
       "name": "MIPS R4000",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -526,7 +578,8 @@
       "code": 66,
       "name": "MIPS R4200",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -536,7 +589,8 @@
       "code": 67,
       "name": "MIPS R4400",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -546,7 +600,8 @@
       "code": 68,
       "name": "MIPS R4600",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -556,7 +611,8 @@
       "code": 69,
       "name": "MIPS R10000",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -566,7 +622,8 @@
       "code": 80,
       "name": "SPARC Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -576,7 +633,8 @@
       "code": 81,
       "name": "SuperSPARC",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -586,7 +644,8 @@
       "code": 82,
       "name": "microSPARC II",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -596,7 +655,8 @@
       "code": 83,
       "name": "microSPARC IIep",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -606,7 +666,8 @@
       "code": 84,
       "name": "UltraSPARC",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -616,7 +677,8 @@
       "code": 85,
       "name": "UltraSPARC II",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -626,7 +688,8 @@
       "code": 86,
       "name": "UltraSPARC IIi",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -636,7 +699,8 @@
       "code": 87,
       "name": "UltraSPARC III",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -646,7 +710,8 @@
       "code": 88,
       "name": "UltraSPARC IIIi",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -656,7 +721,8 @@
       "code": 96,
       "name": "68040",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -666,7 +732,8 @@
       "code": 97,
       "name": "68xxx Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -676,7 +743,8 @@
       "code": 98,
       "name": "68000",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -686,7 +754,8 @@
       "code": 99,
       "name": "68010",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -696,7 +765,8 @@
       "code": 100,
       "name": "68020",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -706,7 +776,8 @@
       "code": 101,
       "name": "68030",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -716,7 +787,8 @@
       "code": 112,
       "name": "Hobbit Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -726,7 +798,8 @@
       "code": 120,
       "name": "Crusoe TM5000 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -736,7 +809,8 @@
       "code": 121,
       "name": "Crusoe TM3000 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -746,7 +820,8 @@
       "code": 122,
       "name": "Efficeon TM8000 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -756,7 +831,8 @@
       "code": 128,
       "name": "Weitek",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -766,7 +842,8 @@
       "code": 130,
       "name": "Itanium Processor",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -776,7 +853,8 @@
       "code": 131,
       "name": "AMD Athlon 64 Processor Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -786,7 +864,8 @@
       "code": 132,
       "name": "AMD Opteron Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -796,7 +875,8 @@
       "code": 144,
       "name": "PA-RISC Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -806,7 +886,8 @@
       "code": 145,
       "name": "PA-RISC 8500",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -816,7 +897,8 @@
       "code": 146,
       "name": "PA-RISC 8000",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -826,7 +908,8 @@
       "code": 147,
       "name": "PA-RISC 7300LC",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -836,7 +919,8 @@
       "code": 148,
       "name": "PA-RISC 7200",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -846,7 +930,8 @@
       "code": 149,
       "name": "PA-RISC 7100LC",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -856,7 +941,8 @@
       "code": 150,
       "name": "PA-RISC 7100",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -866,7 +952,8 @@
       "code": 160,
       "name": "V30 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -876,7 +963,8 @@
       "code": 176,
       "name": "Pentium III Xeon",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -886,7 +974,8 @@
       "code": 177,
       "name": "Pentium III Processor with Intel SpeedStep Technology",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -896,7 +985,8 @@
       "code": 178,
       "name": "Pentium 4",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -906,7 +996,8 @@
       "code": 179,
       "name": "Intel Xeon",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -916,7 +1007,8 @@
       "code": 180,
       "name": "AS400 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -926,7 +1018,8 @@
       "code": 181,
       "name": "Intel Xeon processor MP",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -936,7 +1029,8 @@
       "code": 182,
       "name": "AMD AthlonXP Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -946,7 +1040,8 @@
       "code": 183,
       "name": "AMD AthlonMP Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -956,7 +1051,8 @@
       "code": 184,
       "name": "Intel Itanium 2",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -966,7 +1062,8 @@
       "code": 185,
       "name": "Intel Pentium M Processor",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -976,7 +1073,8 @@
       "code": 190,
       "name": "K7",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -986,7 +1084,8 @@
       "code": 198,
       "name": "Intel Core i7-2760QM",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -996,7 +1095,8 @@
       "code": 200,
       "name": "IBM390 Family",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1006,7 +1106,8 @@
       "code": 201,
       "name": "G4",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1016,7 +1117,8 @@
       "code": 202,
       "name": "G5",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1026,7 +1128,8 @@
       "code": 203,
       "name": "G6",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1036,7 +1139,8 @@
       "code": 204,
       "name": "z/Architecture base",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1046,7 +1150,8 @@
       "code": 250,
       "name": "i860",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1056,7 +1161,8 @@
       "code": 251,
       "name": "i960",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1066,7 +1172,8 @@
       "code": 260,
       "name": "SH-3",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1076,7 +1183,8 @@
       "code": 261,
       "name": "SH-4",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1086,7 +1194,8 @@
       "code": 280,
       "name": "ARM",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1096,7 +1205,8 @@
       "code": 281,
       "name": "StrongARM",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1106,7 +1216,8 @@
       "code": 300,
       "name": "6x86",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1116,7 +1227,8 @@
       "code": 301,
       "name": "MediaGX",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1126,7 +1238,8 @@
       "code": 302,
       "name": "MII",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1136,7 +1249,8 @@
       "code": 320,
       "name": "WinChip",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1146,7 +1260,8 @@
       "code": 350,
       "name": "DSP",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1156,7 +1271,8 @@
       "code": 500,
       "name": "Video Processor",
       "identifier": "Family",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1166,7 +1282,8 @@
       "code": 1,
       "name": "Other",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1176,7 +1293,8 @@
       "code": 2,
       "name": "Unknown",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1186,7 +1304,8 @@
       "code": 3,
       "name": "Daughter Board",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1196,7 +1315,8 @@
       "code": 4,
       "name": "ZIF Socket",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1206,7 +1326,8 @@
       "code": 5,
       "name": "Replacement/Piggy Back",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1216,7 +1337,8 @@
       "code": 6,
       "name": "None",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1226,7 +1348,8 @@
       "code": 7,
       "name": "LIF Socket",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1236,7 +1359,8 @@
       "code": 8,
       "name": "Slot 1",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1246,7 +1370,8 @@
       "code": 9,
       "name": "Slot 2",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1256,7 +1381,8 @@
       "code": 10,
       "name": "370 Pin Socket",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1266,7 +1392,8 @@
       "code": 11,
       "name": "Slot A",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1276,7 +1403,8 @@
       "code": 12,
       "name": "Slot M",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1286,7 +1414,8 @@
       "code": 13,
       "name": "Socket 423",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1296,7 +1425,8 @@
       "code": 14,
       "name": "Socket A (Socket 462)",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1306,7 +1436,8 @@
       "code": 15,
       "name": "Socket 478",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1316,7 +1447,8 @@
       "code": 16,
       "name": "Socket 754",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1326,7 +1458,8 @@
       "code": 17,
       "name": "Socket 940",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1336,7 +1469,8 @@
       "code": 18,
       "name": "Socket 939",
       "identifier": "UpgradeMethod",
-      "wmiObject": "Win32_Processor"
+      "wmiObject": "Win32_Processor",
+      "status": 1
     }
   },
   {
@@ -1346,7 +1480,8 @@
       "code": 0,
       "name": "Unknown",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1356,7 +1491,8 @@
       "code": 1,
       "name": "Other",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1366,7 +1502,8 @@
       "code": 2,
       "name": "SIP",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1376,7 +1513,8 @@
       "code": 3,
       "name": "DIP",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1386,7 +1524,8 @@
       "code": 4,
       "name": "ZIP",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1396,7 +1535,8 @@
       "code": 5,
       "name": "SOJ",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1406,7 +1546,8 @@
       "code": 6,
       "name": "Proprietary",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1416,7 +1557,8 @@
       "code": 7,
       "name": "SIMM",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1426,7 +1568,8 @@
       "code": 8,
       "name": "DIMM",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1436,7 +1579,8 @@
       "code": 9,
       "name": "TSOP",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1446,7 +1590,8 @@
       "code": 10,
       "name": "PGA",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1456,7 +1601,8 @@
       "code": 11,
       "name": "RIMM",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1466,7 +1612,8 @@
       "code": 12,
       "name": "SODIMM",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1476,7 +1623,8 @@
       "code": 13,
       "name": "SRIMM",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1486,7 +1634,8 @@
       "code": 14,
       "name": "SMD",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1496,7 +1645,8 @@
       "code": 15,
       "name": "SSMP",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1506,7 +1656,8 @@
       "code": 16,
       "name": "QFP",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1516,7 +1667,8 @@
       "code": 17,
       "name": "TQFP",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1526,7 +1678,8 @@
       "code": 18,
       "name": "SOIC",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1536,7 +1689,8 @@
       "code": 19,
       "name": "LCC",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1546,7 +1700,8 @@
       "code": 20,
       "name": "PLCC",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1556,7 +1711,8 @@
       "code": 21,
       "name": "BGA",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1566,7 +1722,8 @@
       "code": 22,
       "name": "FPBGA",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1576,7 +1733,8 @@
       "code": 23,
       "name": "LGA",
       "identifier": "FormFactor",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1586,7 +1744,8 @@
       "code": 0,
       "name": "Unknown",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1596,7 +1755,8 @@
       "code": 1,
       "name": "Other",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1606,7 +1766,8 @@
       "code": 2,
       "name": "DRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1616,7 +1777,8 @@
       "code": 3,
       "name": "Synchronous DRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1626,7 +1788,8 @@
       "code": 4,
       "name": "Cache DRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1636,7 +1799,8 @@
       "code": 5,
       "name": "EDO",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1646,7 +1810,8 @@
       "code": 6,
       "name": "EDRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1656,7 +1821,8 @@
       "code": 7,
       "name": "VRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1666,7 +1832,8 @@
       "code": 8,
       "name": "SRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1676,7 +1843,8 @@
       "code": 9,
       "name": "RAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1686,7 +1854,8 @@
       "code": 10,
       "name": "ROM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1696,7 +1865,8 @@
       "code": 11,
       "name": "Flash",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1706,7 +1876,8 @@
       "code": 12,
       "name": "EEPROM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1716,7 +1887,8 @@
       "code": 13,
       "name": "FEPROM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1726,7 +1898,8 @@
       "code": 14,
       "name": "EPROM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1736,7 +1909,8 @@
       "code": 15,
       "name": "CDRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1746,7 +1920,8 @@
       "code": 16,
       "name": "3DRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1756,7 +1931,8 @@
       "code": 17,
       "name": "SDRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1766,7 +1942,8 @@
       "code": 18,
       "name": "SGRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1776,7 +1953,8 @@
       "code": 19,
       "name": "RDRAM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1786,7 +1964,8 @@
       "code": 20,
       "name": "DDR",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1796,7 +1975,8 @@
       "code": 21,
       "name": "DDR2",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1806,7 +1986,8 @@
       "code": 22,
       "name": "DDR2 FB-DIMM",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1816,7 +1997,8 @@
       "code": 24,
       "name": "DDR3",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1826,7 +2008,8 @@
       "code": 25,
       "name": "FBD2",
       "identifier": "MemoryType",
-      "wmiObject": "Win32_PhysicalMemory"
+      "wmiObject": "Win32_PhysicalMemory",
+      "status": 1
     }
   },
   {
@@ -1836,7 +2019,8 @@
       "code": 0,
       "name": "Unknown",
       "identifier": "DriveType",
-      "wmiObject": "Win32_LogicalDisk"
+      "wmiObject": "Win32_LogicalDisk",
+      "status": 1
     }
   },
   {
@@ -1846,7 +2030,8 @@
       "code": 1,
       "name": "No Root Directory",
       "identifier": "DriveType",
-      "wmiObject": "Win32_LogicalDisk"
+      "wmiObject": "Win32_LogicalDisk",
+      "status": 1
     }
   },
   {
@@ -1856,7 +2041,8 @@
       "code": 2,
       "name": "Removable Disk",
       "identifier": "DriveType",
-      "wmiObject": "Win32_LogicalDisk"
+      "wmiObject": "Win32_LogicalDisk",
+      "status": 1
     }
   },
   {
@@ -1866,7 +2052,8 @@
       "code": 3,
       "name": "Local Disk",
       "identifier": "DriveType",
-      "wmiObject": "Win32_LogicalDisk"
+      "wmiObject": "Win32_LogicalDisk",
+      "status": 1
     }
   },
   {
@@ -1876,7 +2063,8 @@
       "code": 4,
       "name": "Network Drive",
       "identifier": "DriveType",
-      "wmiObject": "Win32_LogicalDisk"
+      "wmiObject": "Win32_LogicalDisk",
+      "status": 1
     }
   },
   {
@@ -1886,7 +2074,8 @@
       "code": 5,
       "name": "Compact Disc",
       "identifier": "DriveType",
-      "wmiObject": "Win32_LogicalDisk"
+      "wmiObject": "Win32_LogicalDisk",
+      "status": 1
     }
   },
   {
@@ -1896,7 +2085,8 @@
       "code": 6,
       "name": "RAM Disk",
       "identifier": "DriveType",
-      "wmiObject": "Win32_LogicalDisk"
+      "wmiObject": "Win32_LogicalDisk",
+      "status": 1
     }
   },
   {
@@ -1906,7 +2096,8 @@
       "code": 1,
       "name": "Other",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1916,7 +2107,8 @@
       "code": 2,
       "name": "Unknown",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1926,7 +2118,8 @@
       "code": 3,
       "name": "CGA",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1936,7 +2129,8 @@
       "code": 4,
       "name": "EGA",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1946,7 +2140,8 @@
       "code": 5,
       "name": "VGA",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1956,7 +2151,8 @@
       "code": 6,
       "name": "SVGA",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1966,7 +2162,8 @@
       "code": 7,
       "name": "MDA",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1976,7 +2173,8 @@
       "code": 8,
       "name": "HGC",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1986,7 +2184,8 @@
       "code": 9,
       "name": "MCGA",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -1996,7 +2195,8 @@
       "code": 10,
       "name": "8514A",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2006,7 +2206,8 @@
       "code": 11,
       "name": "XGA",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2016,7 +2217,8 @@
       "code": 12,
       "name": "Linear Frame Buffer",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2026,7 +2228,8 @@
       "code": 160,
       "name": "PC-98",
       "identifier": "VideoArchitecture",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2036,7 +2239,8 @@
       "code": 1,
       "name": "Other",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2046,7 +2250,8 @@
       "code": 2,
       "name": "Unknown",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2056,7 +2261,8 @@
       "code": 3,
       "name": "VRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2066,7 +2272,8 @@
       "code": 4,
       "name": "DRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2076,7 +2283,8 @@
       "code": 5,
       "name": "SRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2086,7 +2294,8 @@
       "code": 6,
       "name": "WRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2096,7 +2305,8 @@
       "code": 7,
       "name": "EDORAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2106,7 +2316,8 @@
       "code": 8,
       "name": "Burst Synchronous DRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2116,7 +2327,8 @@
       "code": 9,
       "name": "Pipelined Burst SRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2126,7 +2338,8 @@
       "code": 10,
       "name": "CDRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2136,7 +2349,8 @@
       "code": 11,
       "name": "3DRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2146,7 +2360,8 @@
       "code": 12,
       "name": "SDRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   },
   {
@@ -2156,7 +2371,8 @@
       "code": 13,
       "name": "SGRAM",
       "identifier": "VideoMemoryType",
-      "wmiObject": "Win32_VideoController"
+      "wmiObject": "Win32_VideoController",
+      "status": 1
     }
   }
 ]

@@ -53,13 +53,21 @@ def createCPU(name, machine, manufacturer, arch, partnum=None, family=None, upgr
     processor.save()
     return processor
 
-def lookupWMICPU(cpu):
-    archName = models.WMICodes.objects.get(code=cpu.Architecture, identifier="Architecture",
-                                           wmiObject="Win32_Processor")
-    familyName = models.WMICodes.objects.get(code=cpu.Family, identifier="Family",
-                                             wmiObject="Win32_Processor")
-    upgradeName = models.WMICodes.objects.get(code=cpu.UpgradeMethod, identifier="UpgradeMethod",
-                                              wmiObject="Win32_Processor")
+
+def lookupWMICPU(cpu, machine):
+    archName, createdArch = models.WMICodes.objects.get_or_create(code=cpu.Architecture, identifier="Architecture",
+                                                                  wmiObject="Win32_Processor")
+    familyName, createdFamily = models.WMICodes.objects.get_or_create(code=cpu.Family, identifier="Family",
+                                                                      wmiObject="Win32_Processor")
+    upgradeName, createdUpgrade = models.WMICodes.objects.get_or_create(code=cpu.UpgradeMethod,
+                                                                        identifier="UpgradeMethod",
+                                                                        wmiObject="Win32_Processor")
+    if createdArch:
+        archName.machines.add(machine)
+    if createdFamily:
+        familyName.machines.add(machine)
+    if createdUpgrade:
+        upgradeName.machines.add(machine)
     try:
         PartNumber = cpu.PartNumber.strip()
     except AttributeError:
@@ -72,7 +80,7 @@ def lookupWMICPU(cpu):
 
 
 def createWMICPU(cpu, machine):
-    archName, familyName, upgradeName, PartNumber, SerialNumber = lookupWMICPU(cpu)
+    archName, familyName, upgradeName, PartNumber, SerialNumber = lookupWMICPU(cpu, machine)
     return createCPU(
         name=cpu.Name.strip(),
         machine=machine,
@@ -93,7 +101,6 @@ def createRAM(size, machine, manufacturer=None, partnum=None, speed=None, formFa
               serial=None, location=None):
     ramMod, _ = models.RAMModel.objects.get_or_create(
         size=size,
-        machine=machine,
         manufacturer=manufacturer,
         partnum=partnum,
         speed=speed,
@@ -112,11 +119,17 @@ def createRAM(size, machine, manufacturer=None, partnum=None, speed=None, formFa
     return ramStick
 
 
-def lookupWMIRAM(ram):
-    formName = models.WMICodes.objects.get(code=ram.FormFactor, identifier="FormFactor",
-                                           wmiObject="Win32_PhysicalMemory")
-    memTypeName = models.WMICodes.objects.get(code=ram.MemoryType, identifier="MemoryType",
-                                              wmiObject="Win32_PhysicalMemory")
+def lookupWMIRAM(ram, machine):
+    formName, createdForm = models.WMICodes.objects.get_or_create(code=ram.FormFactor, identifier="FormFactor",
+                                                                  wmiObject="Win32_PhysicalMemory")
+    memTypeName, createdMemType = models.WMICodes.objects.get_or_create(code=ram.MemoryType, identifier="MemoryType",
+                                                                        wmiObject="Win32_PhysicalMemory")
+    if createdForm:
+        formName.machines.add(machine)
+    if createdMemType:
+        memTypeName.machines.add(machine)
+
+    # Clean data and test if exists all at once. WMI returns some weird stuff, don't judge
     try:
         PartNumber = ram.PartNumber.strip()
     except AttributeError:
@@ -129,7 +142,7 @@ def lookupWMIRAM(ram):
 
 
 def createWMIRAM(ram, machine):
-    formName, memTypeName, PartNumber, SerialNumber = lookupWMIRAM(ram)
+    formName, memTypeName, PartNumber, SerialNumber = lookupWMIRAM(ram, machine)
     return createRAM(
         size=int(ram.Capacity),
         manufacturer=ram.Manufacturer,
@@ -162,16 +175,22 @@ def createGPU(name, machine, size=None, refresh=None, arch=None, memoryType=None
     return gpuCard
 
 
-def lookupWMIGPU(gpu):
-    vidArchName = models.WMICodes.objects.get(code=gpu.VideoArchitecture, identifier="VideoArchitecture",
-                                              wmiObject="Win32_VideoController")
-    memTypeName = models.WMICodes.objects.get(code=gpu.VideoMemoryType, identifier="VideoMemoryType",
-                                              wmiObject="Win32_VideoController")
+def lookupWMIGPU(gpu, machine):
+    vidArchName, createdVidArch = models.WMICodes.objects.get_or_create(code=gpu.VideoArchitecture,
+                                                                        identifier="VideoArchitecture",
+                                                                        wmiObject="Win32_VideoController")
+    memTypeName, createdMemType = models.WMICodes.objects.get_or_create(code=gpu.VideoMemoryType,
+                                                                        identifier="VideoMemoryType",
+                                                                        wmiObject="Win32_VideoController")
+    if createdVidArch:
+        vidArchName.machines.add(machine)
+    if createdMemType:
+        memTypeName.machines.add(machine)
     return vidArchName.name, memTypeName.name
 
 
 def createWMIGPU(gpu, machine):
-    vidArchName, memTypeName = lookupWMIGPU(gpu)
+    vidArchName, memTypeName = lookupWMIGPU(gpu, machine)
     return createGPU(
         name=gpu.Name.strip(),
         size=int(gpu.AdapterRAM),
@@ -301,7 +320,6 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
                 # Error handling needed if machine has no model
                 break  # Machine has been found and defined. Update the machine
 
-
     # Need to add a way to make sure that a computer isn't going to replace another with matching mac
     if not machine:
         errString = "None of the network cards found have a mac address!"
@@ -396,8 +414,11 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
             diskPartToLogic = makeQuery("Win32_DiskPartition", diskpart.DeviceID, "Win32_LogicalDiskToPartition")
             for logicdisk in wmiObj.query(diskPartToLogic):
                 """Get info from Win32_LogicalDisk"""
-                driveTypeName = models.WMICodes.objects.get(code=logicdisk.DriveType, identifier="DriveType",
-                                                            wmiObject="Win32_LogicalDisk")
+                driveTypeName, createdDriveType = models.WMICodes.objects.get_or_create(code=logicdisk.DriveType,
+                                                                                        identifier="DriveType",
+                                                                                        wmiObject="Win32_LogicalDisk")
+                if createdDriveType:
+                    driveTypeName.machines.add(machine)
 
                 logicDisk, _ = models.LogicalDisk.objects.get_or_create(
                     disk=physDisk,
@@ -421,7 +442,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
 
     """Begin creation of Network"""
     list(map(
-        lambda net: createWMILAN(net),
+        lambda net: createWMILAN(net, machine),
         netdevices
     ))
     return machine

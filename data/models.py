@@ -6,10 +6,10 @@ Machine.roles =many-to-many> Roles
     but this works well enough for now.
 CPU.model =many-to-one> CPUModel
 CPU.machine =ForeignKey> Machine
-    The thought behind this particular design (carried across many different componenets in the Database), is that you
+    The thought behind this particular design (carried across many different components in the Database), is that you
     have a unique item that serves as the actual component assigned to a machine (so that, in many instances, you can
     have many of one component assigned to the machine; for scalability) and a model object that serves as a lookup
-    table for all the information that is garunteed to be the same (based on the fact that models contain the same set
+    table for all the information that is guaranteed to be the same (based on the fact that models contain the same set
     of data between themselves). While this might be a topic of argument, I am confident in this schema as it allows
     queries to be structured easier and disallow many mistaken inputs (either by hand or automated)
 RAM.model =many-to-one> RAMModel
@@ -19,24 +19,24 @@ PhysicalDisk.machine =ForeignKey> Machine
 PhysicalDisk.model =many-to-one> PhysicalDiskModel
     Adding onto the Unique=>Non-Unique aspect as before, each physical disk can have many Logical disks inside of them.
     The clever amongst you will note that logical disks can span between physical disks (IE: RAID). This is a feature
-    that is yet to be implamented, but will likely be changed over soon.
+    that is yet to be implemented, but will likely be changed over soon.
 GPU.model =many-to-one> GPUModel
 GPU.machine =ForeignKey> Machine
 
-You can see a visual explaination in the `data` folder labeled `designgraph.svg` (data\visualization\designgraph.svg)
+You can see a visual explanation in the `data` folder labeled `designgraph.svg` (data\visualization\designgraph.svg)
 (BTW, I generated this fancy little table using DbVisualizer Free with a little SVG editing)
 
 Because WMI returns codes for certain values, I've built a table that serves as a lookup table for those codes.
 That being said, because not all values start at 0 (Thanks, Microsoft), and because there are so many overlapping
-codes between responces, I've handled each Object::Variable pair as a kind of key inside the Table.
+codes between responses, I've handled each Object::Variable pair as a kind of key inside the Table.
 The table holds the following information:
-NumericalResponce (int) | HumanResponce (string) | WMIVariable (string) | WMIObject (string)
+NumericalResponse (int) | HumanResponse (string) | WMIVariable (string) | WMIObject (string)
 You may turn a code into a human readable name as such:
- >>> HumanResponse = models.WMICodes.objects.get(code=NumericalResponce, identifier="WMIVariable", \
+ >>> HumanResponse = models.WMICodes.objects.get(code=NumericalResponse, identifier="WMIVariable", \
  wmiObject="WMIObject")
 
 You'll notice a distinct lack of static variables to define the data. We're storing the data in a fixture. This fixture
-currently requires manual loading (using manage.py), but can be switched to an initial data loading proceedure (using
+currently requires manual loading (using manage.py), but can be switched to an initial data loading procedure (using
 fixtures and initial migration files)
 For a guide on how to fill the model with initial data:
 https://docs.djangoproject.com/en/1.10/howto/initial-data/
@@ -97,10 +97,23 @@ class calcFreeSize:
 
 
 class WMICodes(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, default='Unknown')
     code = models.PositiveSmallIntegerField()
     identifier = models.CharField(max_length=255)
     wmiObject = models.CharField(max_length=255)
+    machines = models.ManyToManyField('Machine')
+    UNKNOWN = 0
+    KNOWN = 1
+    CUSTOM = 2
+    STATUS_TYPES = (
+        (UNKNOWN, 'Unknown'),
+        (KNOWN, 'Known'),
+        (CUSTOM, 'Custom'),
+    )
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS_TYPES,
+        default=UNKNOWN
+    )
 
     def __unicode__(self):
         return u"\"{}\" at {}.{}".format(self.name, self.wmiObject, self.identifier)

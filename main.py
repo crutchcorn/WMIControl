@@ -58,10 +58,12 @@ from wmiControl import runFile
 from excepts import AlreadyInDB
 
 # Load config file
+
 with open("conf.toml") as conffile:
     config = toml.loads(conffile.read())
 
-def switchSettings(config, value):
+
+def switchSettings(value):
         config['settings'][value] = not config['settings'][value]
         print(value.title() + "switch has been toggled.")
         print("Value is now: " + str(config['settings'][value]))
@@ -131,9 +133,9 @@ def main():
 
     elif arguments['settings']:
         if arguments['skip']:
-            config = switchSettings(config, "skip")
+            config = switchSettings("skipUpdate")
         elif arguments['silent']:
-            config = switchSettings(config, "silent")
+            config = switchSettings("silentlyFail")
         with open("conf.toml", "w") as updateConfig:
             updateConfig.write(toml.dumps(config))
 
