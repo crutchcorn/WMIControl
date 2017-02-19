@@ -1,4 +1,3 @@
-
 # Core imports
 import os
 
@@ -11,26 +10,16 @@ application = get_wsgi_application()
 # DB models and exceptions
 from data import models
 
-processor_string = "processor"
-cpu_model_string = "cpu_model"
-ram_stick_string = "ram_stick"
-ram_model_string = "ram_model"
-gpu_card_string = "gpu_card"
-gpu_model_string = "gpu_model"
-network_card_string = "network_card"
-network_model_string = "network_model"
-physical_disk_model_string = "physical_disk_model"
-physical_disk_string = "physical_disk"
-
 
 class Machine:
     """ To pass through items, you can consider it assigned as such
-    self.processors = [{processor_string: processors, "cpu_model": cpu_models}]
+    self.processors = [{"processor": processors, "cpu_model": cpu_models}]
     self.rams = [{"ram_stick": ram_sticks, "ram_model": ram_models}]
     self.gpus = [{"gpu_card": gpu_cards, "gpu_model": gpu_models}]
     self.networks = [{"network_card": network_cards, "network_model": network_models}]
     self.physical_disks = [{"physical_disk_model": physical_disk_models, "physical_disk": physical_disks}]
     """
+
     def __init__(self, machine=models.Machine(), model=models.MachineModel(), processors=None, rams=None, gpus=None,
                  networks=None, physical_disks=None, logic_disks=None):
         self.machine = machine
@@ -48,9 +37,15 @@ class Machine:
         self.save_gpus()
         self.save_networks()
         self.save_physical_disks()
+        self.save_logic_disks()
         self.save_processors()
         self.save_rams()
         return self.machine
+
+    @staticmethod
+    def save_object(objectToSave, model, item):
+        objectToSave[model].save()
+        objectToSave[item].save()
 
     def createCPU(self, name, manufacturer, arch, partnum=None, family=None, upgradeMethod=None, cores=None,
                   threads=None, speed=None, serial=None, location=None):
@@ -73,17 +68,12 @@ class Machine:
             location=location
         )
 
-        self.processors.append({processor_string: processor, cpu_model_string: cpu_model})
+        self.processors.append({"processor": processor, "cpu_model": cpu_model})
         return processor, cpu_model
-
-    @staticmethod
-    def save_processor(processor):
-        processor[cpu_model_string].save()
-        processor[processor_string].save()
 
     def save_processors(self):
         for processor in self.processors:
-            self.save_processor(processor)
+            self.save_object(processor, "cpu_model", "processor")
 
     def createRAM(self, size, manufacturer=None, partnum=None, speed=None, formFactor=None, memoryType=None,
                   serial=None, location=None):
@@ -102,17 +92,12 @@ class Machine:
             serial=serial,
             location=location
         )
-        self.rams.append({ram_stick_string: ram_stick, ram_model_string: ram_model})
+        self.rams.append({"ram_stick": ram_stick, "ram_model": ram_model})
         return ram_stick, ram_model
-
-    @staticmethod
-    def save_ram(ram):
-        ram[ram_model_string].save()
-        ram[ram_stick_string].save()
 
     def save_rams(self):
         for ram in self.rams:
-            self.save_ram(ram)
+            self.save_object(ram, "ram_model", "ram_stick")
 
     def createLAN(self, name, mac, manufacturer=None, location=None):
         network_model, _ = models.NetworkModel.objects.get_or_create(
@@ -126,17 +111,12 @@ class Machine:
             mac=mac,
             location=location,
         )
-        self.networks.append({network_card_string: network_card, network_model_string: network_model})
+        self.networks.append({"network_card": network_card, "network_model": network_model})
         return network_card, network_model
-
-    @staticmethod
-    def save_network(network):
-        network[network_model_string].save()
-        network[network_card_string].save()
 
     def save_networks(self):
         for network in self.networks:
-            self.save_network(network)
+            self.save_object(network, "network_model", "network_card")
 
     def createGPU(self, name, size=None, refresh=None, arch=None, memoryType=None, location=None):
         gpu_model, _ = models.GPUModel.objects.get_or_create(
@@ -152,17 +132,12 @@ class Machine:
             model=gpu_model,
             location=location,
         )
-        self.gpus.append({gpu_card_string: gpu_card, gpu_model_string: gpu_model})
+        self.gpus.append({"gpu_card": gpu_card, "gpu_model": gpu_model})
         return gpu_card, gpu_model
-
-    @staticmethod
-    def save_gpu(gpu):
-        gpu[gpu_model_string].save()
-        gpu[gpu_card_string].save()
 
     def save_gpus(self):
         for gpu in self.gpus:
-            self.save_gpu(gpu)
+            self.save_object(gpu, "gpu_model", "gpu_card")
 
     def createDrive(self, name, size, interface, manufacturer, serial, partitions):
         physical_disk_model, _ = models.PhysicalDiskModel.objects.get_or_create(
@@ -179,18 +154,13 @@ class Machine:
             partitions=partitions,
         )
         self.physical_disks.append({
-            physical_disk_string: physical_disk, physical_disk_model_string: physical_disk_model
+            "physical_disk": physical_disk, "physical_disk_model": physical_disk_model
         })
         return physical_disk, physical_disk_model
 
-    @staticmethod
-    def save_physical_disk(physical_disk):
-        physical_disk[physical_disk_model_string].save()
-        physical_disk[physical_disk_string].save()
-
     def save_physical_disks(self):
         for physical_disk in self.physical_disks:
-            self.save_physical_disk(physical_disk)
+            self.save_object(physical_disk, "physical_disk_model", "physical_disk")
 
     def createLogicDisk(self, disk, name, mount, filesystem, size, freesize, disktype):
         logic_disk, _ = models.LogicalDisk.objects.get_or_create(
@@ -204,3 +174,7 @@ class Machine:
         )
         self.logic_disks.append(logic_disk)
         return logic_disk
+
+    def save_logic_disks(self):
+        for logic_disk in self.logic_disks:
+            logic_disk.save()
