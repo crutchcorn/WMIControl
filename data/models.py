@@ -56,17 +56,19 @@ from macaddress.fields import MACAddressField
 
 
 class CalcSizeMixin:
-    sizeProps = []
     scalingFactors = {'GB': 1024 ** 3 , 'MB': 1024 ** 2, 'KB': 1024}
 
     def __getattr__(self, item):
-        for sizeProp in self.sizeProps:
-            if item.startswith(sizeProp + "In"):
-                unit = item[item.index("In") + 2:]
-                if unit in self.scalingFactors.keys():
-                    return int(getattr(self, sizeProp)) / self.scalingFactors[unit]
-                else:
-                    raise AttributeError(unit + " is not an known size unit.")
+        try:
+            sizeProp = item[:item.index("In")]
+            unit = item[item.index("In") + 2:]
+            if unit in self.scalingFactors.keys():
+                return int(getattr(self, sizeProp)) / self.scalingFactors[unit]
+            else:
+                raise AttributeError(unit + " is not an known size unit.")
+        except ValueError:
+            pass
+
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, item))
 
 
@@ -203,8 +205,6 @@ class RAMModel(models.Model, CalcSizeMixin):
     formFactor = models.CharField(max_length=255, null=True, blank=True)
     memoryType = models.CharField(max_length=255, null=True, blank=True)
 
-    sizeProps = ["size"]
-
     def __unicode__(self):
         return u"{} GB, {}".format(self.sizeInGB, self.manufacturer)
 
@@ -230,8 +230,6 @@ class PhysicalDiskModel(models.Model, CalcSizeMixin):
     size = models.BigIntegerField()
     interface = models.CharField(max_length=5, blank=True)
     manufacturer = models.CharField(max_length=255, blank=True)
-
-    sizeProps = ["size"]
 
     def __unicode__(self):
         return u"{} Mount, {} GB".format(self.name, self.sizeInGB)
@@ -262,8 +260,6 @@ class LogicalDisk(models.Model, CalcSizeMixin):
     freesize = models.BigIntegerField(null=True, blank=True)
     type = models.CharField(max_length=255, null=True, blank=True)
 
-    sizeProps = ["size", "freesize"]
-
     def __unicode__(self):
         return u"{} Mount, {} GB, {} GB Free".format(self.name, self.sizeInGB, self.freesizeInGB)
 
@@ -277,8 +273,6 @@ class GPUModel(models.Model, CalcSizeMixin):
     refresh = models.PositiveSmallIntegerField(null=True, blank=True)
     arch = models.CharField(max_length=255, null=True, blank=True)
     memoryType = models.CharField(max_length=255, null=True, blank=True)
-
-    sizeProps = ["size"]
 
     def __unicode__(self):
         return self.name
