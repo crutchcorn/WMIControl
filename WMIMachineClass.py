@@ -9,34 +9,10 @@ application = get_wsgi_application()
 
 # DB models and exceptions
 from data import models
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from excepts import AlreadyInDB, SilentFail, AccessDenied
 from MachineClass import Machine
 
 
 class WMIMachine(Machine):
-    def createCPU(self, name, machine, manufacturer, arch, partnum=None, family=None, upgradeMethod=None, cores=None,
-                  threads=None, speed=None, serial=None, location=None):
-        self.cpu_model, _ = models.CPUModel.objects.get_or_create(
-            name=name,
-            manufacturer=manufacturer,
-            partnum=partnum,
-            arch=arch,
-            family=family,
-            upgradeMethod=upgradeMethod,
-            cores=cores,
-            threads=threads,
-            speed=speed
-
-        )
-
-        self.processor, _ = models.CPU.objects.get_or_create(
-            machine=machine,
-            model=self.cpu_model,
-            serial=serial,
-            location=location
-        )
-
     def lookupWMICPU(self, cpu):
         archName, createdArch = models.WMICodes.objects.get_or_create(code=cpu.Architecture, identifier="Architecture",
                                                                       wmiObject="Win32_Processor")
@@ -61,11 +37,10 @@ class WMIMachine(Machine):
             SerialNumber = None
         return archName, familyName, upgradeName, PartNumber, SerialNumber
 
-    def createWMICPU(self, cpu, machine):
+    def createWMICPU(self, cpu):
         archName, familyName, upgradeName, PartNumber, SerialNumber = self.lookupWMICPU(cpu)
-        self.createCPU(
+        return self.createCPU(
             name=cpu.Name.strip(),
-            machine=machine,
             manufacturer=cpu.Manufacturer,
             partnum=PartNumber,
             arch=archName.name,
@@ -76,25 +51,6 @@ class WMIMachine(Machine):
             speed=cpu.MaxClockSpeed,
             serial=SerialNumber,
             location=cpu.DeviceID
-        )
-
-    def createRAM(self, size, machine, manufacturer=None, partnum=None, speed=None, formFactor=None, memoryType=None,
-                  serial=None, location=None):
-        self.ram_model, _ = models.RAMModel.objects.get_or_create(
-            size=size,
-            machine=machine,
-            manufacturer=manufacturer,
-            partnum=partnum,
-            speed=speed,
-            formFactor=formFactor,
-            memoryType=memoryType
-        )
-
-        self.ram_stick, _ = models.RAM.objects.get_or_create(
-            machine=machine,
-            model=self.ram_model,
-            serial=serial,
-            location=location
         )
 
     def lookupWMIRAM(self, ram):
@@ -119,33 +75,17 @@ class WMIMachine(Machine):
             SerialNumber = None
         return formName, memTypeName, PartNumber, SerialNumber
 
-    def createWMIRAM(self, ram, machine):
+    def createWMIRAM(self, ram):
         formName, memTypeName, PartNumber, SerialNumber = self.lookupWMIRAM(ram)
-        self.createRAM(
+        return self.createRAM(
             size=int(ram.Capacity),
             manufacturer=ram.Manufacturer,
             partnum=PartNumber,
             speed=ram.Speed,
             formFactor=formName.name,
             memoryType=memTypeName.name,
-            machine=machine,
             serial=SerialNumber,
             location=ram.DeviceLocator
-        )
-
-    def createGPU(self, name, machine, size=None, refresh=None, arch=None, memoryType=None, location=None):
-        self.gpu_model, _ = models.GPUModel.objects.get_or_create(
-            name=name,
-            size=size,
-            refresh=refresh,
-            arch=arch,
-            memoryType=memoryType
-        )
-
-        self.gpu_card, _ = models.GPU.objects.get_or_create(
-            machine=machine,
-            model=self.gpu_model,
-            location=location,
         )
 
     def lookupWMIGPU(self, gpu):
@@ -161,36 +101,51 @@ class WMIMachine(Machine):
             memTypeName.machines.add(self.machine)
         return vidArchName.name, memTypeName.name
 
-    def createWMIGPU(self, gpu, machine):
+    def createWMIGPU(self, gpu):
         vidArchName, memTypeName = self.lookupWMIGPU(gpu)
-        self.createGPU(
+        return self.createGPU(
             name=gpu.Name.strip(),
             size=int(gpu.AdapterRAM),
             refresh=gpu.MaxRefreshRate,
             arch=vidArchName,
             memoryType=memTypeName,
-            machine=machine,
             location=gpu.DeviceID
         )
 
-    def createLAN(self, name, machine, mac, manufacturer=None, location=None):
-        self.network_model, _ = models.NetworkModel.objects.get_or_create(
-            name=name,
-            manufacturer=manufacturer
-        )
-
-        self.network_card, _ = models.Network.objects.get_or_create(
-            machine=machine,
-            model=self.network_model,
-            mac=mac,
-            location=location,
-        )
-
-    def createWMILAN(self, net, machine):
-        self.createLAN(
+    def createWMILAN(self, net):
+        return self.createLAN(
             name=net.Name.strip(),
             manufacturer=net.Manufacturer,
-            machine=machine,
             mac=net.MACAddress,
             location=net.DeviceID
         )
+
+    def createWMIDrive(self, disk):
+        return self.createDrive(
+            name=disk.Model,
+            size=disk.Size,
+            interface=disk.InterfaceType,
+            manufacturer=disk.Manufacturer,
+            serial=disk.SerialNumber,
+            partitions=disk.Partitions
+        )
+
+    def createWMILogicDisk(self, disk, logicdisk):
+        disktype = self.lookupWMILogicDisk(disktype=logicdisk.DriveType)
+        return self.createLogicDisk(
+            disk=disk,
+            name=logicdisk.Name,
+            mount=logicdisk.DeviceID,
+            filesystem=logicdisk.FileSystem,
+            size=logicdisk.Size,
+            freesize=logicdisk.FreeSpace,
+            disktype=disktype
+        )
+
+    def lookupWMILogicDisk(self, disktype):
+        driveTypeName, createdDriveType = models.WMICodes.objects.get_or_create(code=disktype,
+                                                                                identifier="DriveType",
+                                                                                wmiObject="Win32_LogicalDisk")
+        if createdDriveType:
+            driveTypeName.machines.add(self.machine)
+        return driveTypeName.name
