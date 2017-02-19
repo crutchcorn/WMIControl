@@ -35,30 +35,12 @@ class Machine:
                  networks=None, physical_disks=None, logic_disks=None):
         self.machine = machine
         self.model = model
-        if processors:
-            self.processors = processors
-        else:
-            self.processors = []
-        if rams:
-            self.rams = rams
-        else:
-            self.rams = []
-        if gpus:
-            self.gpus = gpus
-        else:
-            self.gpus = []
-        if networks:
-            self.networks = networks
-        else:
-            self.networks = []
-        if physical_disks:
-            self.physical_disks = physical_disks
-        else:
-            self.physical_disks = []
-        if logic_disks:
-            self.logic_disks = logic_disks
-        else:
-            self.logic_disks = []
+        self.processors = processors or []
+        self.rams = rams or []
+        self.gpus = gpus or []
+        self.networks = networks or []
+        self.physical_disks = physical_disks or []
+        self.logic_disks = logic_disks or []
 
     def save(self):
         self.model.save()
