@@ -55,45 +55,19 @@ from macaddress.fields import MACAddressField
 # from djmoney.models.fields import MoneyField
 
 
-def toGB(size):
-    return int(size) / (1024 * 1024 * 1024)
+class CalcSizeMixin:
+    sizeProps = []
+    scalingFactors = {'GB': 1024 ** 3 , 'MB': 1024 ** 2, 'KB': 1024}
 
-
-def toMB(size):
-    return int(size) / (1024 * 1024)
-
-
-def toKB(size):
-    return int(size) / 1024
-
-
-class calcSize:
-    """While this may seem redundant to have calcSize and the functions above, I have done so to ensure that converting
-    both of them is as simple and readable as possible without importing much else. It is likely that this doesn't
-    matter and they would suffice perfectly well as they do the same; however they require an import."""
-    def sizeInGB(self):
-        return toGB(self.size)
-
-    def sizeInMB(self):
-        return toMB(self.size)
-
-    def sizeInKB(self):
-        return toKB(self.size)
-
-
-class calcFreeSize:
-    """While this function may only be used in one class for now, that may likely change in the future and modularity is
-    easier to add earlier. If there are alternative suggestions, I'd recommend bringing them up! As this and calcSize
-    are so similar, it may be possible to make a main class and dynamically generate function name to reduce code even
-    further. EG: .__init__ would set `freeSize` in this instance and `size` would be in `calcSize`."""
-    def freeSizeInGB(self):
-        return toGB(self.freesize)
-
-    def freeSizeInMB(self):
-        return toMB(self.freesize)
-
-    def freeSizeInKB(self):
-        return toKB(self.freesize)
+    def __getattr__(self, item):
+        for sizeProp in self.sizeProps:
+            if item.startswith(sizeProp + "In"):
+                unit = item[item.index("In") + 2:]
+                if unit in self.scalingFactors.keys():
+                    return int(getattr(self, sizeProp)) / self.scalingFactors[unit]
+                else:
+                    raise AttributeError(unit + " is not an known size unit.")
+        raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, item))
 
 
 class WMICodes(models.Model):
@@ -221,7 +195,7 @@ class CPU(models.Model):
         return self.__unicode__()
 
 
-class RAMModel(models.Model, calcSize):
+class RAMModel(models.Model, CalcSizeMixin):
     size = models.BigIntegerField()
     manufacturer = models.CharField(max_length=255, blank=True, null=True)
     partnum = models.CharField(max_length=255, null=True, blank=True)
@@ -229,8 +203,10 @@ class RAMModel(models.Model, calcSize):
     formFactor = models.CharField(max_length=255, null=True, blank=True)
     memoryType = models.CharField(max_length=255, null=True, blank=True)
 
+    sizeProps = ["size"]
+
     def __unicode__(self):
-        return u"{} GB, {}".format(self.sizeInGB(), self.manufacturer)
+        return u"{} GB, {}".format(self.sizeInGB, self.manufacturer)
 
     def __str__(self):
         return self.__unicode__()
@@ -249,14 +225,16 @@ class RAM(models.Model):
         return self.__unicode__()
 
 
-class PhysicalDiskModel(models.Model, calcSize):
+class PhysicalDiskModel(models.Model, CalcSizeMixin):
     name = models.CharField(max_length=255, blank=True)
     size = models.BigIntegerField()
     interface = models.CharField(max_length=5, blank=True)
     manufacturer = models.CharField(max_length=255, blank=True)
 
+    sizeProps = ["size"]
+
     def __unicode__(self):
-        return u"{} Mount, {} GB".format(self.name, self.sizeInGB())
+        return u"{} Mount, {} GB".format(self.name, self.sizeInGB)
 
     def __str__(self):
         return self.__unicode__()
@@ -275,7 +253,7 @@ class PhysicalDisk(models.Model):
         return self.__unicode__()
 
 
-class LogicalDisk(models.Model, calcSize, calcFreeSize):
+class LogicalDisk(models.Model, CalcSizeMixin):
     disk = models.ForeignKey('PhysicalDisk')
     name = models.CharField(max_length=255)
     mount = models.CharField(max_length=4, null=True, blank=True)
@@ -284,19 +262,23 @@ class LogicalDisk(models.Model, calcSize, calcFreeSize):
     freesize = models.BigIntegerField(null=True, blank=True)
     type = models.CharField(max_length=255, null=True, blank=True)
 
+    sizeProps = ["size", "freesize"]
+
     def __unicode__(self):
-        return u"{} Mount, {} GB, {} GB Free".format(self.name, self.size, self.free)
+        return u"{} Mount, {} GB, {} GB Free".format(self.name, self.sizeInGB, self.freesizeInGB)
 
     def __str__(self):
         return self.__unicode__()
 
 
-class GPUModel(models.Model, calcSize):
+class GPUModel(models.Model, CalcSizeMixin):
     name = models.CharField(max_length=255)
     size = models.BigIntegerField(null=True, blank=True)
     refresh = models.PositiveSmallIntegerField(null=True, blank=True)
     arch = models.CharField(max_length=255, null=True, blank=True)
     memoryType = models.CharField(max_length=255, null=True, blank=True)
+
+    sizeProps = ["size"]
 
     def __unicode__(self):
         return self.name
