@@ -23,14 +23,6 @@ We personally use PostgreSQL for testing, but it should work the same no matter 
 #### NMAP
 This program requires nmap to be previously installed. Proceed to download from [here](https://nmap.org/download.html). Insure you are downloading and installing the Windows version
 
-#### PyWin32
-WMIControl uses a library called PyWin32. Unfortunately, it is not unable to be packaged within PyPi. You have to install it from their installer [here](https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/). Ensure you have to proper architecture selected for your Windows version. You must also have the same arcitecture of Python installed, otherwise you will recieve errors such as:
-
-`PermissionError: [Errno 13] Permission denied: 'C:\\Program Files (x86)\\python\\lib\\site-packages\\win32com\\gen_py\\__init__.py'`
-
-> User's note:
-> PyWin32 seems to always have problems with discovering Python versions. If it complains that Python is not found, go into regestry, export `HKEY_LOCAL_MACHINE\SOFTWARE\Python`, and import it again with the prefix of the version it expects (IE: `3.6` to `3.6-32`)
-
 ### Install Commands
 ```
 git clone https://github.com/crutchcorn/WMIControl.git
