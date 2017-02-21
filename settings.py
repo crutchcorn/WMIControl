@@ -8,6 +8,8 @@ except FileNotFoundError:
     print("conf.toml does not exist. Please use the template in conf.toml.example to create one.")
     exit()
 
+FIXTURE_DIRS = ('/data/fixtures',)
+
 DATABASES = {
     'default': {
         'ENGINE': config['db']['databases']['engine'],

@@ -1,17 +1,14 @@
-# Core imports
-import os
-
 # Custom Imports
 import wmi
 
 # Local imports
 from networkMngr import netDeviceTest, getComputers, getDeviceNetwork
-from WMIMachineClass import WMIMachine
+from machineclasses.WMIMachineClass import WMIMachine
 
 # Database info
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+from lib.setSettings import djangopath
+djangopath(up=1, settings='settings')
 from django.core.wsgi import get_wsgi_application
-
 application = get_wsgi_application()
 
 # DB models and exceptions
@@ -21,6 +18,7 @@ from excepts import AlreadyInDB, SilentFail, AccessDenied
 
 Byte2GB = 1024 * 1024 * 1024
 local = wmi.WMI()
+
 
 def testCredentials(computer, userLogin):
     print("Trying to connect to", computer, "with user '" + userLogin['user'] + "'")

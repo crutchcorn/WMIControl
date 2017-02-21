@@ -1,8 +1,7 @@
 # Core imports
-import os
+from lib.setSettings import djangopath
+djangopath(up=1, settings='settings')
 
-# Database info
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 from django.core.wsgi import get_wsgi_application
 
 application = get_wsgi_application()

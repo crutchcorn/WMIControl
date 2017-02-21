@@ -56,18 +56,16 @@ Options:
 """
 
 # Custom Imports
-from docopt import docopt
-import toml
 import os
 
-# Local imports
-from networkMngr import finishIP, getDeviceNetwork
-from wmiScanner import WMIInfo, getWMIObjs
-from wmiControl import runFile
-from importtools.activations.handler import importCSV, retireCSV, searchActivation
+import toml
+from docopt import docopt
+from wmiskai.wmiScanner import WMIInfo, getWMIObjs
 
-# from pluginHelper import makeAllAssets, updateCloudID, getAuth
 from excepts import AlreadyInDB
+from importtools.activations.handler import importCSV, retireCSV, searchActivation
+from networkMngr import finishIP, getDeviceNetwork
+from wmiskai.wmiControl import runFile
 
 # Load config file
 
