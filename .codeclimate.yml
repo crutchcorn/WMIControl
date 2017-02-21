@@ -29,3 +29,4 @@ ratings:
   - "**.rb"
 exclude_paths:
 - "scratchpad.py"
+- "data/migrations/0001_initial.py"
