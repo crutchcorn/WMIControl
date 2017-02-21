@@ -75,6 +75,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
         wmiObj = local
 
     machineObj = WMIMachine()
+
     machineName = wmiObj.Win32_ComputerSystem()[-1].Name
 
     """Get a list of valid network devices to use later to find MAC in DB"""
@@ -111,7 +112,8 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
                 raise AlreadyInDB(machineName, "is already in your database. Skipping")
             else:
                 print(machineName + " will be updated in the local database")
-                machineObj.model = machineObj.machine.model
+                if machineObj.machine.model:
+                    machineObj.model = machineObj.machine.model
                 # Error handling needed if machine has no model
                 machineObj.machine.name = machineName
                 break  # Machine has been found and defined. Update the machine
@@ -126,7 +128,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     machineObj.machine.name = machineName
     machineObj.machine.os = wmiObj.Win32_OperatingSystem()[-1].Caption.strip()
     # Get the roles of the machine
-    machineObj.save() # This is in bad form! You must create the machine before assigning it a many-to-many!
+    machineObj.machine.save()  # This is in bad form! You must create the machine before assigning it a many-to-many!
     # Because of this, I will likely need to make some major changes to the codebase to remove any many-to-manys
     try:
         machineObj.machine.roles = list(map(
@@ -178,6 +180,7 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     for diskdrive in wmiObj.Win32_DiskDrive():
         """Get info from Win32_LogicalDisk"""
         physDisk, _ = machineObj.createWMIDrive(diskdrive)
+        machineObj.save_physical_disks()
         partsOnDrive = makeQuery("Win32_DiskDrive", diskdrive.DeviceID, "Win32_DiskDriveToDiskPartition")
         for diskpart in wmiObj.query(partsOnDrive):
             diskPartToLogic = makeQuery("Win32_DiskPartition", diskpart.DeviceID, "Win32_LogicalDiskToPartition")

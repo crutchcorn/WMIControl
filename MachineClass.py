@@ -164,7 +164,6 @@ class Machine:
 
     def createLogicDisk(self, disk, name, mount, filesystem, size, freesize, disktype):
         logic_disk, _ = models.LogicalDisk.objects.get_or_create(
-            disk=disk,
             name=name,
             mount=mount,
             filesystem=filesystem,
@@ -172,6 +171,7 @@ class Machine:
             freesize=freesize,
             type=disktype
         )
+        logic_disk.disk.add(disk)
         self.logic_disks.append(logic_disk)
         return logic_disk
 

@@ -259,7 +259,7 @@ class PhysicalDisk(models.Model):
 
 
 class LogicalDisk(models.Model, CalcSizeMixin):
-    disk = models.ForeignKey('PhysicalDisk')
+    disk = models.ManyToManyField('PhysicalDisk')
     name = models.CharField(max_length=255)
     mount = models.CharField(max_length=4, null=True, blank=True)
     filesystem = models.CharField(max_length=255, null=True, blank=True)
