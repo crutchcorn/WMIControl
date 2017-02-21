@@ -126,6 +126,8 @@ def WMIInfo(wmiObj=None, silentlyFail=False, skipUpdate=False):
     machineObj.machine.name = machineName
     machineObj.machine.os = wmiObj.Win32_OperatingSystem()[-1].Caption.strip()
     # Get the roles of the machine
+    machineObj.save() # This is in bad form! You must create the machine before assigning it a many-to-many!
+    # Because of this, I will likely need to make some major changes to the codebase to remove any many-to-manys
     try:
         machineObj.machine.roles = list(map(
             lambda server: models.Role.objects.get_or_create(name=server.Name.strip())[0],

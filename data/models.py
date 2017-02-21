@@ -84,7 +84,7 @@ class WMICodes(models.Model):
     code = models.PositiveSmallIntegerField()
     identifier = models.CharField(max_length=255)
     wmiObject = models.CharField(max_length=255)
-    machines = models.ManyToManyField('Machine')
+    machines = models.ManyToManyField('Machine', blank=True)
     UNKNOWN = 0
     KNOWN = 1
     CUSTOM = 2
