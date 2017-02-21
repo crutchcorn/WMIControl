@@ -1,6 +1,7 @@
 # Configuration files: Prevents people from trying to commit their own config (*cough* CORBIN)
 *.toml
-*.ai # Shh
+# Shh
+*.ai
 
 # Ignore data migrations
 migrations/
