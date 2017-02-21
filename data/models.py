@@ -56,19 +56,26 @@ from macaddress.fields import MACAddressField
 
 
 class CalcSizeMixin:
-    scalingFactors = {'GB': 1024 ** 3 , 'MB': 1024 ** 2, 'KB': 1024}
+    """The way you use this is to add the class as a parent class. This will allow you to use "InGB/InMB/inKB" at the
+    end of any variable name that is of the type "Integer".
+    EG: sizeInGB
+    """
+    scalingFactors = {'TB': 1024 ** 4, 'GB': 1024 ** 3, 'MB': 1024 ** 2, 'KB': 1024}
 
+    # __getattr__ is called when an unknown variable is called. Self is the class itself and item is the argument
+    # (variable name) passed through to the function.
     def __getattr__(self, item):
         try:
-            sizeProp = item[:item.index("In")]
-            unit = item[item.index("In") + 2:]
-            if unit in self.scalingFactors.keys():
-                return int(getattr(self, sizeProp)) / self.scalingFactors[unit]
+            sizeProp = item[:item.index("In")]  # Gets index for keyword "In"
+            unit = item[item.index("In") + 2:]  # Pass the argument of everything past keyword
+            if unit in self.scalingFactors.keys():  # Test if argument matches known units
+                return int(getattr(self, sizeProp)) / self.scalingFactors[unit]  # Return the math needed
             else:
-                raise AttributeError(unit + " is not an known size unit.")
-        except ValueError:
+                    raise AttributeError(unit + " is not an known size unit.")  # Return error message
+        except ValueError:  # Ignore (AKA Return standard error message) if any other type than one of
             pass
 
+        # Return standard error message
         raise AttributeError("'{}' object has no attribute '{}'".format(self.__class__.__name__, item))
 
 
