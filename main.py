@@ -9,6 +9,7 @@ Usage:
     WMIControl retire [<dbtable>] <file>
     WMIControl search [<dbtable>] (--mac=<mac> | --coa=<coa> | --prodkey=<prodkey>)
     WMIControl settings (skip | silent)
+    WMIControl list
 
 Options:
     -h --help           ~ Show this screen
@@ -62,6 +63,7 @@ import toml
 from docopt import docopt
 
 from importtools.activations.handler import importCSV, retireCSV, searchActivation
+from importtools.general import listMachines
 from lib.excepts import AlreadyInDB
 from lib.networkMngr import finishIP, getDeviceNetwork
 from wmiskai.wmiControl import runFile
@@ -185,5 +187,7 @@ def main():
         else:
             print("I'm sorry, that has not been implamented yet")
 
+    elif arguments['list']:
+        listMachines()
 if __name__ == "__main__":
     main()
