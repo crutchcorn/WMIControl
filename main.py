@@ -60,12 +60,12 @@ import os
 
 import toml
 from docopt import docopt
-from wmiskai.wmiScanner import WMIInfo, getWMIObjs
 
-from excepts import AlreadyInDB
 from importtools.activations.handler import importCSV, retireCSV, searchActivation
-from networkMngr import finishIP, getDeviceNetwork
+from lib.excepts import AlreadyInDB
+from lib.networkMngr import finishIP, getDeviceNetwork
 from wmiskai.wmiControl import runFile
+from wmiskai.wmiScanner import WMIInfo, getWMIObjs
 
 # Load config file
 

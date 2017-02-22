@@ -1,12 +1,9 @@
 # Custom Imports
 import wmi
 
-# Local imports
-from networkMngr import netDeviceTest, getComputers, getDeviceNetwork
-from machineclasses.WMIMachineClass import WMIMachine
-
-# Database info
+from lib.networkMngr import netDeviceTest, getComputers, getDeviceNetwork
 from lib.setSettings import djangopath
+from machineclasses.WMIMachineClass import WMIMachine
 djangopath(up=1, settings='settings')
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
@@ -14,7 +11,7 @@ application = get_wsgi_application()
 # DB models and exceptions
 from data import models
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from excepts import AlreadyInDB, SilentFail, AccessDenied
+from lib.excepts import AlreadyInDB, SilentFail, AccessDenied
 
 Byte2GB = 1024 * 1024 * 1024
 local = wmi.WMI()

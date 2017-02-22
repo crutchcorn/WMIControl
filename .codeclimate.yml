@@ -12,6 +12,9 @@ engines:
     enabled: true
   pep8:
     enabled: true
+    checks:
+      E731:
+        enabled: false
   radon:
     enabled: true
     exclude_fingerprints:
@@ -21,6 +24,8 @@ engines:
     - f7bf748fba4025d70b1ccf41982538e1
     - 2e177f566eebd902996a42ccc955f20e
     - 2e177f566eebd902996a42ccc955f20e
+    - 2e177f566eebd902996a42ccc955f20e
+    - 6e81a92c93c510b66793ab96b59d285f
 ratings:
   paths:
   - "**.inc"

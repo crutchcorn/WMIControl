@@ -1,4 +1,9 @@
 # DB models and exceptions
+from lib.setSettings import djangopath
+djangopath(up=2, settings='settings')
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+
 from data import models
 from uuid import uuid4
 import csv
@@ -6,9 +11,6 @@ import csv
 # Database info
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
-
 
 def hasRelatedMachine(self):
     return hasattr(self, 'machine')
