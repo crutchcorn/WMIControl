@@ -54,11 +54,11 @@ def getDeviceNetwork(c=None):
                 print("Out of range number, try again")
             else:
                 break
-    ip = netDevices[0].IPAddress[0]
-    subnet = netDevices[0].IPSubnet[0]
-    cidr = str(IPNetwork(ip + "/" + subnet).cidr)
-    return ip, subnet, cidr
-
+        ip = netDevices[0].IPAddress[0]
+        subnet = netDevices[0].IPSubnet[0]
+        cidr = str(IPNetwork(ip + "/" + subnet).cidr)
+        return ip, subnet, cidr
+    return None, None, None
 
 def finishIP(ip, ipRange):
     """Given string ip, append input range where blank
@@ -112,6 +112,8 @@ def findBroadcast(ip=None, subnet=None):
     """
     if not ip:
         ip, subnet, _ = getDeviceNetwork()
+        if not ip and not subnet:
+            return "0.0.0.0"
     return ".".join([str((int(ip.split('.')[i]) | int(subnet.split('.')[i]) ^ 255)) for i in range(0, 4)])
 
 

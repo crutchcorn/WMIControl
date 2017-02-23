@@ -5,11 +5,8 @@ Usage:
     WMIControl scan (-r | --range) <start> <end>
     WMIControl scan (-s | --subnet)
     WMIControl control [<file> [<nmapIP>]]
-    WMIControl import [<dbtable>] <file>
-    WMIControl retire [<dbtable>] <file>
-    WMIControl search [<dbtable>] (--mac=<mac> | --coa=<coa> | --prodkey=<prodkey>)
     WMIControl settings (skip | silent)
-    WMIControl list
+    WMIControl shell
 
 Options:
     -h --help           ~ Show this screen
@@ -43,31 +40,23 @@ Options:
         If <nmapIP> ip is left incomplete, it will finish it with '0-255'.         EG: 192.168.1 becomes 192.168.1.0-255
         (More ways to select assets to run will come soon)
 
-    import                     Import a file or individual COAID
-    retire                     Retire COAID. Reassign computer to new one
-    search                     Search for any given COA-ID
-
-
-
     settings            ~ Modify settings for WMIControl
         ----------------------------------------------------------------
         skip            ~ A toggle to skip updating assets that have already been added to your database.
         silent          ~ A toggle to silence any non-max-level-crutial errors while scanning.
 
+    shell               ~ A shell that you can drop down to to run more advanced program functions
 """
 
 # Custom Imports
-import os
-
 import toml
 from docopt import docopt
 
-from importtools.activations.handler import importCSV, retireCSV, searchActivation
-from importtools.general import listMachines
 from lib.excepts import AlreadyInDB
 from lib.networkMngr import finishIP, getDeviceNetwork
 from wmiskai.wmiControl import runFile
 from wmiskai.wmiScanner import WMIInfo, getWMIObjs
+from lib.skaishell import SkaiShell
 
 # Load config file
 
@@ -165,29 +154,8 @@ def main():
             # cmd.py will go here. Unfortunately cmd.py is not done (or hardly started, even)
             print("Sorry, this feature is still in development. Please use <file> to run commands")
 
-    if arguments['import']:  # Import file
-        if arguments['<dbtable>'] == "Activation":
-            importCSV(os.path.abspath(arguments['<file>']))
-        else:
-            print("I'm sorry, that has not been implamented yet")
-    elif arguments['retire']:  # Retire COAs that match the given items. Only ProductKey/COAID/MAC is needed
-        if arguments['<dbtable>'] == "Activation":
-            retireCSV(os.path.abspath(arguments['<file>']), config['silentlyFail'])
-        else:
-            print("I'm sorry, that has not been implamented yet")
+    elif arguments['shell']:
+        SkaiShell().cmdloop()
 
-    elif arguments['search']:
-        if arguments['<dbtable>'] == "Activation":
-            if arguments['--mac']:
-                searchActivation("mac", arguments['--mac'])
-            elif arguments['--coa']:
-                searchActivation("coa", arguments['--coa'])
-            elif arguments['--prodkey']:
-                searchActivation("prodkey", arguments['--prodkey'])
-        else:
-            print("I'm sorry, that has not been implamented yet")
-
-    elif arguments['list']:
-        listMachines()
 if __name__ == "__main__":
     main()
