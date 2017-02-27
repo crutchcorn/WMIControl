@@ -12,6 +12,7 @@ import csv
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 
+
 def hasRelatedMachine(self):
     return hasattr(self, 'machine')
 

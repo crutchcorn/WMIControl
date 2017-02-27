@@ -60,6 +60,7 @@ def getDeviceNetwork(c=None):
         return ip, subnet, cidr
     return None, None, None
 
+
 def finishIP(ip, ipRange):
     """Given string ip, append input range where blank
     >>> finishIP('192.168.', '0')

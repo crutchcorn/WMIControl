@@ -1,4 +1,4 @@
-# This file will handle the plugin system and serve as a middle-man psuedo-library for all calls to said plugins
+# This file will handle the plugin system and serve as a middle-man pseudo-library for all calls to said plugins
 import collections
 import os
 from integrations import assetpanda  # Replace with plugin!

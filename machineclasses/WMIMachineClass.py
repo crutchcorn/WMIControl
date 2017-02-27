@@ -8,7 +8,7 @@ application = get_wsgi_application()
 
 # DB models and exceptions
 from data import models
-from MachineClass import Machine
+from machineclasses.MachineClass import Machine
 
 
 class WMIMachine(Machine):

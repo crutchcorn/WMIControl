@@ -1,4 +1,4 @@
-# Fair warning to all, this is HIGHLY configured JUST to match my usecase.
+# Fair warning to all, this is HIGHLY configured JUST to match my use-case.
 # I'll likely (if I decide that I want to) go ahead and change this later, but that may be difficult.
 import requests
 
@@ -42,7 +42,7 @@ def getToken(config):
         # Add more from http://docs.python-requests.org/en/latest/user/quickstart/#errors-and-exceptions
         raise SystemExit
 
-    # Takes token recieved and gives token that's needed
+    # Takes token received and gives token that's needed
     key = token.json()['token_type'].title() + " " + token.json()['access_token']
     auth = {'Authorization': key}
     return auth

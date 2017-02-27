@@ -73,6 +73,14 @@ def switchSettings(value):
 silentAndSkipDefaults = (config['settings']['silentlyFail'], config['settings']['skipUpdate'])
 
 
+def finishIt(startorEnd, number, arguments):
+    return tuple(part for part in finishIP(arguments['<' + startorEnd + '>'], str(number)).split('.'))
+
+
+def WMIObjDefaults(serch, arguments):
+    return config['credentials']['wmi']['users'], serch, arguments['<args>']
+
+
 def main():
     # Get auth key from asset tracker
     # auth = getAuth(config['credentials']['assetpanda'])  # Replace with plugin!
@@ -80,16 +88,15 @@ def main():
     # Grab CLI Arguments
     arguments = docopt(__doc__, version='WMIControl 0.1')
     # This will finish (see finishIP) and split up an IP address into a list
-    finishIt = lambda startOrEnd, number: tuple(part for part in finishIP(arguments['<' + startOrEnd + '>'], str(number)).split('.'))
-    WMIObjDefaults = lambda search: (config['credentials']['wmi']['users'], search, arguments['<args>'])
+
 
     # Handle CLI Arguments
     if arguments['scan']:
         search = ""
         if arguments['<nmapIP>'] or arguments['--range'] or arguments['--subnet']:
             if arguments['--range']:
-                start = finishIt("start", 0)
-                end = finishIt("end", 255)
+                start = finishIt("start", 0, arguments)
+                end = finishIt("end", 255, arguments)
                 for s, e in zip(start, end):
                     if s is e:
                         search += s
@@ -103,7 +110,7 @@ def main():
                     search = [search, arguments['<args>']]
             elif arguments['--subnet']:
                 _, _, search = getDeviceNetwork()
-            for comp in getWMIObjs(*WMIObjDefaults(search)):
+            for comp in getWMIObjs(*WMIObjDefaults(search, arguments)):
                 try:
                     WMIInfo(comp, *silentAndSkipDefaults)
                 except AlreadyInDB as inDBErr:
@@ -133,12 +140,15 @@ def main():
     #     """
 
     elif arguments['settings']:
-        if arguments['skip']:
-            config = switchSettings("skipUpdate")
-        elif arguments['silent']:
-            config = switchSettings("silentlyFail")
-        with open("conf.toml", "w") as updateConfig:
-            updateConfig.write(toml.dumps(config))
+        if arguments['skip'] or arguments['silentyFail']:
+            if arguments['skip']:
+                newConfig = switchSettings("skipUpdate")
+            elif arguments['silent']:
+                newConfig = switchSettings("silentlyFail")
+            with open("conf.toml", "w") as updateConfig:
+                updateConfig.write(toml.dumps(newConfig))
+        else:
+            pass
 
     elif arguments['control']:
         # Select which computers to control
@@ -148,7 +158,7 @@ def main():
             else:
                 _, _, search = getDeviceNetwork()
 
-            for comp in getWMIObjs(*WMIObjDefaults(search)):
+            for comp in getWMIObjs(*WMIObjDefaults(search, arguments)):
                 runFile(comp, arguments['<file>'])
         else:
             # cmd.py will go here. Unfortunately cmd.py is not done (or hardly started, even)

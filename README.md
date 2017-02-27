@@ -27,13 +27,11 @@ This program requires nmap to be previously installed. Proceed to download from 
 ```
 git clone https://github.com/crutchcorn/WMIControl.git
 cd WMIControl
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 Then, copy config.toml.example to config.toml and modify it to match your settings. See below for more
 ```
-python manage.py makemigrations data
 python manage.py migrate
-python manage.py loaddata wmiCodes.json
 ```
 
 ## Configuration

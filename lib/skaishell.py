@@ -2,6 +2,10 @@ import cmd
 from importtools.general import listMachines
 from importtools.activations.handler import importCSV, retireCSV, searchActivation
 import os
+import toml
+
+with open("conf.toml") as conffile:
+    config = toml.loads(conffile.read())
 
 
 class SkaiShell(cmd.Cmd):
