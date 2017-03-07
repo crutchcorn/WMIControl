@@ -51,16 +51,18 @@ Options:
 # Custom Imports
 import toml
 from docopt import docopt
+import firstrun
+firstrun.main()
 
 from lib.excepts import AlreadyInDB
 from lib.networkMngr import finishIP, getDeviceNetwork
 from wmiskai.wmiControl import runFile
 from wmiskai.wmiScanner import WMIInfo, getWMIObjs
 from lib.skaishell import SkaiShell
-
+from os.path import join, expanduser
 # Load config file
 
-with open("conf.toml") as conffile:
+with open(join(expanduser('~'), "conf.toml")) as conffile:
     config = toml.loads(conffile.read())
 
 
@@ -145,7 +147,7 @@ def main():
                 newConfig = switchSettings("skipUpdate")
             elif arguments['silent']:
                 newConfig = switchSettings("silentlyFail")
-            with open("conf.toml", "w") as updateConfig:
+            with open(join(expanduser('~'), "conf.toml"), "w") as updateConfig:
                 updateConfig.write(toml.dumps(newConfig))
         else:
             pass

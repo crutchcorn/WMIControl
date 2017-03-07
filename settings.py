@@ -1,8 +1,9 @@
 import toml
 from sys import exit
+from os.path import join, expanduser
 
 try:
-    with open("conf.toml") as conffile:
+    with open(join(expanduser('~'), "conf.toml")) as conffile:
         config = toml.loads(conffile.read())
 except FileNotFoundError:
     print("conf.toml does not exist. Please use the template in conf.toml.example to create one.")
