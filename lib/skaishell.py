@@ -4,7 +4,7 @@ from importtools.activations.handler import importCSV, retireCSV, searchActivati
 import os
 import toml
 
-with open("conf.toml") as conffile:
+with open(os.path.join(os.path.expanduser('~'), "conf.toml")) as conffile:
     config = toml.loads(conffile.read())
 
 
