@@ -8,4 +8,3 @@ netaddr==0.7.18
 requests==2.11.0
 django-macaddress==1.4.0
 pypiwin32==220
-python-nmap==0.6.1

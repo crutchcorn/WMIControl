@@ -20,6 +20,7 @@ local = wmi.WMI()
 def testCredentials(computer, userLogin):
     print("Trying to connect to", computer, "with user '" + userLogin['user'] + "'")
     try:
+        # impersonationLevel=impersonate, authenticationLevel=pktPrivacy
         wmiObj = wmi.WMI(str(computer), user=userLogin['user'], password=userLogin['pass'])
     except wmi.x_wmi as e:
         # This is unfortunately the way this must be done. There is no error codes in wmi library AFAIK
