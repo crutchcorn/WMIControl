@@ -2,28 +2,49 @@ import nmap
 import wmi
 import socket
 from struct import pack
+from os.path import abspath
 from netaddr import IPNetwork, EUI, mac_bare, AddrFormatError
 from macaddress import format_mac
+import json
+from copy import deepcopy
 
 local = wmi.WMI()
 
 
+# Check! ^-^
 def netDeviceTest(net):
     """Given Win32_NetworkAdapter object, returns if object is valid"""
     return net.MACAddress is not None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not \
         net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\")
 
 
-def getDeviceNetwork(c=None):
+# FIX! v-v
+def getDeviceNetwork(c=local):
     """Given WMI object c, returns IPaddress, subnetMask, and cidr
 
     While inconvinient, I am having cidrNet as the third item as you can simply call it in functions
 
     This function has a bug that when imported, it will run. Though I know the root cause I don't know the solution
-    The root cause is that Python precompiles default calls
+    The root cause is that Python precompiles default calls, so using this function in default args is bad OP
     """
-    if not c:
-        c = local
+    with open(abspath('../flags.json')) as flagsJSON:
+        flags = json.load(flagsJSON)
+
+    newNetworks = {
+        "netObjs": [],
+        "flags": {
+            "netDevices": [],
+            "selectedNet": ""
+        }
+    }
+
+    flagCheck = [not not flags[k] for k in ['netDevices', 'selectedNet'] if k in flags]
+    if all([all(flagCheck), len(flagCheck) == 2]):  # If both are in the `flags` dict
+        newNetworks['flags'] = deepcopy(flags)
+        newNetworks['flags']['netDevices'] = []
+    else:  # Otherwise, get rid of data
+        flags.update(newNetworks['flags'])
+        newNetworks['flags'] = deepcopy(flags)
 
     validNetworkIDs = list(map(
         lambda adapter: adapter.Index,
@@ -32,35 +53,49 @@ def getDeviceNetwork(c=None):
             c.Win32_NetworkAdapter()
         )
     ))
-    netDevices = []
+
     for netAdapter in [netAdapter for netAdapter in c.Win32_NetworkAdapterConfiguration() if
                        (netAdapter.Index in validNetworkIDs)]:
-        netDevices.append(netAdapter)
-    if len(netDevices) > 1:
+        newNetworks['netObjs'].append(netAdapter)
+        newNetworks['flags']['netDevices'].append(netAdapter.MACAddress)
+
+    newFlags = newNetworks['flags']['netDevices']
+    if (len(newFlags) > 1) and (set(flags['netDevices']) != set(newFlags)):
+        # `or` force reset network flag was not set
         i = 1
         print("There are more than one network devices currently active")
         print("Please select a device from the list given:")
-        for possibleNet in netDevices:
+        for possibleNet in newNetworks['netObjs']:
             print(str(i) + ") " + possibleNet.Description)
             i += 1
         print("")
         while True:
             try:
                 netSelection = int(input('Input: '))
-                netDevices = [netDevices[netSelection - 1]]
+                newNetworks['flags']['selectedNet'] = newFlags[netSelection - 1]
             except ValueError:
                 print("Not a number, try again")
             except IndexError:
                 print("Out of range number, try again")
             else:
                 break
-        ip = netDevices[0].IPAddress[0]
-        subnet = netDevices[0].IPSubnet[0]
-        cidr = str(IPNetwork(ip + "/" + subnet).cidr)
-        return ip, subnet, cidr
-    return None, None, None
+    elif len(newFlags) == 1:
+        newNetworks['flags']['selectedNet'] = newFlags[0]
+    elif not newFlags:
+        return None, None, None
+
+    with open(abspath('../flags.json'), 'w') as f:
+        json.dump(newNetworks['flags'], f)
+
+    selectedObj = \
+        [netObj for netObj in newNetworks['netObjs'] if netObj.MACAddress == newNetworks['flags']['selectedNet']][0]
+    ip = selectedObj.IPAddress[0]
+    subnet = selectedObj.IPSubnet[0]
+    cidr = str(IPNetwork(ip + "/" + subnet).cidr)
+    return ip, subnet, cidr
 
 
+# Check! ^-^
 def finishIP(ip, ipRange):
     """Given string ip, append input range where blank
     >>> finishIP('192.168.', '0')
@@ -77,6 +112,7 @@ def finishIP(ip, ipRange):
     return ip
 
 
+# FIX! v-v
 def getComputers(search=None, args=None):
     """Given string search and string args: Return list of hosts on network
     'args' being nmap arguments to be passed to nmap for optimized searching on networks
@@ -107,6 +143,7 @@ def listNetDevices():
     return list(filter(None, ips))
 
 
+# FIX! v-v
 def findBroadcast(ip=None, subnet=None):
     """Given string ip, subnet: Find WoL broadcast IP.
     Leave blank to use getDeviceNetwork as ip and subnet retreval
@@ -118,6 +155,7 @@ def findBroadcast(ip=None, subnet=None):
     return ".".join([str((int(ip.split('.')[i]) | int(subnet.split('.')[i]) ^ 255)) for i in range(0, 4)])
 
 
+# Check! ^-^
 def sendWoL(mac, broadcast=findBroadcast()):
     """Given string mac and broadcast: Turn on computer using WoL
     This was taken from http://code.activestate.com/recipes/358449-wake-on-lan/. Thanks, Fadly!
