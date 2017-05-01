@@ -11,14 +11,12 @@ from copy import deepcopy
 local = wmi.WMI()
 
 
-# Check! ^-^
 def netDeviceTest(net):
     """Given Win32_NetworkAdapter object, returns if object is valid"""
     return net.MACAddress is not None and net.PhysicalAdapter and net.Manufacturer != "Microsoft" and not \
         net.PNPDeviceID.startswith("USB\\") and not net.PNPDeviceID.startswith("ROOT\\")
 
 
-# FIX! v-v
 def getDeviceNetwork(c=local):
     """Given WMI object c, returns IPaddress, subnetMask, and cidr
 
@@ -27,7 +25,7 @@ def getDeviceNetwork(c=local):
     This function has a bug that when imported, it will run. Though I know the root cause I don't know the solution
     The root cause is that Python precompiles default calls, so using this function in default args is bad OP
     """
-    with open(abspath('../flags.json')) as flagsJSON:
+    with open('flags.json') as flagsJSON:
         flags = json.load(flagsJSON)
 
     newNetworks = {
@@ -84,7 +82,7 @@ def getDeviceNetwork(c=local):
     elif not newFlags:
         return None, None, None
 
-    with open(abspath('../flags.json'), 'w') as f:
+    with open('flags.json', 'w') as f:
         json.dump(newNetworks['flags'], f)
 
     selectedObj = \
@@ -95,7 +93,6 @@ def getDeviceNetwork(c=local):
     return ip, subnet, cidr
 
 
-# Check! ^-^
 def finishIP(ip, ipRange):
     """Given string ip, append input range where blank
     >>> finishIP('192.168.', '0')
@@ -155,7 +152,6 @@ def findBroadcast(ip=None, subnet=None):
     return ".".join([str((int(ip.split('.')[i]) | int(subnet.split('.')[i]) ^ 255)) for i in range(0, 4)])
 
 
-# Check! ^-^
 def sendWoL(mac, broadcast=findBroadcast()):
     """Given string mac and broadcast: Turn on computer using WoL
     This was taken from http://code.activestate.com/recipes/358449-wake-on-lan/. Thanks, Fadly!
