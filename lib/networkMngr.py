@@ -2,7 +2,6 @@ import nmap
 import wmi
 import socket
 from struct import pack
-from os.path import abspath
 from netaddr import IPNetwork, EUI, mac_bare, AddrFormatError
 from macaddress import format_mac
 import json
@@ -109,8 +108,7 @@ def finishIP(ip, ipRange):
     return ip
 
 
-# FIX! v-v
-def getComputers(search=None, args=None):
+def getComputers(search=getDeviceNetwork()[2], args='-sS -p 22 -n -T5'):
     """Given string search and string args: Return list of hosts on network
     'args' being nmap arguments to be passed to nmap for optimized searching on networks
 
@@ -123,10 +121,6 @@ def getComputers(search=None, args=None):
         -T5  : Insane timing template. This is the most unreliable, but also the quickest. If you have issues with
                assets being found, I'd suggest to start change with this option.
     """
-    if not search:
-        _, _, search = getDeviceNetwork()
-    if not args:
-        args = '-sS -p 22 -n -T5'
     nm = nmap.PortScanner()
     scanInfo = nm.scan(hosts=search, arguments=args)  # Remove -n to get DNS NetBIOS results
     IPs = nm.all_hosts()  # Gives me an host of hosts
@@ -135,20 +129,17 @@ def getComputers(search=None, args=None):
 
 def listNetDevices():
     """Returns a list of all device's hostnames on the network"""
-    _, a = getComputers(getDeviceNetwork()[2], '-sS -p 22')
+    _, a = getComputers(args='-sS -p 22')
     ips = [info['hostnames'][0]['name'] for _, info in a['scan'].items()]
     return list(filter(None, ips))
 
 
-# FIX! v-v
 def findBroadcast(ip=None, subnet=None):
     """Given string ip, subnet: Find WoL broadcast IP.
     Leave blank to use getDeviceNetwork as ip and subnet retreval
     """
-    if not ip:
+    if not ip or not subnet:
         ip, subnet, _ = getDeviceNetwork()
-        if not ip and not subnet:
-            return "0.0.0.0"
     return ".".join([str((int(ip.split('.')[i]) | int(subnet.split('.')[i]) ^ 255)) for i in range(0, 4)])
 
 
