@@ -1,8 +1,20 @@
 # WMIControl
 [![Code Climate](https://codeclimate.com/github/crutchcorn/WMIControl/badges/gpa.svg)](https://codeclimate.com/github/crutchcorn/WMIControl)
 ## Preface
-This project's goals are to create a sort of "control center".
-This would include WMI scanner, asset management medium, and management software, and more.
+At it's current state, the program is only able to use WMI to scan Windows machines into a central database for asset tracking. 
+
+### Roadmap
+
+This project's goals are to create a sort of "control center". This would include:
+- WMI Scanner
+- SNMP Scanner
+- Asset Management Web GUI
+- Asset Control Web GUI
+
+
+And more
+
+Though the program is only currently able to do WMI Scanning via the CLI, the code in order to control those machines have been written but are not exposed to the CLI tool.
 
 ## Installation
 ### Prereqs:
@@ -28,14 +40,11 @@ This program requires nmap to be previously installed. Proceed to download from 
 git clone https://github.com/crutchcorn/WMIControl.git
 cd WMIControl
 pip install -r requirements.txt
+python main.py
 ```
-Then, copy config.toml.example to config.toml and modify it to match your settings. See below for more
-```
-python manage.py migrate
-```
-
+The program will then generate an `conf.toml.example` file for you to use for a real config file. See below for more
 ## Configuration
-**The example configuration file is under `conf.toml.example`. You'll need to copy or rename that file to `conf.toml` and edit it to reflect your settings.**
+**The example configuration file will be under `%USERPROFILE%\conf.toml.example`. You'll need to copy or rename that file to `conf.toml` and edit it to reflect your settings.**
 
 In order to use WMIControl, you'll need to modify the configuration file to match your settings. The settings are as follows:
 
@@ -97,7 +106,7 @@ While the help page for the program is more than enough to see program usage, he
 - `wmicontrol -h` or `wmicontrol --help` - Show the help screen.
 - `wmicontrol -v` or `wmicontrol --version` - Show version.
 
-Please note; currently, the CLI arguments are VERY likely to change and will not be stable until otherwise noted.
+Please note; currently, the CLI arguments are VERY likely to change and will not be stable until a v1.0.0 stable release.
 
 
 # Developer Notes
